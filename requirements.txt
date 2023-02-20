@@ -1,0 +1,6 @@
+django
+numpy
+soundfile
+scipy
+pandas
+tdqm
