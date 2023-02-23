@@ -1,0 +1,178 @@
+{% load static %}
+
+<!DOCTYPE HTML>
+<!--
+	Arcana by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+
+<head>
+	<title>EcoSonos</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" href="{% static 'ecosonos/assets/css/main.css' %}" />
+</head>
+
+<body class="is-preload">
+	<div id="page-wrapper">
+
+		<!-- Header -->
+		<div id="header">
+
+			<!-- Logo -->
+			<div class="logoup"><img src="{% static 'ecosonos/images/logo_econosonos.png' %}"></div>
+
+			<!-- Nav -->
+			<nav id="nav">
+				<ul>
+					<li class="current"><a href="{% url 'index' %}">Inicio</a></li>
+					<li> <a href="{% url 'preproceso' %}">Preprocesamiento</a></li>
+					<li><a href="{% url 'indices' %}">Índices</a></li>
+					<li><a href="right-sidebar.html">Etiquetado</a></li>
+					<li><a href="two-sidebar.html">Contacto</a></li>
+				</ul>
+			</nav>
+
+		</div>
+
+		<!-- Banner -->
+		<section id="banner">
+			<header>
+				<h2>EcoSonos: <em>Observación a través del sonido</em></h2>
+				<a href="#" class="button">Conocer más</a>
+			</header>
+		</section>
+
+		<!-- Posts -->
+		<section class="wrapper style1">
+			<div class="container">
+				<div class="row">
+					<section class="col-12 col-12-narrower">
+						<div class="contenidos">
+							<a href="#" class="button">Cargar Archivos</a>
+						</div>
+					</section>
+					<section class="col-12 col-12-narrower">
+						<div class="contenidos">
+							<a href="#" class="button">Mover Archivos con Lluvia</a>
+						</div>
+					</section>
+				</div>
+			</div>
+		</section>
+
+		<!-- Gigantic Heading -->
+		<section class="wrapper style2">
+			<div class="container">
+				<header class="major">
+					<h2
+						style="font-family: hocus_regularregular; letter-spacing: 0.1em; font-size: 4em; line-height: 0.2em; color: #19a173;">
+						ECOSONOS</h2>
+					<p>Herramienta computacional para hacer del escuchar un observar. La herramienta permite analizar el
+						paisaje acústico para entender que está sucediendo en el ecosistema. Para esto identifica
+						automáticamente presencia de cantos de animales en las diferentes frecuencias (desde 300Hz hasta
+						80kHhz) y reconoce los cantos de especies para las que el usuario entrena el algoritmo. También
+						permite analizar el paisaje acústico de una manera global, estimando índices acústicos. Con esta
+						información el software estima similitud acústica entre los puntos geográficos que se quieren
+						analizar a través del audio</p>
+				</header>
+			</div>
+		</section>
+
+
+		<!-- CTA -->
+		<section id="cta" class="wrapper style3">
+			<div class="container">
+				<header>
+					<h2>¿Cómo puedo cargar un audio?</h2>
+					<a href="#" class="button">¡Te Explicamos!</a>
+				</header>
+			</div>
+		</section>
+
+		<!-- Footer -->
+		<div id="footer">
+			<div class="container">
+				<div class="row">
+					<section class="col-3 col-6-narrower col-12-mobilep">
+						<h3>Enlaces 1</h3>
+						<ul class="links">
+							<li><a href="#">Mattis et quis rutrum</a></li>
+							<li><a href="#">Suspendisse amet varius</a></li>
+							<li><a href="#">Sed et dapibus quis</a></li>
+							<li><a href="#">Rutrum accumsan dolor</a></li>
+							<li><a href="#">Mattis rutrum accumsan</a></li>
+							<li><a href="#">Suspendisse varius nibh</a></li>
+							<li><a href="#">Sed et dapibus mattis</a></li>
+						</ul>
+					</section>
+					<section class="col-3 col-6-narrower col-12-mobilep">
+						<h3>Enlaces 2</h3>
+						<ul class="links">
+							<li><a href="#">Duis neque nisi dapibus</a></li>
+							<li><a href="#">Sed et dapibus quis</a></li>
+							<li><a href="#">Rutrum accumsan sed</a></li>
+							<li><a href="#">Mattis et sed accumsan</a></li>
+							<li><a href="#">Duis neque nisi sed</a></li>
+							<li><a href="#">Sed et dapibus quis</a></li>
+							<li><a href="#">Rutrum amet varius</a></li>
+						</ul>
+					</section>
+					<section class="col-6 col-12-narrower">
+						<h3>¡Contáctanos!</h3>
+						<form>
+							<div class="row gtr-50">
+								<div class="col-6 col-12-mobilep">
+									<input type="text" name="name" id="name" placeholder="Nombre" />
+								</div>
+								<div class="col-6 col-12-mobilep">
+									<input type="email" name="email" id="email" placeholder="Email" />
+								</div>
+								<div class="col-12">
+									<textarea name="message" id="message" placeholder="Mensaje" rows="5"></textarea>
+								</div>
+								<div class="col-12">
+									<ul class="actions">
+										<li><input type="submit" class="button alt" value="Enviar" /></li>
+									</ul>
+								</div>
+							</div>
+						</form>
+					</section>
+				</div>
+			</div>
+
+			<!-- Icons -->
+			<ul class="icons">
+				<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+				<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+				<li><a href="#" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
+				<li><a href="#" class="icon brands fa-linkedin-in"><span class="label">LinkedIn</span></a></li>
+				<li><a href="#" class="icon brands fa-google-plus-g"><span class="label">Google+</span></a></li>
+			</ul>
+
+			<!-- Copyright -->
+			<div class="copyright">
+				<ul class="menu">
+					<li>&copy; Todos los derechos reservados</li>
+					<li>Diseño: <a href="#">Grupo Investigación</a></li>
+				</ul>
+			</div>
+
+		</div>
+
+	</div>
+
+	<!-- Scripts -->
+	<script src="{% static 'ecosonos/assets/js/jquery.min.js' %}"></script>
+	<script src="{% static 'ecosonos/assets/js/jquery.dropotron.min.js' %}"></script>
+	<script src="{% static 'ecosonos/assets/js/browser.min.js' %}"></script>
+	<script src="{% static 'ecosonos/assets/js/breakpoints.min.js' %}"></script>
+	<script src="{% static 'ecosonos/assets/js/util.js' %}"></script>
+	<script src="{% static 'ecosonos/assets/js/main.js' %}"></script>
+
+</body>
+
+</html>

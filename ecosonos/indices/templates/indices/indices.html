@@ -1,0 +1,116 @@
+{% load static%}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <form method="POST" action="">
+        {% csrf_token %}
+        <label for="ACIft">ACIft</label>
+        <input type="checkbox" name="options" value="ACIft">
+
+        <label for="ADI">ADI</label>
+        <input type="checkbox" name="options" value="ADI">
+
+        <label for="ACItf">ACItf</label>
+        <input type="checkbox" name="options" value="ACItf">
+
+        <label for="BETA">BETA</label>
+        <input type="checkbox" name="options" value="BETA">
+
+        <label for="TE">TE</label>
+        <input type="checkbox" name="options" value="TE">
+
+        <label for="ESM">ESM</label>
+        <input type="checkbox" name="options" value="ESM">
+
+        <label for="NDSI">NDSI</label>
+        <input type="checkbox" name="options" value="NDSI">
+
+        <label for="P">P</label>
+        <input type="checkbox" name="options" value="P">
+
+        <label for="M">M</label>
+        <input type="checkbox" name="options" value="M">
+
+        <label for="NP">NP</label>
+        <input type="checkbox" name="options" value="NP">
+
+        <label for="MID">MID</label>
+        <input type="checkbox" name="options" value="MID">
+
+        <label for="BNF">BNF</label>
+        <input type="checkbox" name="options" value="BNF">
+
+        <label for="BNT">BNT</label>
+        <input type="checkbox" name="options" value="BNT">
+
+        <label for="MD">MD</label>
+        <input type="checkbox" name="options" value="MD">
+
+        <label for="FM">FM</label>
+        <input type="checkbox" name="options" value="FM">
+
+        <label for="SF">SF</label>
+        <input type="checkbox" name="options" value="SF">
+
+        <label for="RMS">RMS</label>
+        <input type="checkbox" name="options" value="RMS">
+
+        <label for="CF">CF</label>
+        <input type="checkbox" name="options" value="CF">
+
+        <label for="SC">SC</label>
+        <input type="checkbox" name="options" value="SC">
+
+        <label for="SB">SB</label>
+        <input type="checkbox" name="options" value="SB">
+
+        <label for="Tonnets">Tonnets</label>
+        <input type="checkbox" name="options" value="Tonnets">
+
+        <label for="SVE">SVE</label>
+        <input type="checkbox" name="options" value="SVE">
+
+        <label for="SNR">SNR</label>
+        <input type="checkbox" name="options" value="SNR">
+
+        <label for="ADIm">ADIm</label>
+        <input type="checkbox" name="options" value="ADIm"><br /><br />
+
+        Seleccionar todos<input type="checkbox" id="seleccionar-todos"><br /><br />
+        <button type="submit" name="seleccionar-carpeta">Seleccionar carpeta</button>
+    </form>
+
+    <form method="POST" action="">
+        {% csrf_token %}
+        <button type="submit" name="mostrar-grafica">Mostar grafica</button>
+    </form>
+    {{ chart|safe }}
+    <!-- <script src="{% static 'indices/js/selectAll.js' %}"></script> -->
+    <script>
+        const selectAllCheckbox = document.getElementById("seleccionar-todos");
+        const checkboxes = document.getElementsByName("options");
+
+        selectAllCheckbox.addEventListener("change", function () {
+            for (const checkbox of checkboxes) {
+                checkbox.checked = this.checked;
+            }
+        });
+
+        for (const checkbox of checkboxes) {
+            checkbox.addEventListener("change", function () {
+                selectAllCheckbox.checked = Array.from(checkboxes).every(c => c.checked);
+            });
+        }
+    </script>
+</body>
+
+</html>

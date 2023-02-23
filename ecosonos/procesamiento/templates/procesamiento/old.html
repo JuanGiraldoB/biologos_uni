@@ -1,0 +1,26 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preprocesamiento</title>
+</head>
+
+<body>
+    <p>Seleccionar carpeta que contenga archivos .wav</p>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <button type="submit" id="cargar" name="cargar">Cargar archivos</button>
+    </form>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <button type="submit" id="mover" name="mover">Mover archivos con lluvia</button>
+    </form>
+    <script src="{% static 'procesamiento/script.js' %}"></script>
+</body>
+
+</html>

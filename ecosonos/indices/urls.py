@@ -3,5 +3,5 @@ from . import views
 
 
 urlpatterns = [
-    path('', views.lluvia, name='preproceso'),
+    path('', views.indices, name='indices'),
 ]

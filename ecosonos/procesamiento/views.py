@@ -1,12 +1,19 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from .utils.procesos_lluvia import getRutasArchivos
+from .utils.procesos_lluvia import getRutasArchivos, algoritmo_lluvia, csvReturn, removeRainFiles
 # Create your views here.
 
 
 def lluvia(request):
     if request.method == 'POST':
-        rutas, carpeta = getRutasArchivos()
-        print(rutas, carpeta)
+        if 'cargar' in request.POST:
+            g_buenas, g_malas, cond_malas = [], [], []
+            grabaciones, ruta = getRutasArchivos()
+            request.session['ruta'] = ruta
+            grab_buenas, grab_malas, cond_malas = algoritmo_lluvia(grabaciones)
+            csvReturn(ruta, grabaciones, cond_malas, request)
 
-    return render(request, 'procesamiento/index.html')
+        else:
+            removeRainFiles(
+                request.session['ruta'], request.session['ruta_csv'])
+
+    return render(request, 'procesamiento/preprocesos.html')

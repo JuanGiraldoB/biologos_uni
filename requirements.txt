@@ -4,3 +4,6 @@ soundfile
 scipy
 pandas
 tdqm
+librosa
+matplotlib
+plotly
