@@ -80,7 +80,8 @@ def ACIft(kwargs):
     s = kwargs['s']
 
     s = s / np.amax(s)
-    ACI = np.sum(np.divide(np.absolute(np.diff(s, axis=0)), s[1:, :] + s[:-1, :]))
+    ACI = np.sum(np.divide(np.absolute(
+        np.diff(s, axis=0)), s[1:, :] + s[:-1, :]))
     return ACI
 
 
@@ -121,7 +122,8 @@ def ADI(kwargs):
     p = np.zeros(nband)
 
     for band in range(nband):
-        p[band] = np.sum(pbin[band * bin_step : (band + 1) * bin_step]) + 0.0000001
+        p[band] = np.sum(
+            pbin[band * bin_step: (band + 1) * bin_step]) + 0.0000001
 
     ADIv = -np.multiply(p, np.log(p))
     ADItot = np.sum(ADIv)
@@ -150,7 +152,6 @@ def ADIm(kwargs):
     Fs = kwargs['Fs']
     wband = kwargs['wband']
 
-
     bn = background_noise_freq_ADIm(s)
     # bn=-50
     # bn = 10**(bn/20)
@@ -164,7 +165,8 @@ def ADIm(kwargs):
     p = np.zeros(nband)
 
     for band in range(nband):
-        p[band] = np.sum(pbin[band * bin_step : (band + 1) * bin_step]) + 0.0000001
+        p[band] = np.sum(
+            pbin[band * bin_step: (band + 1) * bin_step]) + 0.0000001
 
     ADIv = -np.multiply(p, np.log(p))
     ADIv = list(ADIv)
@@ -195,7 +197,7 @@ def background_noise_freq(kwargs):
         sH = np.zeros(nbinsn)
 
         for j in range(nbinsn):
-            sH[j] = H[j : j + fwin].sum() / fwin
+            sH[j] = H[j: j + fwin].sum() / fwin
 
         modep = sH.argmax()
         mode = np.amin(f) + (np.amax(f) - np.amin(f)) * (modep / nbins)
@@ -212,6 +214,7 @@ def background_noise_freq(kwargs):
         bnn = np.mean(bn)
 
     return bnn
+
 
 def background_noise_freq_ADIm(s):
     """Calcula el valor del ruido de fondo para cada celda del
@@ -235,7 +238,7 @@ def background_noise_freq_ADIm(s):
         sH = np.zeros(nbinsn)
 
         for j in range(nbinsn):
-            sH[j] = H[j : j + fwin].sum() / fwin
+            sH[j] = H[j: j + fwin].sum() / fwin
 
         modep = sH.argmax()
         mode = np.amin(f) + (np.amax(f) - np.amin(f)) * (modep / nbins)
@@ -275,7 +278,7 @@ def background_noise_time(kwargs):
     sHdB = np.zeros((len(HdB) - fwin, 1))
 
     for i in range(len(HdB) - fwin):
-        sHdB[i] = sum(HdB[i : i + fwin] / fwin)
+        sHdB[i] = sum(HdB[i: i + fwin] / fwin)
 
     modep = np.argmax(sHdB)
     bn = SPLmin + 0.1 * modep
@@ -421,14 +424,14 @@ def median_envelope(kwargs):
 
     if VerParticion >= 3:
         for seg in range(min_points, npoints, min_points):
-            y.append(np.abs(signal.hilbert(audio[seg - min_points : seg])))
+            y.append(np.abs(signal.hilbert(audio[seg - min_points: seg])))
     else:
         if VerParticion == 1:
             min_points = Fs * 20
         else:
             min_points = Fs * 30
         for seg in range(min_points, npoints, min_points):
-            y.append(np.abs(signal.hilbert(audio[seg - min_points : seg])))
+            y.append(np.abs(signal.hilbert(audio[seg - min_points: seg])))
 
     y = np.concatenate([y])
     M = (2 ** (depth - 1)) * np.median(y)
@@ -582,7 +585,7 @@ def number_of_peaks(kwargs):
 
         ret = np.cumsum(a, dtype=float)
         ret[n:] = ret[n:] - ret[:-n]
-        return ret[n - 1 :] / n
+        return ret[n - 1:] / n
 
     s = np.sum(s, axis=1)
     s = s / np.amax(s)
@@ -595,7 +598,8 @@ def number_of_peaks(kwargs):
     dsdf = np.divide(ds, df)
 
     step = round(len(s) / nedges)
-    meansig = [np.mean(np.abs(s[j * step : (j + 1) * step])) for j in range(nedges)]
+    meansig = [np.mean(np.abs(s[j * step: (j + 1) * step]))
+               for j in range(nedges)]
 
     ind = []
 
@@ -606,8 +610,8 @@ def number_of_peaks(kwargs):
         if (
             s[i] > meansig[i % nedges]
             and s[i] > 1.2 * np.mean(s)
-            and np.mean(dsdf[i + 1 : i + 4]) > 0
-            and np.mean(dsdf[i - 4 : i - 1]) < 0
+            and np.mean(dsdf[i + 1: i + 4]) > 0
+            and np.mean(dsdf[i - 4: i - 1]) < 0
         ):
             ind.append(i)
 
@@ -763,14 +767,14 @@ def temporal_entropy(kwargs):
 
     if VerParticion >= 3:
         for seg in range(min_points, npoints, min_points):
-            y.append(np.abs(signal.hilbert(audio[seg - min_points : seg])))
+            y.append(np.abs(signal.hilbert(audio[seg - min_points: seg])))
     else:
         if VerParticion == 1:
             min_points = Fs * 20
         else:
             min_points = Fs * 30
         for seg in range(min_points, npoints, min_points):
-            y.append(np.abs(signal.hilbert(audio[seg - min_points : seg])))
+            y.append(np.abs(signal.hilbert(audio[seg - min_points: seg])))
 
     env = np.concatenate([y])
     env_norm = env / np.sum(env)
@@ -827,7 +831,6 @@ def wiener_entropy(kwargs):
     type_win = kwargs['type_win']
     overlap = kwargs['overlap']
 
-
     f, pxx = signal.welch(
         audio, nperseg=win, nfft=nfft, window=type_win, noverlap=overlap
     )
@@ -835,6 +838,7 @@ def wiener_entropy(kwargs):
     den = np.mean(pxx)
     spf = num / den
     return spf
+
 
 def spectral_centroid(kwargs):
     """Calcula el centroide espectral
@@ -853,6 +857,7 @@ def spectral_centroid(kwargs):
 
     return SC
 
+
 def spectral_bandwidth(kwargs):
     """Calcula el ancho de banda espectral
 
@@ -867,8 +872,9 @@ def spectral_bandwidth(kwargs):
     Fs = kwargs['Fs']
 
     SB = np.mean(librosa.feature.spectral_bandwidth(y=audio, sr=Fs))
-    
+
     return SB
+
 
 def tonnetz(kwargs):
     """Calcula la red de tonos de la grabacion de audio
@@ -882,11 +888,10 @@ def tonnetz(kwargs):
     """
     audio = kwargs['audio']
     Fs = kwargs['Fs']
-    
-    ton = np.mean(librosa.feature.tonnetz(audio, Fs))
-    
-    return ton
 
+    ton = np.mean(librosa.feature.tonnetz(y=audio, sr=Fs))
+
+    return ton
 
 
 # *********/*********/*********/*********/*********/*********/*********/**

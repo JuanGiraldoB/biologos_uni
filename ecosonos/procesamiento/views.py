@@ -1,19 +1,93 @@
 from django.shortcuts import render, redirect
 from .utils.procesos_lluvia import getRutasArchivos, algoritmo_lluvia, csvReturn, removeRainFiles
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.urls import reverse
+from .utils.prueba_progress import tipos_grabaciones, procesar_audio
+import numpy as np
 # Create your views here.
 
 
+@csrf_exempt
 def lluvia(request):
     if request.method == 'POST':
         if 'cargar' in request.POST:
-            g_buenas, g_malas, cond_malas = [], [], []
-            grabaciones, ruta = getRutasArchivos()
-            request.session['ruta'] = ruta
-            grab_buenas, grab_malas, cond_malas = algoritmo_lluvia(grabaciones)
-            csvReturn(ruta, grabaciones, cond_malas, request)
+            try:
+                print("cargando archivos")
+                grabaciones, ruta = getRutasArchivos()
+                n_grabs = len(grabaciones)
+                request.session['ruta'] = ruta
+                request.session['grabaciones'] = grabaciones
+                request.session['n_grab'] = n_grabs
+                request.session['index'] = 0
+                PSD_medio = np.zeros((n_grabs,))
+                PSD_medio = PSD_medio.tolist()
+                print(PSD_medio)
+                # print(np.array(PSD_medio))
+                request.session['PSD_medio'] = PSD_medio
+                print('archivos cargados')
+
+            except:
+                # TODO: agregar flash message
+                print('debe seleccionar una carpeta')
+
+            finally:
+                return redirect(reverse('preproceso'))
+
+        elif request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            try:
+                index = request.session['index']
+                n_grab = request.session['n_grab']
+                grabaciones = request.session['grabaciones']
+                PSD_medio = request.session['PSD_medio']
+
+                data = {'progress': index, 'max': n_grab}
+
+                if index == n_grab:
+                    g_buenas, g_malas, cond_malas = [], [], []
+                    g_buenas, g_malas, cond_malas = tipos_grabaciones(
+                        grabaciones, PSD_medio)
+                    csv_ruta = csvReturn(request.session['ruta'],
+                                         request.session['grabaciones'], cond_malas, request)
+
+                    request.session['ruta_csv'] = csv_ruta
+
+                    return JsonResponse(data)
+
+                grabacion = grabaciones[index]
+                PSD_medio[index] = procesar_audio(grabacion)
+
+                request.session['index'] = index + 1
+                print(f'Procesada {grabacion}[{index}]')
+
+                return JsonResponse(data)
+
+                # grab_buenas, grab_malas, cond_malas = algoritmo_lluvia(
+                #     request.session['grabaciones'])
+
+                # csv_ruta = csvReturn(request.session['ruta'],
+                #                      request.session['grabaciones'], cond_malas, request)
+
+                # request.session['ruta_csv'] = csv_ruta
+
+            except:
+                # TODO: agregar flash message
+                print(
+                    'debe seleccionar una carpeta previamente o existen archivos corruptos')
+
+            # finally:
+            #     return redirect(reverse('preproceso'))
 
         else:
-            removeRainFiles(
-                request.session['ruta'], request.session['ruta_csv'])
+            try:
+                removeRainFiles(
+                    request.session['ruta'], request.session['ruta_csv'])
 
-    return render(request, 'procesamiento/preprocesos.html')
+            except:
+                # TODO: agregar flash message
+                print('debe haber procesado archivos .wav previamente')
+
+            finally:
+                return redirect(reverse('preproceso'))
+
+    return render(request, 'procesamiento/old.html')

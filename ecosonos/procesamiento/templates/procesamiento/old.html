@@ -7,6 +7,14 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        #progress-bar {
+            background-color: #4CAF50;
+            height: 20px;
+            width: 0%;
+        }
+    </style>
     <title>Preprocesamiento</title>
 </head>
 
@@ -16,10 +24,21 @@
         {% csrf_token %}
         <button type="submit" id="cargar" name="cargar">Cargar archivos</button>
     </form>
+
+    <button type="submit" id="procesar" name="procesar">Procesar archivos con lluvia</button>
+
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <button type="submit" id="mover" name="mover">Mover archivos con lluvia</button>
     </form>
+
+    <button type="submit" id="prueba" style="display: none;">daasdas</button>
+
+
+    <h1>Progress Bar Example</h1>
+    <div id="progress-bar" style="width: 0%;"></div>
+    </script> -->
+    <script src="{% static 'procesamiento/progressBar.js' %}"></script>
     <script src="{% static 'procesamiento/script.js' %}"></script>
 </body>
 

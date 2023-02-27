@@ -40,6 +40,62 @@ def getRutasArchivos():
     return rutas, carpeta
 
 
+def procesar_audio(grabacion, wn="hann", wl=1024, nfft=1024, ovlp=0, canal=2, cond=0):
+    banda_lluvia = (600, 1200)
+    x, Fs = sf.read(grabacion)
+
+    if len(x.shape) == 1:
+        audio = x
+    else:
+        x = x.mean(axis=1)
+        x = np.squeeze(x)
+        audio = x
+
+    puntos_minuto = Fs * 60
+    npuntos = len(audio)
+    banda = []
+
+    for seg in range(0, npuntos, puntos_minuto):
+        f, p = signal.welch(
+            audio[seg: puntos_minuto + seg],
+            Fs,
+            nperseg=wl,
+            window=wn,
+            nfft=nfft,
+            noverlap=ovlp,
+        )
+        banda.append(
+            p[np.logical_and(f >= banda_lluvia[0], f <= banda_lluvia[1])])
+
+    banda = np.concatenate(banda)
+    return np.mean(banda)
+    # PSD_medio[index] = np.mean(banda)
+
+
+def tipos_grabaciones(grabaciones, PSD_medio, cond=0):
+    PSD_medio = np.array(PSD_medio)
+    PSD_medio_sin_ceros = PSD_medio[PSD_medio > 0]
+    umbral = (
+        np.mean(PSD_medio_sin_ceros) + gmean(PSD_medio_sin_ceros)
+    ) / 2
+
+    cond_buenas = np.logical_and(PSD_medio < umbral, PSD_medio != 0)
+    cond_malas = np.logical_and(PSD_medio >= umbral, PSD_medio != 0)
+    grabaciones = np.array(grabaciones)
+
+    if cond == 1:
+        grab_buenas = grabaciones
+    else:
+        grab_buenas = np.array(
+            [grab.split("/")[-1] for grab in grabaciones[cond_buenas]]
+        ).T
+
+    grab_malas = np.array([grab.split("/")[-1]
+                          for grab in grabaciones[cond_malas]]).T
+
+    return grab_buenas, grab_malas, cond_malas
+
+
 def algoritmo_lluvia(
     grabaciones, wn="hann", wl=1024, nfft=1024, ovlp=0, canal=2, cond=0
 ):

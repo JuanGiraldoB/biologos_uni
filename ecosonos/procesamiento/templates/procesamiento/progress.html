@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Test</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        #progress-bar {
+            background-color: #4CAF50;
+            height: 20px;
+            width: 0%;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Progress Bar Example</h1>
+    <div id="progress-bar" style="width: 0%;"></div>
+    <script>
+        $(document).ready(function () {
+            setInterval(updateProgressBar, 1000);
+        });
+
+        function updateProgressBar() {
+            $.ajax({
+                url: "{% url 'progress' %}",
+                type: "POST",
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    var progress = data['progress'];
+                    console.log(data)
+                    $('#progress-bar').css('width', progress + '%');
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
