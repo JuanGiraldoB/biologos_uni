@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
-from .utils.procesos_lluvia import getRutasArchivos, algoritmo_lluvia, csvReturn, removeRainFiles
+from .utils.procesos_lluvia import getRutasArchivos, csvReturn, removeRainFiles
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
-from .utils.prueba_progress import tipos_grabaciones, procesar_audio
+from .utils.procesos_lluvia_progress import tipos_grabaciones, procesar_audio
 import numpy as np
 # Create your views here.
 
@@ -22,8 +22,6 @@ def lluvia(request):
                 request.session['index'] = 0
                 PSD_medio = np.zeros((n_grabs,))
                 PSD_medio = PSD_medio.tolist()
-                print(PSD_medio)
-                # print(np.array(PSD_medio))
                 request.session['PSD_medio'] = PSD_medio
                 print('archivos cargados')
 
@@ -62,21 +60,10 @@ def lluvia(request):
 
                 return JsonResponse(data)
 
-                # grab_buenas, grab_malas, cond_malas = algoritmo_lluvia(
-                #     request.session['grabaciones'])
-
-                # csv_ruta = csvReturn(request.session['ruta'],
-                #                      request.session['grabaciones'], cond_malas, request)
-
-                # request.session['ruta_csv'] = csv_ruta
-
             except:
                 # TODO: agregar flash message
                 print(
                     'debe seleccionar una carpeta previamente o existen archivos corruptos')
-
-            # finally:
-            #     return redirect(reverse('preproceso'))
 
         else:
             try:
@@ -90,4 +77,4 @@ def lluvia(request):
             finally:
                 return redirect(reverse('preproceso'))
 
-    return render(request, 'procesamiento/old.html')
+    return render(request, 'procesamiento/preproceso.html')

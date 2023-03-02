@@ -92,36 +92,6 @@ def calcularIndice(indices_select, carpeta, archivos):
     """
     Indices_grabaciones = []
 
-    # if indices_select == "Todos":
-    #     indices_select = [
-    #         "ACIft",
-    #         "ADI",
-    #         "ACItf",
-    #         "BETA",
-    #         "TE",
-    #         "ESM",
-    #         "NDSI",
-    #         "P",
-    #         "M",
-    #         "NP",
-    #         "MID",
-    #         "BNF",
-    #         "BNT",
-    #         "MD",
-    #         "FM",
-    #         "SF",
-    #         "RMS",
-    #         "CF",
-    #         "SC",
-    #         "SB",
-    #         "Tonnets",
-    #         "SVE",
-    #         "SNR",
-    #         "ADIm",
-    #     ]
-    # else:
-    #     indices_select = indices_select.split("+")
-
     grabaciones = []
     # carpeta = askdirectory(title='Seleccionar carpeta con audios')
     # archivos = os.listdir(carpeta)

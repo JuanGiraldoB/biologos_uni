@@ -1,17 +1,16 @@
-var intervalId = null;
-
+let intervalId = null;
 document.addEventListener("DOMContentLoaded", function () {
-    var button = document.getElementById("procesar");
+    let button = document.getElementById("procesar");
     button.addEventListener("click", function () {
-        intervalId = setInterval(updateProgressBar, 100);
+        console.log("dasdas")
+        intervalId = setInterval(updateProgressBar, 1000);
     });
 });
 
-// const hiddenButton = document.getElementById('prueba');
 
 function updateProgressBar() {
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", "/preproceso/", true);
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST", "/indices/", true);
     xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
     xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token }}');
     xhr.onreadystatechange = function () {
@@ -21,8 +20,8 @@ function updateProgressBar() {
             const max = data['max'];
             const progressBar = document.getElementById("progress-bar");
 
-            progressBar.style.width = progress * 50 + '%';
-            console.log(progress, max, "hey")
+            progressBar.style.width = progress * 10 + '%';
+            console.log(progress, max)
             if (progress == max) {
                 clearInterval(intervalId);
             }
