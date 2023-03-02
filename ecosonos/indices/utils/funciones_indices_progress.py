@@ -86,7 +86,20 @@ def calcular_espectrograma(ruta):
     return f, t, s, senal_audio, fs
 
 
+# G21A_20190520_190000.WAV
 def csvIndices(indicesCalculados, ruta, indices_seleccionados):
+    print("Indices calculados:", indicesCalculados[0])
+    print("indices_seleccionados:", indices_seleccionados)
+    print("Ruta:", ruta)
+    grabaciones = indicesCalculados[0]
+    fechas = []
+    horas = []
+
+    for nombre in grabaciones:
+        partes_nombre = nombre[:-4].split('_')
+        fechas.append(partes_nombre[1])
+        horas.append(partes_nombre[2])
+
     Valores = indicesCalculados
 
     data = None
@@ -95,6 +108,9 @@ def csvIndices(indicesCalculados, ruta, indices_seleccionados):
 
     for j in range(len(indices_seleccionados)):
         indicesDF[indices_seleccionados[j]] = Valores[j]
+
+    indicesDF['fecha'] = fechas
+    indicesDF['hora'] = horas
 
     nombreGrabacion = Valores[0][0]
     nombreGrabadora = nombreGrabacion.split('_')[0]
@@ -217,9 +233,10 @@ def graficaErrorBar(ruta, grabaciones):
     nombreGrabacion = grabaciones[0].split("/")[-1]
     grabadora = nombreGrabacion.split('_')[0]
     df = pd.read_csv(ruta + '/Indices_acusticos_'+grabadora+'.csv')
-    print(df)
-    normalized_df = df / df.max(axis=0, numeric_only=True)
-    print(normalized_df)
+
+    # Ignora las ultimas dos columnas(fecha y hora)
+    normalized_df = df.iloc[:, :-2] / \
+        df.iloc[:, :-2].max(axis=0, numeric_only=True)
 
     meanDF = normalized_df.mean(axis=0, numeric_only=True)
     stdDF = normalized_df.std(axis=0, numeric_only=True)
@@ -228,19 +245,35 @@ def graficaErrorBar(ruta, grabaciones):
     std_DF = stdDF.to_list()
 
     keys = meanDF.keys()
-    print(meanDF)
-    print(stdDF)
-    print(keys.values)
-
-    print('DF', df)
 
     x_pos = np.arange(len(keys.values))
-    print('X_POS', x_pos)
 
     df_means = pd.DataFrame(
         {'Indices': meanDF.index, 'mean_DF': meanDF.values, 'std_DF': stdDF.values})
 
     return df_means
+
+
+# def graficaErrorBar(ruta, grabaciones):
+#     nombreGrabacion = grabaciones[0].split("/")[-1]
+#     grabadora = nombreGrabacion.split('_')[0]
+#     df = pd.read_csv(ruta + '/Indices_acusticos_'+grabadora+'.csv')
+#     normalized_df = df / df.max(axis=0, numeric_only=True)
+
+#     meanDF = normalized_df.mean(axis=0, numeric_only=True)
+#     stdDF = normalized_df.std(axis=0, numeric_only=True)
+
+#     mean_DF = meanDF.to_list()
+#     std_DF = stdDF.to_list()
+
+#     keys = meanDF.keys()
+
+#     x_pos = np.arange(len(keys.values))
+
+#     df_means = pd.DataFrame(
+#         {'Indices': meanDF.index, 'mean_DF': meanDF.values, 'std_DF': stdDF.values})
+
+#     return df_means
 
     # fig, ax = plt.subplots()
     # ax.bar(x_pos, mean_DF,
