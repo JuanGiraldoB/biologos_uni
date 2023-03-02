@@ -1,11 +1,10 @@
 from django.shortcuts import render, redirect
-from .utils.procesos_lluvia import getRutasArchivos, csvReturn, removeRainFiles
+# from .utils.procesos_lluvia import getRutasArchivos, csvReturn, removeRainFiles
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
-from .utils.procesos_lluvia_progress import tipos_grabaciones, procesar_audio
+from .utils.procesos_lluvia_progress import tipos_grabaciones, procesar_audio, csvReturn, removeRainFiles, getRutasArchivos
 import numpy as np
-# Create your views here.
 
 
 @csrf_exempt
@@ -28,9 +27,6 @@ def lluvia(request):
             except:
                 # TODO: agregar flash message
                 print('debe seleccionar una carpeta')
-
-            finally:
-                return redirect(reverse('preproceso'))
 
         elif request.headers.get('x-requested-with') == 'XMLHttpRequest':
             try:
@@ -67,14 +63,12 @@ def lluvia(request):
 
         else:
             try:
+                # plot_polar_indices()
                 removeRainFiles(
                     request.session['ruta'], request.session['ruta_csv'])
 
             except:
                 # TODO: agregar flash message
                 print('debe haber procesado archivos .wav previamente')
-
-            finally:
-                return redirect(reverse('preproceso'))
 
     return render(request, 'procesamiento/preproceso.html')
