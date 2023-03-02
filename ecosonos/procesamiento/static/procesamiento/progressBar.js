@@ -7,8 +7,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-// const hiddenButton = document.getElementById('prueba');
-
 function updateProgressBar() {
     var xhr = new XMLHttpRequest();
     xhr.open("POST", "/preproceso/", true);
