@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
-from .utils.funciones_indices import graficaErrorBar
-from .utils.funciones_indices_progress import getRutasArchivos, calcularIndice, csvIndices
+# from .utils.funciones_indices import graficaErrorBar
+from .utils.funciones_indices_progress import getRutasArchivos, calcularIndice, csvIndices, graficaErrorBar
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from tkinter.filedialog import askdirectory
@@ -17,7 +17,6 @@ def indices(request):
     context = {'chart': chart}
 
     if request.method == 'POST':
-        print("prueba")
         if 'cargar' in request.POST:
             indices_seleccionados = request.POST.getlist('options')
 
@@ -43,7 +42,6 @@ def indices(request):
                     Valores.append(list())
 
                 request.session['valores'] = Valores
-                print(request.session['valores'])
 
             except:
                 # TODO: add flash message
@@ -62,13 +60,11 @@ def indices(request):
             indices_seleccionados = request.session['indices_seleccionados']
             ruta = request.session['ruta_indices']
             index = request.session['index_indices']
-            indices_por_grabacion = request.session['grab_ind_calculados']
             n_grab = request.session['n_grab_indices']
 
             data = {'progress': index, 'max': n_grab}
 
             if index == n_grab:
-                print("Dasdasdasmkdas")
                 csvIndices(Valores, ruta, indices_seleccionados)
                 return JsonResponse(data)
 
