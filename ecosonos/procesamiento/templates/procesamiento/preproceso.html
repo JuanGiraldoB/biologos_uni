@@ -65,6 +65,13 @@
 								<p>Seleccionar la carpeta que contiene los archivos (.wav)</p>
 								<input type="submit" value="Cargar Archivos" id="cargar" name="cargar"></input>
 							</form>
+							{% if messages %}
+							<ul class="messages">
+								{% for message in messages %}
+								<li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+									{% endfor %}
+							</ul>
+							{% endif %}
 						</div>
 					</section>
 					<section class="col-12 col-12-narrower">

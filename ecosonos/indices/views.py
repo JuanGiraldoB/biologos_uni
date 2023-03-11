@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect
-# from .utils.funciones_indices import graficaErrorBar
 from .utils.funciones_indices_progress import getRutasArchivos, calcularIndice, csvIndices, graficaErrorBar
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
@@ -7,8 +6,51 @@ from tkinter.filedialog import askdirectory
 import os
 import plotly.express as px
 from django.urls import reverse
+import plotly.express as px
+import pandas as pd
+from django.contrib import messages
+from django.http import HttpResponse
+
 
 # Create your views here.
+
+def folder_view(request):
+    if request.method == 'POST':
+
+        if 'cargar' in request.POST:
+            carpeta = askdirectory(title='Seleccionar carpeta con audios')
+            archivos = os.listdir(carpeta)
+            carpetas = []
+
+            for ruta, carpetas_subdir, _ in os.walk(carpeta):
+                # Add all directories to the carpetas list
+                for carpeta_subdir in carpetas_subdir:
+                    carpetas.append(os.path.join(ruta, carpeta_subdir))
+
+            return render(request, 'indices/folder_view.html', {'carpeta': carpeta, 'archivos': carpetas})
+
+    return render(request, 'indices/folder_select.html')
+
+
+def procesar(request):
+    if request.method == 'POST':
+        carpetas = request.POST.getlist('carpetas')
+        archivos = []
+
+        for carpeta in carpetas:
+            print('carpeta', carpeta)
+
+            for ruta, _, archivos_subdir in os.walk(carpeta):
+
+                # Add all files to the archivos list
+                for archivo in archivos_subdir:
+                    archivos.append(os.path.join(ruta, archivo))
+
+        # Redirect to a success page or display a success message
+        return HttpResponse('Archivos procesados: {}'.format(archivos))
+    else:
+        # Return a form to select the files
+        return render(request, 'seleccionar.html', {'archivos': archivos})
 
 
 @csrf_exempt
@@ -65,6 +107,7 @@ def indices(request):
             data = {'progress': index, 'max': n_grab}
 
             if index == n_grab:
+                print("terminado")
                 csvIndices(Valores, ruta, indices_seleccionados)
                 return JsonResponse(data)
 
@@ -79,16 +122,23 @@ def indices(request):
 
         if 'mostrar-grafica' in request.POST:
             try:
+                print(request.session['ruta_indices'])
                 df_means = graficaErrorBar(
-                    request.session['carpeta'], request.session['grabaciones'])
+                    request.session['ruta_indices'], request.session['grabaciones_indices'])
                 fig = px.bar(df_means, x='Indices',
                              y='mean_DF', error_y='std_DF')
+                # df = pd.read_csv(
+                #     request.session['carpeta'] + "/Indices_acusticos_G21A.csv")
+                # fig = px.bar_polar(df, r='hora', theta='fecha', color='ACIft', hover_data=['hora'],
+                #                    template='plotly_dark', title='ACIft vs. fecha')
+
                 chart = fig.to_html()
                 context = {'chart': chart}
                 return render(request, 'indices/indices.html', context)
 
-            except:
+            except Exception as e:
                 # TODO: add flash message
+                print(e)
                 print('debe primero cargar datos')
                 return redirect(reverse('indices'))
 

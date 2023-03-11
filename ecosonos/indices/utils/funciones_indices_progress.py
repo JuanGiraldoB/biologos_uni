@@ -6,7 +6,6 @@ from tkinter.filedialog import askdirectory
 from tqdm import tqdm
 import numpy as np
 from django.http import JsonResponse
-import matplotlib.pyplot as plt
 import os
 # import matplotlib.pyplot as plt
 
@@ -88,9 +87,6 @@ def calcular_espectrograma(ruta):
 
 # G21A_20190520_190000.WAV
 def csvIndices(indicesCalculados, ruta, indices_seleccionados):
-    print("Indices calculados:", indicesCalculados[0])
-    print("indices_seleccionados:", indices_seleccionados)
-    print("Ruta:", ruta)
     grabaciones = indicesCalculados[0]
     fechas = []
     horas = []
