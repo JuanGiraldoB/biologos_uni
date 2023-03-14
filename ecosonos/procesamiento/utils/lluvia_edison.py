@@ -455,13 +455,16 @@ def algoritmo_lluvia_edison(carpetas, raiz, progreso):
     if (Edison_Duque):
         with Pool(processes=workers) as pool:
             result = []
+
             for i, res in enumerate(tqdm.tqdm(pool.imap(_apply_df, [(d, calculo_PSD_and_Espectro_promedio, i, q) for i, d in enumerate(df_split)]), total=len(df_split))):
                 result.append(res)
+
                 while not q.empty():
                     completed_task = q.get()
                     completado = progreso.archivos_completados
                     progreso.archivos_completados += 1
                     progreso.save()
+                    # print(f"Completed task {completed_task}: {completado}")
 
         x = pd.concat([r[0] for r in result])
 

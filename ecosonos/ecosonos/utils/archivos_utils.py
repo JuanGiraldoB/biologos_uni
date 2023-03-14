@@ -2,7 +2,7 @@ import pandas as pd
 import shutil
 
 
-def mover_archivos_lluvia(carpeta_raiz, carpeta_destino, ruta_xlsx):
+def mover_archivos_lluvia(carpeta_raiz, carpeta_destino):
     ruta_xlsx = f'{carpeta_raiz}/resultado.xlsx'
     xlsx_file = pd.read_excel(ruta_xlsx)
 
