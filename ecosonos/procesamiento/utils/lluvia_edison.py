@@ -4,7 +4,7 @@ import pandas as pd
 from scipy import signal, stats
 import os
 import tqdm
-from multiprocessing import Pool
+from multiprocessing import Manager, Pool
 import time
 from datetime import timedelta
 import argparse
@@ -12,6 +12,7 @@ from pathlib import Path
 import warnings
 from pydub import AudioSegment
 import sys
+import asyncio
 
 warnings.filterwarnings('ignore')
 warnings.simplefilter("ignore", category=RuntimeWarning)
@@ -132,7 +133,6 @@ def calculo_PSD_and_Espectro_promedio(df_ll, pbar=None):
     :param df_ll: ruta de la grabacion que se esta analizando y carpeta a la que pertenece
     :return: ruta de la grabacion, directorio en con rangos de frecuencia vs PDS encontrado, valor PSD media, indicador para saber si el archivo esta corrupto, nombre de la carpeta al que pertenece la grabacion y espectrograma promedio de la grabacion
     '''
-    print('****************************', df_ll.name)
     canal = 0
     canal1 = 1
     fmin = 200
@@ -223,9 +223,14 @@ def calculo_PSD_and_Espectro_promedio(df_ll, pbar=None):
 
 
 def _apply_df(args):
-    df, func = args
+    df, func, i, q = args
     res = df.apply(func, axis=1)
-    return res
+
+    for file_processed in res:
+        if file_processed is not None:
+            q.put(i)
+
+    return res, i
 
 
 def regla_decision(x, umbral):
@@ -364,8 +369,16 @@ def algoritmo_lluvia_imp_intensidad(df_ind, arraymeanspect_ind):
     return df_indices_lluvia
 
 
-def algoritmo_lluvia_edison(carpetas, raiz):
+async def run_algoritmo_lluvia_edison(carpetas, raiz, request):
+    await asyncio.to_thread(algoritmo_lluvia_edison, carpetas, raiz, request)
 
+
+def run_algoritmo_lluvia_edison_sync(carpetas, raiz, request):
+    asyncio.run(run_algoritmo_lluvia_edison(carpetas, raiz, request))
+
+
+def algoritmo_lluvia_edison(carpetas, raiz, progreso):
+    warnings.simplefilter("ignore", category=RuntimeWarning)
     # Edison_Duque = True # toma valor True para utilizar metodo de EDISON,2022 y False para utilizar metodo de DUQUE,2019
 
     Edison_Duque = True
@@ -388,8 +401,9 @@ def algoritmo_lluvia_edison(carpetas, raiz):
                "path_FI": [],
                "duracion_escog": []}
 
-    print(f"Inventorying Files...")
+    # print(f"Inventorying Files...")
     start_time = time.time()
+    numero_archivos = 0
     for carpeta in carpetas:
         for archivo in os.listdir(carpeta):
             file_name = os.path.join(carpeta, archivo).replace('\\', '/')
@@ -397,6 +411,7 @@ def algoritmo_lluvia_edison(carpetas, raiz):
             if os.path.isfile(file_name):
                 if any([f".{formato}" in archivo for formato in formatos]):
                     if not (archivo.startswith(".")):
+                        numero_archivos += 1
 
                         dict_df["field_number_PR"].append(
                             os.path.basename(carpeta))
@@ -410,18 +425,21 @@ def algoritmo_lluvia_edison(carpetas, raiz):
                         duration = len(audio_file) / 1000
                         dict_df["duracion_escog"].append(duration)
 
+    progreso.cantidad_archivos = numero_archivos
+    progreso.save()
+
     df = pd.DataFrame(dict_df)
     df[['prefix', 'date', 'hour', 'format']] = df.name_FI.str.extract(
         r'(?P<prefix>\w+)_(?P<date>\d{8})_(?P<hour>\d{6}).(?P<format>[0-9a-zA-Z]+)')
 
-    print(f"{len(df)} files found")
+    # print(f"{len(df)} files found")
 
     df = df.loc[df.field_number_PR.apply(
         lambda x: x not in exclude_these_sites), :]
 
-    print(f"{len(df)} files found after exclude {','.join(exclude_these_sites)} sites")
+    # print(f"{len(df)} files found after exclude {','.join(exclude_these_sites)} sites")
 
-    print(f"Calculating Indices...")
+    # print(f"Calculating Indices...")
     workers = min(len(df), n_cores)
 
     if (8 <= len(df) // workers):
@@ -431,13 +449,27 @@ def algoritmo_lluvia_edison(carpetas, raiz):
 
     df_split = np.array_split(df, fact_split * workers)
 
+    manager = Manager()
+    q = manager.Queue()
+
     if (Edison_Duque):
         with Pool(processes=workers) as pool:
-            result = list(tqdm.tqdm(pool.imap(_apply_df, [
-                          (d, calculo_PSD_and_Espectro_promedio) for d in df_split]), total=len(df_split)))
-        print('RESUUUUUUUUUUUUULT:', result)
-        x = pd.concat(result)
-        print(f"Running Rain Algorithm...")
+            result = []
+            for i, res in enumerate(tqdm.tqdm(pool.imap(_apply_df, [(d, calculo_PSD_and_Espectro_promedio, i, q) for i, d in enumerate(df_split)]), total=len(df_split))):
+                result.append(res)
+                while not q.empty():
+                    completed_task = q.get()
+                    completado = progreso.archivos_completados
+                    progreso.archivos_completados += 1
+                    progreso.save()
+
+        x = pd.concat([r[0] for r in result])
+
+        #     result = list(tqdm.tqdm(pool.imap(_apply_df, [
+        #                   (d, calculo_PSD_and_Espectro_promedio) for d in df_split]), total=len(df_split)))
+
+        # x = pd.concat(result)
+        # print(f"Running Rain Algorithm...")
         x = np.array(list(zip(*x)), dtype=object).T
 
         df_ind = pd.DataFrame(list(x[:, 1]))
@@ -465,7 +497,7 @@ def algoritmo_lluvia_edison(carpetas, raiz):
         assert len(df) == len(df_indices_lluvia)
 
         df_y = df.merge(df_indices_lluvia, how='left', on='path_FI')
-        df_y = df_y.drop(['path_FI', 'date', 'prefix', 'hour', 'format',
+        df_y = df_y.drop(['date', 'prefix', 'hour', 'format',
                          'damaged_FI', 'grupo', 'rain_FI_PSD', 'duracion_escog'], axis=1)
         cols = list((df_y.columns))
         cols2 = cols[:-2] + cols[-1:] + ['Duracion(seg)']
@@ -473,8 +505,8 @@ def algoritmo_lluvia_edison(carpetas, raiz):
 
         path_file = os.path.join(folder_rain, name_file)
 
-        print(f"Saving in {path_file} ...")
+        # print(f"Saving in {path_file} ...")
         df_y.to_excel(path_file, index=False)
-        print(f"Results saved in {path_file}")
+        # print(f"Results saved in {path_file}")
         print(
             f"Execution Time {str(timedelta(seconds=time.time() - start_time))}")

@@ -15,13 +15,6 @@
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 	<link rel="stylesheet" href="{% static 'ecosonos/assets/css/main.css' %}" />
-	<style>
-		#progress-bar {
-			background-color: #4CAF50;
-			height: 20px;
-			width: 0%;
-		}
-	</style>
 </head>
 
 <body class="is-preload">
@@ -62,35 +55,55 @@
 						<div class="contenidos">
 							<form method="POST" enctype="multipart/form-data">
 								{% csrf_token %}
-								<p>Seleccionar la carpeta que contiene los archivos (.wav)</p>
-								<input type="submit" value="Cargar Archivos" id="cargar" name="cargar"></input>
+								<p>Seleccionar la carpeta raiz que contiene los archivos (.wav)</p>
+								<input type="submit" value="Seleccionar Carpeta Principal" id="cargar"
+									name="cargar"></input>
 							</form>
-							{% if messages %}
-							<ul class="messages">
-								{% for message in messages %}
-								<li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+							{% if carpetas %}
+							<form method="POST">
+								{% csrf_token %}
+
+								{% if procesando %}
+								<p id="procesando">Procesando...</p>
+								{% endif %}
+								<ul>
+									{% for carpeta in carpetas %}
+									<li>
+										<label>
+											<input type="checkbox" name="carpetas" value="{{ carpeta }}" checked>
+											{{ carpeta }}
+										</label>
+									</li>
 									{% endfor %}
-							</ul>
+								</ul>
+								<input type="submit" value="Procesar Carpetas con Lluvia" id="procesar_carpetas"
+									name="procesar_carpetas"></input>
+							</form>
 							{% endif %}
 						</div>
 					</section>
-					<section class="col-12 col-12-narrower">
+					<!-- <section class="col-12 col-12-narrower">
 						<div class="contenidos">
-							<input type="submit" value="Procesar Archivos con Lluvia" id="procesar"
-								name="procesar"></input>
+							<form method="POST">
+								{% csrf_token %}
+								<input type="submit" value="Procesar Carpetas con Lluvia" id="procesar_carpetas"
+									name="procesar_carpetas"></input>
+							</form>
 						</div>
-					</section>
+					</section> -->
 					<section class="col-12 col-12-narrower">
 						<div class="contenidos">
 							<form method="POST" enctype="multipart/form-data">
 								{% csrf_token %}
-								<input type="submit" value="Mover Archivos con Lluvia" id="mover" name="mover"></input>
+								<input type="submit" value="Mover Archivos con Lluvia" id="mover_archivos"
+									name="mover_archivos"></input>
 							</form>
 						</div>
 					</section>
 					<section>
+						<input type="submit" value="Progreso" id="progreso" name="progreso"></input>
 						<h1>Progress Bar Example</h1>
-						<div id="progress-bar" style="width: 0%;"></div>
+						<div id="progreso_completado"></div>
 					</section>
 				</div>
 			</div>

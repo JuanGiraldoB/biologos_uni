@@ -1,0 +1,15 @@
+{% load static %}
+
+<style>
+    #progress-bar {
+        background-color: #4CAF50;
+        height: 20px;
+        width: 0%;
+    }
+</style>
+
+<h1>Progress Bar Example</h1>
+<input type="submit" value="Procesar Archivos" id="procesar" name="procesar"></input>
+<div id="progress-bar" style="width: 0%;"></div>
+
+<script src="{% static 'procesamiento/progressBar.js' %}"></script>

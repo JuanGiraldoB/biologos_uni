@@ -1,18 +1,27 @@
 {% load static %}
-
 <!DOCTYPE HTML>
 <!--
 	Arcana by HTML5 UP
 	html5up.net | @ajlkn
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 -->
-<html>
+<html lang="en">
 
 <head>
 	<title>EcoSonos</title>
 	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 	<link rel="stylesheet" href="{% static 'ecosonos/assets/css/main.css' %}" />
+	<style>
+		#progress-bar {
+			background-color: #4CAF50;
+			height: 20px;
+			width: 0%;
+		}
+	</style>
 </head>
 
 <body class="is-preload">
@@ -49,51 +58,39 @@
 		<section class="wrapper style1">
 			<div class="container">
 				<div class="row">
-					<section class="col-6 col-12-narrower">
-						<div class="box post">
-							<a href="#" class="image left"><img src="{% static 'ecosonos/images/pic01.jpg' %}"
-									alt="" /></a>
-							<div class="inner">
-								<h3>Opción 1</h3>
-								<p>Duis neque nisi, dapibus sed mattis et quis, nibh. Sed et dapibus nisl amet mattis,
-									sed a rutrum accumsan sed. Suspendisse eu.</p>
-							</div>
+					<section class="col-12 col-12-narrower">
+						<div class="contenidos">
+							<form method="POST" enctype="multipart/form-data">
+								{% csrf_token %}
+								<p>Seleccionar la carpeta que contiene los archivos (.wav)</p>
+								<input type="submit" value="Cargar Archivos" id="cargar" name="cargar"></input>
+							</form>
+							{% if messages %}
+							<ul class="messages">
+								{% for message in messages %}
+								<li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+									{% endfor %}
+							</ul>
+							{% endif %}
 						</div>
 					</section>
-					<section class="col-6 col-12-narrower">
-						<div class="box post">
-							<a href="#" class="image left"><img src="{% static 'ecosonos/images/pic02.jpg' %}"
-									alt="" /></a>
-							<div class="inner">
-								<h3>Opción 2</h3>
-								<p>Duis neque nisi, dapibus sed mattis et quis, nibh. Sed et dapibus nisl amet mattis,
-									sed a rutrum accumsan sed. Suspendisse eu.</p>
-							</div>
+					<section class="col-12 col-12-narrower">
+						<div class="contenidos">
+							<input type="submit" value="Procesar Archivos con Lluvia" id="procesar"
+								name="procesar"></input>
 						</div>
 					</section>
-				</div>
-				<div class="row">
-					<section class="col-6 col-12-narrower">
-						<div class="box post">
-							<a href="#" class="image left"><img src="{% static 'ecosonos/images/pic03.jpg' %}"
-									alt="" /></a>
-							<div class="inner">
-								<h3>Opción 3</h3>
-								<p>Duis neque nisi, dapibus sed mattis et quis, nibh. Sed et dapibus nisl amet mattis,
-									sed a rutrum accumsan sed. Suspendisse eu.</p>
-							</div>
+					<section class="col-12 col-12-narrower">
+						<div class="contenidos">
+							<form method="POST" enctype="multipart/form-data">
+								{% csrf_token %}
+								<input type="submit" value="Mover Archivos con Lluvia" id="mover" name="mover"></input>
+							</form>
 						</div>
 					</section>
-					<section class="col-6 col-12-narrower">
-						<div class="box post">
-							<a href="#" class="image left"><img src="{% static 'ecosonos/images/pic04.jpg' %}"
-									alt="" /></a>
-							<div class="inner">
-								<h3>Opción 4</h3>
-								<p>Duis neque nisi, dapibus sed mattis et quis, nibh. Sed et dapibus nisl amet mattis,
-									sed a rutrum accumsan sed. Suspendisse eu.</p>
-							</div>
-						</div>
+					<section>
+						<h1>Progress Bar Example</h1>
+						<div id="progress-bar" style="width: 0%;"></div>
 					</section>
 				</div>
 			</div>
@@ -208,6 +205,8 @@
 	<script src="{% static 'ecosonos/assets/js/breakpoints.min.js' %}"></script>
 	<script src="{% static 'ecosonos/assets/js/util.js' %}"></script>
 	<script src="{% static 'ecosonos/assets/js/main.js' %}"></script>
+
+	<script src="{% static 'procesamiento/progressBar.js' %}"></script>
 
 </body>
 

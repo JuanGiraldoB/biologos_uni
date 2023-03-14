@@ -4,13 +4,29 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
 from .utils.procesos_lluvia_progress import tipos_grabaciones, procesar_audio, csvReturn, removeRainFiles, getRutasArchivos
-from .utils.session_utils import inicializar_variables_session, guardar_grabaciones_session, guardar_raiz_carpeta_session
-from .utils.lluvia_edison import algoritmo_lluvia_edison
+from .utils.lluvia_edison import algoritmo_lluvia_edison, run_algoritmo_lluvia_edison, run_algoritmo_lluvia_edison_sync
 import numpy as np
 from django.contrib import messages
 from tkinter.filedialog import askdirectory
 import os
 from django.http import HttpResponse
+import asyncio
+from asgiref.sync import sync_to_async
+
+from .models import Progreso
+
+
+from ecosonos.utils.archivos_utils import (
+    mover_archivos_lluvia
+)
+
+from ecosonos.utils.carpeta_utils import (
+    obtener_subcarpetas,
+    guardar_carpetas_seleccionadas,
+    guardar_raiz_carpeta_session,
+    obtener_carpetas_seleccionadas,
+    obtener_carpeta_raiz
+)
 
 
 # @csrf_exempt
@@ -71,7 +87,6 @@ from django.http import HttpResponse
 
 #         else:
 #             try:
-#                 # plot_polar_indices()
 #                 removeRainFiles(
 #                     request.session['ruta'], request.session['ruta_csv'])
 
@@ -82,49 +97,78 @@ from django.http import HttpResponse
 #     return render(request, 'procesamiento/preproceso.html')
 
 
-@csrf_exempt
-def lluvia(request):
+async def lluvia(request):
+    data = {}
+
     if request.method == 'POST':
         if 'cargar' in request.POST:
-            grabaciones, ruta = getRutasArchivos()
-            print(grabaciones, ruta)
-            n_grabaciones = len(grabaciones)
-            PSD_medio = np.zeros((n_grabaciones,))
-            PSD_medio = PSD_medio.tolist()
+            carpeta_raiz = askdirectory(title='Seleccionar carpeta raiz')
+            await sync_to_async(guardar_raiz_carpeta_session)(request, carpeta_raiz)
+            carpetas = await sync_to_async(obtener_subcarpetas)(carpeta_raiz)
+            carpetas.insert(0, carpeta_raiz)
+            data['carpetas'] = carpetas
 
-            inicializar_variables_session(
-                request, ruta, grabaciones, n_grabaciones, PSD_medio)
+            await sync_to_async(Progreso.objects.all().delete)()
 
-    return render(request, 'procesamiento/preproceso.html')
+            return render(request, 'procesamiento/preproceso.html', data)
 
+        elif 'procesar_carpetas' in request.POST:
+            carpetas_seleccionadas = request.POST.getlist('carpetas')
+            # await sync_to_async(guardar_carpetas_seleccionadas)(request, carpetas_seleccionadas)
+            # carpetas_seleccionadas = await sync_to_async(obtener_carpetas_seleccionadas)(request)
 
-def escoger_carpeta(request):
-    if request.method == 'POST':
+            progreso = await sync_to_async(Progreso.objects.create)()
+            carpeta_raiz = await sync_to_async(obtener_carpeta_raiz)(request)
 
-        if 'cargar' in request.POST:
-            carpeta = askdirectory(title='Seleccionar carpeta con audios')
-            guardar_raiz_carpeta_session(request, carpeta)
+            data = {}
+            data['carpetas'] = carpetas_seleccionadas
+            data['procesando'] = 'true'
 
-            carpetas = []
-            carpetas.append(carpeta)
+            asyncio.create_task(run_algoritmo_lluvia_edison(
+                carpetas_seleccionadas, carpeta_raiz, progreso))
 
-            for ruta, carpetas_subdir, _ in os.walk(carpeta):
-                # Add all directories to the carpetas list
-                for carpeta_subdir in carpetas_subdir:
-                    carpetas.append(os.path.join(
-                        ruta, carpeta_subdir).replace('\\', '/'))
+            return render(request, 'procesamiento/preproceso.html', data)
 
-            return render(request, 'procesamiento/lista_carpeta.html', {'carpetas': carpetas})
+        elif 'mover_archivos' in request.POST:
+            carpeta_destino = askdirectory(
+                title='Carpeta de destino de audios con lluvia')
+            carpeta_raiz = obtener_carpeta_raiz(request)
 
-    return render(request, 'procesamiento/escoger_carpeta.html')
-
-
-def lista_carpetas(request):
-    if request.method == 'POST':
-        carpetas = request.POST.getlist('carpetas')
-
-        algoritmo_lluvia_edison(carpetas, request.session['raiz_preproceso'])
-        return HttpResponse('Archivos procesados: {}'.format(carpetas))
+            mover_archivos_lluvia(carpeta_raiz, carpeta_destino)
     else:
-        # Return a form to select the files
-        return render(request, 'procesamiento/escoger_carpeta.html')
+        return render(request, 'procesamiento/preproceso.html')
+
+    return HttpResponse()
+
+
+async def procesar(request):
+    data = {}
+    carpetas_seleccionadas = await sync_to_async(obtener_carpetas_seleccionadas)(request)
+    progreso = await sync_to_async(Progreso.objects.create)()
+    carpeta_raiz = await sync_to_async(obtener_carpeta_raiz)(request)
+    data['carpetas_seleccionadas'] = carpetas_seleccionadas
+    asyncio.create_task(run_algoritmo_lluvia_edison(
+        carpetas_seleccionadas, carpeta_raiz, progreso))
+
+    return render(request, 'procesamiento/preproceso.html', data)
+
+
+@csrf_exempt
+def barra_progreso(request):
+    progreso = Progreso.objects.first()
+    data = {}
+
+    if not progreso:
+        data['progreso'] = "terminado"
+        data['max'] = "terminado"
+        return JsonResponse(data)
+
+    archivos_completados = progreso.archivos_completados
+    cantidad_archivos = progreso.cantidad_archivos
+    data['progreso'] = archivos_completados
+    data['max'] = cantidad_archivos
+
+    if archivos_completados == cantidad_archivos:
+        Progreso.objects.all().delete()
+
+    return JsonResponse(data)
