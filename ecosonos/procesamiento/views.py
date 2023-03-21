@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
 from .utils.procesos_lluvia_progress import tipos_grabaciones, procesar_audio, csvReturn, removeRainFiles, getRutasArchivos
-from .utils.lluvia_edison import algoritmo_lluvia_edison, run_algoritmo_lluvia_edison, run_algoritmo_lluvia_edison_sync
+from .utils.lluvia_edison import algoritmo_lluvia_edison, run_algoritmo_lluvia_edison
 import numpy as np
 from django.contrib import messages
 from tkinter.filedialog import askdirectory

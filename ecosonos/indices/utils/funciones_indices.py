@@ -6,7 +6,7 @@ from tkinter.filedialog import askdirectory
 from tqdm import tqdm
 import numpy as np
 from django.http import JsonResponse
-import matplotlib.pyplot as plt
+import asyncio
 
 # import matplotlib.pyplot as plt
 
@@ -81,7 +81,11 @@ def csvIndices(indicesCalculados, ruta, indices_select):
                      '.csv', encoding='utf_8_sig', index=False, sep=',')
 
 
-def calcularIndice(indices_select, carpeta, archivos):
+async def run_calcular_indice(indices_select, carpeta, archivos):
+    await asyncio.to_thread(calcular_indice, indices_select, carpeta, archivos)
+
+
+def calcular_indice(indices_select, carpeta, archivos):
     """Calcula el valor de los indices seleccionados por el usuario.
 
     :param indices_select: Cadena de texto que agrupa las abreviaturas
@@ -92,15 +96,15 @@ def calcularIndice(indices_select, carpeta, archivos):
     """
     Indices_grabaciones = []
 
-    grabaciones = []
+    grabaciones = archivos
     # carpeta = askdirectory(title='Seleccionar carpeta con audios')
     # archivos = os.listdir(carpeta)
 
-    for archivo in archivos:
-        # archivo = archivo.lower()
-        # incluir todos los formatos que queremos que soporte
-        if archivo[-4:] == ".wav" or archivo[-4:] == ".WAV":
-            grabaciones.append(carpeta + "/" + archivo)
+    # for archivo in archivos:
+    # archivo = archivo.lower()
+    # incluir todos los formatos que queremos que soporte
+    # if archivo[-4:] == ".wav" or archivo[-4:] == ".WAV":
+    #     grabaciones.append(archivo)
 
     Valores = list()
     for i in range(len(indices_select)+1):

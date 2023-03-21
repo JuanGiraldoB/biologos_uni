@@ -174,16 +174,35 @@
 							<br />
 							<section class="col-12 col-12-narrower">
 								<div class="contenidos">
-									<input type="submit" value="Seleccionar Carpeta" id="cargar" name="cargar"></input>
+									<input type="submit" value="Seleccionar Carpeta Principal" id="cargar"
+										name="cargar"></input>
 								</div>
 							</section>
 						</form>
+						{% if carpetas %}
+						<form method="POST">
+							{% csrf_token %}
+
+							{% if procesando %}
+							<p id="procesando">Procesando...</p>
+							{% endif %}
+							<ul>
+								{% for carpeta in carpetas %}
+								<li>
+									<label>
+										<input type="checkbox" name="carpetas" value="{{ carpeta }}" checked>
+										{{ carpeta }}
+									</label>
+								</li>
+								{% endfor %}
+							</ul>
+							<input type="submit" value="Procesar Carpetas" id="procesar_carpetas"
+								name="procesar_carpetas"></input>
+						</form>
+						{% endif %}
 					</section>
 
 					<section class="col-12 col-12-narrower">
-						<div class="contenidos">
-							<input type="submit" value="Procesar Archivos" id="procesar" name="procesar"></input>
-						</div>
 						<h1>Progress Bar Example</h1>
 						<div id="progress-bar" style="width: 0%;"></div>
 					</section>

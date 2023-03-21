@@ -1,5 +1,6 @@
 import pandas as pd
 import shutil
+import os
 
 
 def mover_archivos_lluvia(carpeta_raiz, carpeta_destino):
@@ -12,3 +13,22 @@ def mover_archivos_lluvia(carpeta_raiz, carpeta_destino):
 
         if lluvia == 'YES':
             shutil.move(ruta_archivo, carpeta_destino)
+
+
+def obtener_archivos_wav(carpetas):
+    archivos = []
+    formatos = ['wav', 'WAV']
+
+    for carpeta in carpetas:
+        for archivo in os.listdir(carpeta):
+            file_name = os.path.join(
+                carpeta, archivo).replace('\\', '/')
+
+            # Verifica que sea un archivo y que la extension corresponda con las de la variable formatos
+            if os.path.isfile(file_name):
+                file_extension = file_name.split(".")[1]
+
+                if file_extension in formatos:
+                    archivos.append(file_name)
+
+    return archivos
