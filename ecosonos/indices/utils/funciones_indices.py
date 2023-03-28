@@ -7,6 +7,7 @@ from tqdm import tqdm
 import numpy as np
 from django.http import JsonResponse
 import asyncio
+import datetime
 
 # import matplotlib.pyplot as plt
 
@@ -68,8 +69,22 @@ def calcular_espectrograma(ruta):
 def csvIndices(indicesCalculados, ruta, indices_select):
     Valores = indicesCalculados
 
+    fechas = []
+
+    for nombre in Valores[0]:
+        fecha, tiempo = nombre.split('_')[1:3]
+        tiempo = tiempo.split('.')[0]
+
+        dt_obj = datetime.datetime.strptime(
+            fecha + tiempo, '%Y%m%d%H%M%S')
+
+        fechas.append(dt_obj)
+
+    Valores.append(fechas)
+
     data = None
     indices_select.insert(0, 'File')
+    indices_select.append('Fecha')
     indicesDF = pd.DataFrame(data, columns=indices_select)
 
     for j in range(len(indices_select)):
@@ -81,11 +96,11 @@ def csvIndices(indicesCalculados, ruta, indices_select):
                      '.csv', encoding='utf_8_sig', index=False, sep=',')
 
 
-async def run_calcular_indice(indices_select, carpeta, archivos):
-    await asyncio.to_thread(calcular_indice, indices_select, carpeta, archivos)
+async def run_calcular_indice(indices_select, carpeta, archivos, progreso):
+    await asyncio.to_thread(calcular_indice, indices_select, carpeta, archivos, progreso)
 
 
-def calcular_indice(indices_select, carpeta, archivos):
+def calcular_indice(indices_select, carpeta, archivos, progreso):
     """Calcula el valor de los indices seleccionados por el usuario.
 
     :param indices_select: Cadena de texto que agrupa las abreviaturas
@@ -204,6 +219,8 @@ def calcular_indice(indices_select, carpeta, archivos):
             Valores[j].append(valor_indice)
             aux.append({"Name_indice": indice, "valor": valor_indice})
 
+        progreso.archivos_completados += 1
+        progreso.save()
         Indices_grabaciones.append({"Grabacion": g, "Indices": list(aux)})
 
     csvIndices(Valores, carpeta, indices_select)

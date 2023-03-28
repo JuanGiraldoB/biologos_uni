@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .utils.funciones_indices_progress import getRutasArchivos, calcularIndice, csvIndices, graficaErrorBar
+from .utils.funciones_indices_progress import getRutasArchivos, calcularIndice, csvIndices, graficaErrorBar, grafica_polar
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from tkinter.filedialog import askdirectory
@@ -28,99 +28,7 @@ from ecosonos.utils.carpeta_utils import (
 # Create your views here.
 
 
-@csrf_exempt
-def indices(request):
-    chart = ''
-    context = {'chart': chart}
-
-    if request.method == 'POST':
-        if 'cargar' in request.POST:
-            indices_seleccionados = request.POST.getlist('options')
-
-            if len(indices_seleccionados) == 0:
-                # TODO: add flash message
-                print("debe seleccionar al menos un indice")
-                return redirect(reverse('indices'))
-
-            try:
-                print("cargando archivos")
-                grabaciones, ruta = getRutasArchivos()
-                n_grabs = len(grabaciones)
-                request.session['indices_seleccionados'] = indices_seleccionados
-                request.session['n_grab_indices'] = n_grabs
-                request.session['index_indices'] = 0
-                request.session['ruta_indices'] = ruta
-                # Audios seleccionados
-                request.session['grabaciones_indices'] = grabaciones
-                # Indices calculados por grabacion
-                request.session['grab_ind_calculados'] = []
-                Valores = list()
-                for i in range(len(indices_seleccionados) + 1):
-                    Valores.append(list())
-
-                request.session['valores'] = Valores
-
-            except:
-                # TODO: add flash message
-                print("Debe seleccionar una carpeta o existen audios corruptos")
-
-            finally:
-                return redirect(reverse('indices'))
-
-        elif request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            # elif 'procesar' in request.POST:
-
-            print("Procesando...")
-
-            Valores = request.session['valores']
-            grabaciones = request.session['grabaciones_indices']
-            indices_seleccionados = request.session['indices_seleccionados']
-            ruta = request.session['ruta_indices']
-            index = request.session['index_indices']
-            n_grab = request.session['n_grab_indices']
-
-            data = {'progress': index, 'max': n_grab}
-
-            if index == n_grab:
-                print("terminado")
-                csvIndices(Valores, ruta, indices_seleccionados)
-                return JsonResponse(data)
-
-            grabacion = grabaciones[index]
-            calcularIndice(indices_seleccionados,
-                           ruta, grabacion, Valores)
-
-            print(Valores)
-            request.session['index_indices'] = index + 1
-            request.session['valores'] = Valores
-            return JsonResponse(data)
-
-        if 'mostrar-grafica' in request.POST:
-            try:
-                print(request.session['ruta_indices'])
-                df_means = graficaErrorBar(
-                    request.session['ruta_indices'], request.session['grabaciones_indices'])
-                fig = px.bar(df_means, x='Indices',
-                             y='mean_DF', error_y='std_DF')
-                # df = pd.read_csv(
-                #     request.session['carpeta'] + "/Indices_acusticos_G21A.csv")
-                # fig = px.bar_polar(df, r='hora', theta='fecha', color='ACIft', hover_data=['hora'],
-                #                    template='plotly_dark', title='ACIft vs. fecha')
-
-                chart = fig.to_html()
-                context = {'chart': chart}
-                return render(request, 'indices/indices.html', context)
-
-            except Exception as e:
-                # TODO: add flash message
-                print(e)
-                print('debe primero cargar datos')
-                return redirect(reverse('indices'))
-
-    return render(request, 'indices/indices.html', context)
-
-
-async def lluvia_carpeta(request):
+async def indices(request):
     data = {}
 
     if request.method == 'POST':
@@ -134,30 +42,37 @@ async def lluvia_carpeta(request):
             indices_seleccionados = request.POST.getlist('options')
             await sync_to_async(guardar_indices_session)(request, indices_seleccionados)
 
-            data['carpetas'] = carpetas
             await sync_to_async(Progreso.objects.all().delete)()
+
+            data['carpetas'] = carpetas
             return render(request, 'indices/indices.html', data)
 
         elif 'procesar_carpetas' in request.POST:
             carpetas_seleccionadas = request.POST.getlist('carpetas')
-            carpeta_raiz = await sync_to_async(obtener_carpeta_raiz)(request)
+            await sync_to_async(guardar_carpetas_seleccionadas)(request, carpetas_seleccionadas,  indices=True)
+            carpeta_raiz = await sync_to_async(obtener_carpeta_raiz)(request, indices=True)
             indices_seleccionados = await sync_to_async(obtener_indices_session)(request)
 
             archivos = await sync_to_async(obtener_archivos_wav)(carpetas_seleccionadas)
 
-            progreso = await sync_to_async(Progreso.objects.create)()
-            progreso.cantidad_archivos = len(archivos)
+            progreso = await sync_to_async(Progreso.objects.create)(cantidad_archivos=len(archivos))
 
             asyncio.create_task(run_calcular_indice(
-                indices_seleccionados, carpeta_raiz, archivos))
+                indices_seleccionados, carpeta_raiz, archivos, progreso))
 
-            data = {}
             data['carpetas'] = carpetas_seleccionadas
 
-            # asyncio.create_task(run_algoritmo_lluvia_edison(
-            #     carpetas_seleccionadas, carpeta_raiz, progreso))
-
             return render(request, 'indices/indices.html', data)
+
+        if 'mostrar-grafica' in request.POST:
+            carpeta_raiz = await sync_to_async(obtener_carpeta_raiz)(request, indices=True)
+            carpetas_seleccionadas = await sync_to_async(obtener_carpetas_seleccionadas)(request, indices=True)
+            archivos = await sync_to_async(obtener_archivos_wav)(carpetas_seleccionadas)
+
+            grafica = await sync_to_async(grafica_polar)(carpeta_raiz, archivos)
+
+            context = {'grafica': grafica}
+            return render(request, 'indices/indices.html', context)
 
     return render(request, 'indices/indices.html')
 
@@ -174,11 +89,15 @@ def barra_progreso(request):
 
     archivos_completados = progreso.archivos_completados
     cantidad_archivos = progreso.cantidad_archivos
+
+    print(
+        f'completados: {archivos_completados}/terminados: {cantidad_archivos}')
+
     data['progreso'] = archivos_completados
     data['max'] = cantidad_archivos
 
-    # print("cat", archivos_completados, cantidad_archivos)
     if archivos_completados == cantidad_archivos:
+        print(f'completado')
         Progreso.objects.all().delete()
 
     return JsonResponse(data)
