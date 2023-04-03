@@ -22,4 +22,5 @@ urlpatterns = [
     path('', index, name='index'),
     path('preproceso/', include('procesamiento.urls')),
     path('indices/', include('indices.urls')),
+    path('etiquetado/', include('etiquetado.urls')),
 ]
