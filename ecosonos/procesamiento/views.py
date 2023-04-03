@@ -1,18 +1,12 @@
-from django.shortcuts import render, redirect
-# from .utils.procesos_lluvia import getRutasArchivos, csvReturn, removeRainFiles
+from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.urls import reverse
-from .utils.procesos_lluvia_progress import tipos_grabaciones, procesar_audio, csvReturn, removeRainFiles, getRutasArchivos
-from .utils.lluvia_edison import algoritmo_lluvia_edison, run_algoritmo_lluvia_edison
-import numpy as np
 from django.contrib import messages
 from tkinter.filedialog import askdirectory
-import os
-from django.http import HttpResponse
 import asyncio
 from asgiref.sync import sync_to_async
 
+from .utils.lluvia_edison import run_algoritmo_lluvia_edison
 from .models import Progreso
 
 
@@ -22,79 +16,9 @@ from ecosonos.utils.archivos_utils import (
 
 from ecosonos.utils.carpeta_utils import (
     obtener_subcarpetas,
-    guardar_carpetas_seleccionadas,
     guardar_raiz_carpeta_session,
-    obtener_carpetas_seleccionadas,
     obtener_carpeta_raiz
 )
-
-
-# @csrf_exempt
-# def lluvia(request):
-#     if request.method == 'POST':
-#         if 'cargar' in request.POST:
-#             try:
-#                 print("cargando archivos")
-#                 grabaciones, ruta = getRutasArchivos()
-#                 n_grabs = len(grabaciones)
-#                 request.session['ruta'] = ruta
-#                 request.session['grabaciones'] = grabaciones
-#                 request.session['n_grab'] = n_grabs
-#                 request.session['index'] = 0
-#                 PSD_medio = np.zeros((n_grabs,))
-#                 PSD_medio = PSD_medio.tolist()
-#                 request.session['PSD_medio'] = PSD_medio
-#                 print('archivos cargados')
-
-#             except:
-#                 # TODO: agregar flash message
-#                 messages.success(request, 'Your message goes here')
-#                 print('debe seleccionar una carpeta')
-
-#         elif request.headers.get('x-requested-with') == 'XMLHttpRequest':
-#             try:
-#                 index = request.session['index']
-#                 n_grab = request.session['n_grab']
-#                 grabaciones = request.session['grabaciones']
-#                 PSD_medio = request.session['PSD_medio']
-
-#                 data = {'progress': index, 'max': n_grab}
-
-#                 if index == n_grab:
-#                     g_buenas, g_malas, cond_malas = [], [], []
-#                     g_buenas, g_malas, cond_malas = tipos_grabaciones(
-#                         grabaciones, PSD_medio)
-#                     csv_ruta = csvReturn(request.session['ruta'],
-#                                          request.session['grabaciones'], cond_malas, request)
-
-#                     print("dasdas")
-#                     request.session['ruta_csv'] = csv_ruta
-
-#                     return JsonResponse(data)
-
-#                 grabacion = grabaciones[index]
-#                 PSD_medio[index] = procesar_audio(grabacion)
-
-#                 request.session['index'] = index + 1
-#                 print(f'Procesada {grabacion}[{index}]')
-
-#                 return JsonResponse(data)
-
-#             except:
-#                 # TODO: agregar flash message
-#                 print(
-#                     'debe seleccionar una carpeta previamente o existen archivos corruptos')
-
-#         else:
-#             try:
-#                 removeRainFiles(
-#                     request.session['ruta'], request.session['ruta_csv'])
-
-#             except:
-#                 # TODO: agregar flash message
-#                 print('debe haber procesado archivos .wav previamente')
-
-#     return render(request, 'procesamiento/preproceso.html')
 
 
 async def lluvia(request):
@@ -103,6 +27,11 @@ async def lluvia(request):
     if request.method == 'POST':
         if 'cargar' in request.POST:
             carpeta_raiz = askdirectory(title='Seleccionar carpeta raiz')
+
+            if not carpeta_raiz:
+                messages.error(request, 'Debe seleccionar la carpeta raiz')
+                return render(request, 'procesamiento/preproceso.html')
+
             await sync_to_async(guardar_raiz_carpeta_session)(request, carpeta_raiz)
             carpetas = await sync_to_async(obtener_subcarpetas)(carpeta_raiz)
             carpetas.insert(0, carpeta_raiz)
@@ -128,12 +57,22 @@ async def lluvia(request):
             return render(request, 'procesamiento/preproceso.html', data)
 
         elif 'mover_archivos' in request.POST:
-            carpeta_destino = askdirectory(
-                title='Carpeta de destino de audios con lluvia')
-            carpeta_raiz = await sync_to_async(obtener_carpeta_raiz)(request)
+            try:
+                carpeta_destino = askdirectory(
+                    title='Carpeta de destino de audios con lluvia')
 
-            mover_archivos_lluvia(carpeta_raiz, carpeta_destino)
-            return render(request, 'procesamiento/preproceso.html')
+                if not carpeta_destino:
+                    messages.error(request, 'Cancelo la selección de carpeta')
+                    return render(request, 'procesamiento/preproceso.html')
+
+                carpeta_raiz = await sync_to_async(obtener_carpeta_raiz)(request)
+
+                mover_archivos_lluvia(carpeta_raiz, carpeta_destino)
+                return render(request, 'procesamiento/preproceso.html')
+            except:
+                messages.error(
+                    request, 'Debe primero haber procesado los audios')
+                return render(request, 'procesamiento/preproceso.html')
     else:
         return render(request, 'procesamiento/preproceso.html')
 
