@@ -9,7 +9,14 @@
 </head>
 
 <body>
-    <h1>dadas</h1>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="submit" value="Seleccionar Carpeta de Resultados .wav" id="resultados" name="resultados"></input>
+    </form>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="submit" value="Seleccionar Archivo .wav" id="cargar" name="cargar"></input>
+    </form>
 </body>
 
 </html>

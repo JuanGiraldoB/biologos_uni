@@ -1,36 +1,35 @@
 let intervalId = null;
 
 document.addEventListener("DOMContentLoaded", function () {
-    let button = document.getElementById("procesar_carpetas");
+	let button = document.getElementById("procesar_carpetas");
 
-    if (button) {
-        intervalId = setInterval(updateProgressBar, 500);
-    }
-
+	if (button) {
+		intervalId = setInterval(updateProgressBar, 500);
+	}
 });
 
 function updateProgressBar() {
-    let xhr = new XMLHttpRequest();
+	let xhr = new XMLHttpRequest();
+	xhr.open("POST", "/indices/barra_progreso", true);
+	xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+	xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
 
-    xhr.open("POST", "/indices/barra_progreso", true);
-    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-    xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token }}');
+	xhr.onreadystatechange = function () {
+		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+			const data = JSON.parse(xhr.responseText);
+			const porcentaje_completado = data["procentaje_completado"];
 
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-            const data = JSON.parse(xhr.responseText);
-            const progress = data['progreso'];
-            const max = data['max'];
-            const div = document.getElementById("progreso_completado");
+			const spanValue = document.getElementById("value1");
+			spanValue.innerHTML = porcentaje_completado + "%";
+			const barElement = document.querySelector(".bar");
+			barElement.style.setProperty("--percentage", spanValue.textContent);
 
-            div.innerHTML = `${progress}/${max}`
+			console.log(porcentaje_completado);
 
-            console.log(`${progress}/${max}`)
-
-            if (progress == "terminado") {
-                clearInterval(intervalId);
-            }
-        }
-    };
-    xhr.send();
+			if (porcentaje_completado == 100) {
+				clearInterval(intervalId);
+			}
+		}
+	};
+	xhr.send();
 }

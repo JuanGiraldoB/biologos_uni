@@ -2,9 +2,11 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
-from tkinter.filedialog import askdirectory
 import asyncio
 from asgiref.sync import sync_to_async
+
+import tkinter as tk
+from tkinter.filedialog import askdirectory
 
 from .utils.lluvia_edison import run_algoritmo_lluvia_edison
 from .models import Progreso
@@ -20,22 +22,28 @@ from ecosonos.utils.carpeta_utils import (
     obtener_carpeta_raiz
 )
 
+from ecosonos.utils.tkinter_utils import mostrar_ventana_encima
+
 
 async def lluvia(request):
     data = {}
 
     if request.method == 'POST':
         if 'cargar' in request.POST:
+            root = mostrar_ventana_encima()
             carpeta_raiz = askdirectory(title='Seleccionar carpeta raiz')
+            root.destroy()
 
             if not carpeta_raiz:
                 messages.error(request, 'Debe seleccionar la carpeta raiz')
                 return render(request, 'procesamiento/preproceso.html')
 
             await sync_to_async(guardar_raiz_carpeta_session)(request, carpeta_raiz)
-            carpetas = await sync_to_async(obtener_subcarpetas)(carpeta_raiz)
-            carpetas.insert(0, carpeta_raiz)
-            data['carpetas'] = carpetas
+            carpetas_nombre_completo, carpetas_nombre_base = await sync_to_async(obtener_subcarpetas)(carpeta_raiz)
+            data['carpetas_nombre_completo'] = carpetas_nombre_completo
+            data['carpetas_nombre_base'] = carpetas_nombre_base
+            data['completo_base_zip'] = zip(
+                carpetas_nombre_completo, carpetas_nombre_base)
 
             await sync_to_async(Progreso.objects.all().delete)()
 
@@ -47,9 +55,11 @@ async def lluvia(request):
             progreso = await sync_to_async(Progreso.objects.create)()
             carpeta_raiz = await sync_to_async(obtener_carpeta_raiz)(request)
 
-            data = {}
-            data['carpetas'] = carpetas_seleccionadas
-            data['procesando'] = 'true'
+            carpetas_nombre_completo, carpetas_nombre_base = await sync_to_async(obtener_subcarpetas)(carpeta_raiz)
+            data['carpetas_nombre_completo'] = carpetas_nombre_completo
+            data['carpetas_nombre_base'] = carpetas_nombre_base
+            data['completo_base_zip'] = zip(
+                carpetas_nombre_completo, carpetas_nombre_base)
 
             asyncio.create_task(run_algoritmo_lluvia_edison(
                 carpetas_seleccionadas, carpeta_raiz, progreso))
@@ -58,17 +68,21 @@ async def lluvia(request):
 
         elif 'mover_archivos' in request.POST:
             try:
+                root = mostrar_ventana_encima()
                 carpeta_destino = askdirectory(
                     title='Carpeta de destino de audios con lluvia')
+                root.destroy()
 
                 if not carpeta_destino:
-                    messages.error(request, 'Cancelo la selección de carpeta')
+                    messages.error(request, 'Canceló la selección de carpeta')
                     return render(request, 'procesamiento/preproceso.html')
 
                 carpeta_raiz = await sync_to_async(obtener_carpeta_raiz)(request)
 
                 mover_archivos_lluvia(carpeta_raiz, carpeta_destino)
+
                 return render(request, 'procesamiento/preproceso.html')
+
             except:
                 messages.error(
                     request, 'Debe primero haber procesado los audios')
@@ -83,16 +97,20 @@ def barra_progreso(request):
     data = {}
 
     if not progreso:
-        data['progreso'] = "terminado"
-        data['max'] = "terminado"
+        data['procentaje_completado'] = 0
         return JsonResponse(data)
 
     archivos_completados = progreso.archivos_completados
     cantidad_archivos = progreso.cantidad_archivos
-    data['progreso'] = archivos_completados
-    data['max'] = cantidad_archivos
 
-    # print("cat", archivos_completados, cantidad_archivos)
+    try:
+        porcentaje_completado = int(
+            (archivos_completados / cantidad_archivos) * 100)
+    except:
+        porcentaje_completado = 0
+
+    data['procentaje_completado'] = porcentaje_completado
+
     if archivos_completados == cantidad_archivos:
         Progreso.objects.all().delete()
 

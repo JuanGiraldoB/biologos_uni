@@ -374,9 +374,6 @@ async def run_algoritmo_lluvia_edison(carpetas, raiz, request):
 
 
 def algoritmo_lluvia_edison(carpetas, raiz, progreso):
-    warnings.simplefilter("ignore", category=RuntimeWarning)
-    # Edison_Duque = True # toma valor True para utilizar metodo de EDISON,2022 y False para utilizar metodo de DUQUE,2019
-
     Edison_Duque = True
 
     # Ruta donde se encuentran los archivos

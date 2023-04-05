@@ -5,4 +5,4 @@ from django.db import models
 
 class Progreso(models.Model):
     archivos_completados = models.IntegerField(default=0)
-    cantidad_archivos = models.IntegerField(default=100, null=True)
+    cantidad_archivos = models.IntegerField(default=0, null=True)
