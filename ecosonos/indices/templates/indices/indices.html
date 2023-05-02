@@ -182,10 +182,6 @@
 						{% if carpetas_nombre_completo %}
 						<form method="POST">
 							{% csrf_token %}
-
-							{% if procesando %}
-							<p id="procesando">Procesando...</p>
-							{% endif %}
 							<div>
 								{% for completo, base in completo_base_zip %}
 								<div class="carpetas-cargadas">
@@ -197,6 +193,23 @@
 							<input type="submit" value="Procesar Carpetas" id="procesar_carpetas"
 								name="procesar_carpetas"></input>
 						</form>
+						{% endif %}
+
+						{% if carpetas_procesando %}
+
+						Procesando
+						{% for procensando in carpetas_procesando %}
+
+						<ul>
+							<li>
+								<label>{{procensando}}</label>
+							</li>
+						</ul>
+
+						{% endfor %}
+						<input type="submit" value="Procesar Carpetas" id="procesar_carpetas"
+							name="procesar_carpetas"></input>
+
 						{% endif %}
 					</section>
 
@@ -215,7 +228,19 @@
 								<button type="submit" name="mostrar-grafica">Mostar grafica</button>
 							</div>
 						</form>
-						{{ grafica|safe }}
+
+						{% if graficas %}
+
+						{% for grafica, indice in zipped %}
+						<ul>
+							<h2>{{indice}}</h2>
+							<li>{{ grafica|safe }}</li>
+						</ul>
+						{% endfor %}
+
+						{% endif %}
+
+						<!-- {{ grafica|safe }} -->
 					</section>
 				</div>
 			</div>

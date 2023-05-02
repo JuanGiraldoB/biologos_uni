@@ -4,6 +4,9 @@ import os
 def obtener_subcarpetas(carpeta):
     carpetas_nombre_completo = []
     carpetas_nombre_base = []
+    carpetas_nombre_completo.append(carpeta)
+    carpetas_nombre_base.append(os.path.basename(carpeta))
+
     for ruta, carpetas_subdir, _ in os.walk(carpeta):
         # Add all directories to the carpetas list
         for carpeta_subdir in carpetas_subdir:
@@ -14,6 +17,25 @@ def obtener_subcarpetas(carpeta):
             nombre_base = os.path.basename(os.path.join(ruta, carpeta_subdir))
             carpetas_nombre_base.append(nombre_base)
     return carpetas_nombre_completo, carpetas_nombre_base
+
+
+def obtener_nombre_base(carpetas):
+    nombres_base = [os.path.basename(carpeta) for carpeta in carpetas]
+    return nombres_base
+
+
+def selecciono_carpeta(carpeta_raiz):
+    """
+        Verifica si fue seleccionada una carpeta
+    """
+    return not carpeta_raiz
+
+
+def subcarpetas_seleccionadas(carpetas):
+    """
+        Verifica si existen carpetas seleccionadas
+    """
+    return not carpetas
 
 
 def guardar_raiz_carpeta_session(request, raiz, app=False):

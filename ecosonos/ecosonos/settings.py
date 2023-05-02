@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'ecosonos',
     'procesamiento',
     'indices',
-    'etiquetado'
+    'etiquetado',
 ]
 
 MIDDLEWARE = [

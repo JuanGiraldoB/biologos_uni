@@ -61,13 +61,6 @@
 				<div class="row">
 					<section class="col-12 col-12-narrower">
 						<div class="contenidos">
-							{% if messages %}
-							<ul class="messages">
-								{% for message in messages %}
-								<li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
-									{% endfor %}
-							</ul>
-							{% endif %}
 							<form method="POST" enctype="multipart/form-data">
 								{% csrf_token %}
 								<p>Seleccionar la carpeta raiz que contiene los archivos (.wav)</p>
@@ -77,10 +70,6 @@
 							{% if carpetas_nombre_completo %}
 							<form class="carpetaprincipal" method="POST">
 								{% csrf_token %}
-
-								{% if procesando %}
-								<p id="procesando">Procesando...</p>
-								{% endif %}
 								<div>
 									{% for completo, base in completo_base_zip %}
 									<div class="carpetas-cargadas">
@@ -92,6 +81,23 @@
 								<input type="submit" value="Procesar Carpetas con Lluvia" id="procesar_carpetas"
 									name="procesar_carpetas"></input>
 							</form>
+							{% endif %}
+
+							{% if carpetas_procesando %}
+
+							Procesando
+							{% for procesando in carpetas_procesando %}
+
+							<ul>
+								<li>
+									<label>{{procesando}}</label>
+								</li>
+							</ul>
+
+							{% endfor %}
+							<input type="submit" value="Procesar Carpetas con Lluvia" id="procesar_carpetas"
+								name="procesar_carpetas"></input>
+
 							{% endif %}
 						</div>
 					</section>

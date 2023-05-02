@@ -18,6 +18,7 @@ def mover_archivos_lluvia(carpeta_raiz, carpeta_destino):
 def obtener_archivos_wav(carpetas):
     archivos = []
     formatos = ['wav', 'WAV']
+    nombres_base = []
 
     for carpeta in carpetas:
         for archivo in os.listdir(carpeta):
@@ -27,8 +28,14 @@ def obtener_archivos_wav(carpetas):
             # Verifica que sea un archivo y que la extension corresponda con las de la variable formatos
             if os.path.isfile(file_name):
                 file_extension = file_name.split(".")[1]
-
                 if file_extension in formatos:
+                    nombre_base = os.path.basename(file_name)
+                    nombres_base.append(nombre_base)
                     archivos.append(file_name)
 
-    return archivos
+    return archivos, nombres_base
+
+
+def reemplazar_caracter(archivos, caracter, reemplazo):
+    for i in range(len(archivos)):
+        archivos[i] = archivos[i].replace(caracter, reemplazo)

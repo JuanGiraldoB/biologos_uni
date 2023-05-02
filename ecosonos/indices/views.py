@@ -1,13 +1,12 @@
-from django.shortcuts import render, redirect
-from .utils.funciones_indices_progress import getRutasArchivos, calcularIndice, csvIndices, graficaErrorBar, grafica_polar
+from django.shortcuts import render
+from .utils.funciones_indices_progress import grafica_polar
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from tkinter.filedialog import askdirectory
-from django.urls import reverse
 from django.contrib import messages
 from asgiref.sync import sync_to_async
 import asyncio
-from .utils.funciones_indices import calcular_indice, run_calcular_indice
+from .utils.funciones_indices import run_calcular_indice
 from .utils.session_utils import guardar_indices_session, obtener_indices_session
 from ecosonos.utils.archivos_utils import obtener_archivos_wav
 from ecosonos.utils.tkinter_utils import mostrar_ventana_encima
@@ -18,12 +17,13 @@ from ecosonos.utils.carpeta_utils import (
     guardar_carpetas_seleccionadas,
     guardar_raiz_carpeta_session,
     obtener_carpetas_seleccionadas,
-    obtener_carpeta_raiz
+    obtener_carpeta_raiz,
+    selecciono_carpeta,
+    subcarpetas_seleccionadas,
+    obtener_nombre_base
 )
 
 from ecosonos.utils.tkinter_utils import mostrar_ventana_encima
-
-# Create your views here.
 
 
 async def app(request):
@@ -35,9 +35,16 @@ async def app(request):
             carpeta_raiz = askdirectory(title='Seleccionar carpeta raiz')
             root.destroy()
 
+            if selecciono_carpeta(carpeta_raiz):
+                return render(request, 'indices/indices.html')
+
             await sync_to_async(guardar_raiz_carpeta_session)(request, carpeta_raiz, app='indices')
 
             indices_seleccionados = request.POST.getlist('options')
+
+            if not indices_seleccionados:
+                return render(request, 'indices/indices.html')
+
             await sync_to_async(guardar_indices_session)(request, indices_seleccionados)
 
             await sync_to_async(Progreso.objects.all().delete)()
@@ -52,33 +59,50 @@ async def app(request):
 
         elif 'procesar_carpetas' in request.POST:
             carpetas_seleccionadas = request.POST.getlist('carpetas')
+
+            if subcarpetas_seleccionadas(carpetas_seleccionadas):
+                return render(request, 'indices/indices.html', data)
+
             await sync_to_async(guardar_carpetas_seleccionadas)(request, carpetas_seleccionadas,  app='indices')
             carpeta_raiz = await sync_to_async(obtener_carpeta_raiz)(request, app='indices')
             indices_seleccionados = await sync_to_async(obtener_indices_session)(request)
 
-            archivos = await sync_to_async(obtener_archivos_wav)(carpetas_seleccionadas)
+            archivos, _ = await sync_to_async(obtener_archivos_wav)(carpetas_seleccionadas)
 
             progreso = await sync_to_async(Progreso.objects.create)(cantidad_archivos=len(archivos))
 
             asyncio.create_task(run_calcular_indice(
                 indices_seleccionados, carpeta_raiz, archivos, progreso))
 
-            carpetas_nombre_completo, carpetas_nombre_base = await sync_to_async(obtener_subcarpetas)(carpeta_raiz)
-            data['carpetas_nombre_completo'] = carpetas_nombre_completo
-            data['carpetas_nombre_base'] = carpetas_nombre_base
-            data['completo_base_zip'] = zip(
-                carpetas_nombre_completo, carpetas_nombre_base)
+            # carpetas_nombre_completo, carpetas_nombre_base = await sync_to_async(obtener_subcarpetas)(carpeta_raiz)
+            # data['carpetas_nombre_completo'] = carpetas_nombre_completo
+            # data['carpetas_nombre_base'] = carpetas_nombre_base
+            # data['completo_base_zip'] = zip(
+            #     carpetas_nombre_completo, carpetas_nombre_base)
+
+            carpetas_seleccionadas = obtener_nombre_base(
+                carpetas_seleccionadas)
+            data['carpetas_procesando'] = carpetas_seleccionadas
 
             return render(request, 'indices/indices.html', data)
 
         if 'mostrar-grafica' in request.POST:
-            carpeta_raiz = await sync_to_async(obtener_carpeta_raiz)(request, app='indices')
-            carpetas_seleccionadas = await sync_to_async(obtener_carpetas_seleccionadas)(request, app='indices')
-            archivos = await sync_to_async(obtener_archivos_wav)(carpetas_seleccionadas)
+            try:
+                carpeta_raiz = await sync_to_async(obtener_carpeta_raiz)(request, app='indices')
+                carpetas_seleccionadas = await sync_to_async(obtener_carpetas_seleccionadas)(request, app='indices')
+                archivos, _ = await sync_to_async(obtener_archivos_wav)(carpetas_seleccionadas)
+                indices_seleccionados = await sync_to_async(obtener_indices_session)(request)
 
-            grafica = await sync_to_async(grafica_polar)(carpeta_raiz, archivos)
+                graficas = []
+                for indice in indices_seleccionados:
+                    graficas.append(await sync_to_async(grafica_polar)(carpeta_raiz, archivos, indice))
+            except Exception as e:
+                print(e)
+                return render(request, 'indices/indices.html')
 
-            context = {'grafica': grafica}
+            zipped = zip(graficas, indices_seleccionados)
+            context = {'graficas': graficas,
+                       'indices': indices_seleccionados, 'zipped': zipped}
             return render(request, 'indices/indices.html', context)
     else:
         return render(request, 'indices/indices.html')
