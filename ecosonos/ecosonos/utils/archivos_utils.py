@@ -1,6 +1,7 @@
 import pandas as pd
 import shutil
 import os
+from datetime import datetime
 
 
 def mover_archivos_lluvia(carpeta_raiz, carpeta_destino):
@@ -39,3 +40,24 @@ def obtener_archivos_wav(carpetas):
 def reemplazar_caracter(archivos, caracter, reemplazo):
     for i in range(len(archivos)):
         archivos[i] = archivos[i].replace(caracter, reemplazo)
+
+
+def obtener_fecha(archivo):
+    archivo_partes = archivo.split('_')
+    fecha = archivo_partes[-2]
+    hora = archivo_partes[-1]
+
+    print(f'partes archivo: {archivo_partes}', end='\n\n')
+
+    yy = int(fecha[0:4])
+    mm = int(fecha[4:6])
+    dd = int(fecha[6:8])
+
+    hh = int(hora[0:2])
+    min = int(hora[2:4])
+    ss = int(hora[4:6])
+
+    date = datetime(year=yy, month=mm, day=dd, hour=hh, minute=min, second=ss,
+                    microsecond=0)
+
+    return date

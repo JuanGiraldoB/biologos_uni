@@ -12,7 +12,7 @@ from scipy import signal
 from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
-import sounddevice as sd
+# import sounddevice as sd
 import soundfile as sf
 from csv import writer
 import time

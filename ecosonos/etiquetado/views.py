@@ -3,11 +3,6 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 import json
 
-import dash
-import dash_core_components as dcc
-import dash_html_components as html
-import plotly.graph_objs as go
-
 
 # Async stuffs
 from asgiref.sync import sync_to_async
