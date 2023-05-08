@@ -72,3 +72,11 @@ def obtener_carpetas_seleccionadas(request, app=False):
 
 def cambiar_diagonales_carpeta(carpeta):
     return carpeta.replace('\\', '/')
+
+
+def guardar_ruta_csv_session(request, ruta_csv):
+    request.session['csv_etiquetado'] = ruta_csv
+
+
+def obtener_ruta_csv_session(request):
+    return request.session['csv_etiquetado']

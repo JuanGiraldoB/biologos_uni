@@ -2,6 +2,9 @@ import pandas as pd
 import shutil
 import os
 from datetime import datetime
+import csv
+
+from .carpeta_utils import guardar_ruta_csv_session
 
 
 def mover_archivos_lluvia(carpeta_raiz, carpeta_destino):
@@ -61,3 +64,21 @@ def obtener_fecha(archivo):
                     microsecond=0)
 
     return date
+
+
+def crear_csv(carpeta_raiz):
+    csv_ruta = os.path.join(carpeta_raiz, 'etiquetas.csv')
+    if not os.path.exists(csv_ruta):
+        with open(csv_ruta, mode='w', newline='') as csv_file:
+            writer = csv.writer(csv_file)
+            writer.writerow(["etiqueta", "t_min", "t_max", "f_min", "f_max"])
+
+    return csv_ruta
+
+
+def agregar_fila_csv(csv_ruta, etiqueta, x0, x1, y0, y1):
+    with open(csv_ruta, "a", newline='') as file:
+        writer = csv.writer(file)
+
+        fila = [etiqueta, x0, x1, y0, y1]
+        writer.writerow(fila)

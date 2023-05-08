@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 import json
-
+import os
 
 # Async stuffs
 from asgiref.sync import sync_to_async
@@ -15,7 +15,9 @@ from ecosonos.utils.carpeta_utils import (
     obtener_carpetas_seleccionadas,
     obtener_carpeta_raiz,
     cambiar_diagonales_carpeta,
-    selecciono_carpeta
+    selecciono_carpeta,
+    guardar_ruta_csv_session,
+    obtener_ruta_csv_session
 )
 
 from .utils.spectograma import (
@@ -27,7 +29,9 @@ from .utils.spectograma import (
 
 from ecosonos.utils.archivos_utils import (
     obtener_archivos_wav,
-    reemplazar_caracter
+    reemplazar_caracter,
+    crear_csv,
+    agregar_fila_csv
 )
 
 from tkinter.filedialog import askdirectory
@@ -49,6 +53,9 @@ def etiquetado(request):
 
             guardar_raiz_carpeta_session(
                 request, carpeta_raiz, app="etiquetado")
+
+            csv_ruta = crear_csv(carpeta_raiz)
+            guardar_ruta_csv_session(request, csv_ruta)
 
             archivos, nombres_base = obtener_archivos_wav([carpeta_raiz])
 
@@ -93,6 +100,7 @@ def espectrograma(request, ruta):
     archivos, nombres_base = obtener_archivos_wav([carpeta_raiz])
     reemplazar_caracter(archivos, caracter='/', reemplazo='-')
 
+    data['ruta'] = ruta
     ruta = ruta.replace('-', '/')
 
     f, t, s = calcular_espectrograma(ruta)
@@ -100,5 +108,35 @@ def espectrograma(request, ruta):
     data['frequencies'] = f.tolist()
     data['times'] = t.tolist()
     data['spectrogram'] = s.tolist()
+    data['nombre'] = os.path.basename(ruta)
+    data['archivos'] = zip(archivos, nombres_base)
 
     return render(request, 'etiquetado/etiquetado.html', data)
+
+
+# @csrf_exempt
+def reproducir_sonido_archivo(request, ruta):
+    ruta = ruta.replace('-', '/')
+
+    data = json.loads(request.body)
+    etiqueta = data.get('etiqueta')
+
+    # Tiempos
+    x0 = data.get('x0')
+    x1 = data.get('x1')
+
+    # Frecuencias
+    y0 = data.get('y0')
+    y1 = data.get('y1')
+
+    print(f'x0: {x0}')
+    print(f'x1: {x1}')
+    print(f'y0: {y0}')
+    print(f'y1: {y1}')
+    print(f'etiqueta: {etiqueta}')
+
+    csv_ruta = obtener_ruta_csv_session(request)
+    agregar_fila_csv(csv_ruta, etiqueta, x0, x1, y0, y1)
+    play_sound(ruta, x0, x1)
+
+    return render(request, 'etiquetado/etiquetado.html')

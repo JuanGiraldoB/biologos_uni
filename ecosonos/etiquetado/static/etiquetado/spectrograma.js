@@ -1,9 +1,50 @@
 document.addEventListener("DOMContentLoaded", () => {
-	let graph = document.getElementById("graph");
+	function reproducir_sonido(ruta, etiqueta, x0, x1, y0, y1) {
+		let csrfToken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
 
-	let filename = document.getElementById("x");
+		fetch(`/etiquetado/espectrograma/reproducir/${ruta}`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				"X-CSRFToken": csrfToken,
+			},
+			body: JSON.stringify({
+				etiqueta: etiqueta,
+				x0: x0,
+				x1: x1,
+				y0: y0,
+				y1: y1,
+			}),
+		})
+			.then((response) => {
+				if (!response.ok) {
+					throw new Error("Network response was not ok");
+				}
+				return response.json();
+			})
+			.then((data) => {
+				console.log("Success:", data);
+			})
+			.catch((error) => {
+				// console.error("Error:", error);
+			});
+	}
 
-	// Define the data for the graph
+	// function quitarEtiqueta(params) {
+	// 	let annotations = document.getElementById("plot").layout.annotations;
+	// 	console.log("here then?");
+	// 	if (annotations && annotations.length > 0) {
+	// 		annotations.pop();
+	// 		annotations.pop();
+	// 		annotations.pop();
+	// 		console.log("here?");
+	// 		Plotly.relayout("plot", { annotations: annotations }); // Update the plot
+	// 	}
+	// }
+
+	let plot = document.getElementById("plot");
+
+	// Define the data for the plot
 	let data = {
 		x: times,
 		y: frequencies,
@@ -14,15 +55,34 @@ document.addEventListener("DOMContentLoaded", () => {
 		dragmode: "select",
 	};
 
-	// Define the layout for the graph
+	// let lockIcon = {
+	// 	width: 1000,
+	// 	height: 1000,
+	// 	path: "M320 768h512v192q0 106 -75 181t-181 75t-181 -75t-75 -181v-192zM1152 672v-576q0 -40 -28 -68t-68 -28h-960q-40 0 -68 28t-28 68v576q0 40 28 68t68 28h32v192q0 184 132 316t316 132t316 -132t132 -316v-192h32q40 0 68 -28t28 -68z",
+	// 	transform: "matrix(0.75 0 0 -0.75 0 1000)",
+	// };
+
+	// let modeBarButtons = [
+	// 	[
+	// 		{
+	// 			name: "Borrar ultima etiqueta",
+	// 			icon: lockIcon,
+	// 			click: () => {
+	// 				quitarEtiqueta();
+	// 			},
+	// 		},
+	// 	],
+	// ];
+
+	// Define the layout for the plot
 	let layout = {
-		xaxis: { title: "Time (s)" },
-		yaxis: { title: "Frequency (Hz)" },
+		xaxis: { title: "Tiempo (s)" },
+		yaxis: { title: "Frecuencia (Hz)" },
 		margin: { t: 60 },
 		width: 800,
 		height: 400,
 		font: { size: 16 },
-		dragmode: "select", // set the default dragmode to 'select'
+		dragmode: "select",
 		updatemenus: [
 			{
 				buttons: [
@@ -41,19 +101,53 @@ document.addEventListener("DOMContentLoaded", () => {
 				y: 1.1,
 				yanchor: "top",
 			},
+			{
+				buttons: [
+					{
+						args: ["colorscale", "Rainbow"],
+						label: "Rainbow",
+						method: "restyle",
+					},
+					{
+						args: ["colorscale", "Blues"],
+						label: "Blues",
+						method: "restyle",
+					},
+					{
+						args: ["colorscale", "Reds"],
+						label: "Reds",
+						method: "restyle",
+					},
+					{
+						args: ["colorscale", "Viridis"],
+						label: "Viridis",
+						method: "restyle",
+					},
+					{
+						args: ["colorscale", "Greens"],
+						label: "Greens",
+						method: "restyle",
+					},
+					{
+						args: ["colorscale", "Earth"],
+						label: "Earth",
+						method: "restyle",
+					},
+				],
+				direction: "down",
+				pad: { r: 10, t: 10 },
+				showactive: true,
+				type: "dropdown",
+				x: 0.25,
+				xanchor: "left",
+				y: 1.1,
+				yanchor: "top",
+			},
 		],
 	};
 
-	// Create the graph
-	Plotly.newPlot("graph", [data], layout, {
-		toImageButtonOptions: {
-			filename: filename,
-			width: 800,
-			height: 600,
-			format: "png",
-		},
-		// annotations: [],
-	});
+	// Create the plot
+	Plotly.newPlot("plot", [data], layout);
 
 	const addLabel = (x, y, label) => {
 		return {
@@ -68,7 +162,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	};
 
 	// Add the callback function to the plotly_selected event
-	graph.on("plotly_selected", function (data) {
+	plot.on("plotly_selected", function (data) {
 		let range = data.range;
 		// X
 		let leftX = range.x[0];
@@ -84,7 +178,8 @@ document.addEventListener("DOMContentLoaded", () => {
 		let centerX = (range.x[0] + range.x[1]) / 2;
 		let centerY = (range.y[0] + range.y[1]) / 2;
 
-		let labelCenter = "<etiqueta>";
+		let etiqueta = document.getElementById("etiqueta");
+		let labelCenter = etiqueta.value;
 		annotations.push(addLabel(centerX, centerY, labelCenter));
 
 		// top left
@@ -95,13 +190,14 @@ document.addEventListener("DOMContentLoaded", () => {
 		let labelBottomRight = `(${rightX.toFixed(2)} , ${bottomY.toFixed(2)})`;
 		annotations.push(addLabel(rightX, bottomY, labelBottomRight));
 
-		Plotly.downloadImage("graph", {
-			format: "png",
-			width: 800,
-			height: 600,
-			filename: "newplot",
-		});
-
-		Plotly.relayout("graph", { annotations: annotations });
+		Plotly.relayout("plot", { annotations: annotations });
+		reproducir_sonido(
+			ruta,
+			labelCenter,
+			parseInt(leftX),
+			parseInt(rightX),
+			bottomY,
+			topY
+		);
 	});
 });

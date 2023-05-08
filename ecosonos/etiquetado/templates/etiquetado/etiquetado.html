@@ -66,7 +66,7 @@
                             {% endif %}
 
                             <!-- Formulario seleccionar carpeta raiz -->
-                            <form method="POST" enctype="multipart/form-data">
+                            <form method="POST" action="{% url 'etiquetado' %}" enctype="multipart/form-data">
                                 {% csrf_token %}
                                 <p>Seleccionar la carpeta raiz que contiene los archivos (.wav)</p>
                                 <input type="submit" value="Seleccionar Carpeta Principal" id="cargar"
@@ -84,45 +84,23 @@
                                         <li><a href="{% url 'espectrograma' ruta=completo%} ">{{base}}</a></li>
                                         {% endfor %}
                                     </ul>
-                                    <!-- <div class="carpetas-cargadas">
-                                        <input type="checkbox" name="carpetas" value="{{ completo }}" checked>
-                                        <label for="carpetas">{{ base }}</label>
-                                    </div> -->
                                 </div>
-                                <input type="submit" value="Procesar Carpetas con Lluvia" id="procesar_carpetas"
-                                    name="procesar_carpetas"></input>
                             </form>
                             {% endif %}
                         </div>
                     </section>
-                    <!-- <section class="col-12 col-12-narrower">
-						<div class="contenidos">
-							<form method="POST">
-								{% csrf_token %}
-								<input type="submit" value="Procesar Carpetas con Lluvia" id="procesar_carpetas"
-									name="procesar_carpetas"></input>
-							</form>
-						</div>
-					</section> -->
-                    <section class="col-12 col-12-narrower">
-                        <div class="contenidos">
-                            <form method="POST" enctype="multipart/form-data">
-                                {% csrf_token %}
-                                <input type="submit" value="Mover Archivos con Lluvia" id="mover_archivos"
-                                    name="mover_archivos"></input>
-                            </form>
-                        </div>
-                    </section>
-
 
                     {% if frequencies %}
                     <section>
 
-                        <h1>My Spectrogram Graph</h1>
-                        <div id="graph"></div>
-                        <p id="x">xxx</p>
+                        <h1>Espectrograma de {{nombre}}</h1>
+                        <input id="etiqueta" type="text" placeholder="etiqueta">
+                        <div id="plot"></div>
 
                         <script>
+                            let ruta = JSON.parse('"{{ ruta|safe }}"');
+                            // ruta = ruta.replaceAll('-', '/')
+                            console.log(ruta)
                             let frequencies = JSON.parse("{{ frequencies|safe }}");
                             let times = JSON.parse("{{ times|safe }}");
                             let spectrogram = JSON.parse("{{ spectrogram|safe }}");

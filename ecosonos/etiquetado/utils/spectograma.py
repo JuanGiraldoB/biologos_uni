@@ -12,7 +12,7 @@ from scipy import signal
 from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
-# import sounddevice as sd
+import sounddevice as sd
 import soundfile as sf
 from csv import writer
 import time
@@ -85,13 +85,13 @@ def calcular_espectrograma(ruta):
 def play_sound(ruta, t_ini, t_fin):
     # Extract data and sampling rate from file
     data, fs = sf.read(ruta, dtype='float32')
-    print('tamaño de la señal', data.shape)
-    print('frecuencia de muestreo', fs)
+    # print('tamaño de la señal', data.shape)
+    # print('frecuencia de muestreo', fs)
     ini = min(int(t_ini*fs), int(t_fin*fs))
     fin = max(int(t_ini*fs), int(t_fin*fs))
-    print(data[ini:fin].shape)
+    # print(data[ini:fin].shape)
     sd.play(data[ini:fin], fs)
-    status = sd.wait()
+    # status = sd.wait()
 
 # # como enviar la información de el tamaño de los vectores de tiempo y frecuencia
 # # además de la frecuencia de muestreo de la señal
@@ -231,7 +231,7 @@ def spectrogram(ruta, carpeta_raiz):
     s = s[:, ::3]
     # s = np.flipud(s)
     t = t[::3]
-    print(s.shape)
+    print("shape", s.shape)
     # for senal_audio in calcular_espectrograma(ruta):
     #    for Fs in calcular_espectrograma(ruta):
     # plt.specgram(senal_audio, Fs=fs, cmap='rainbow')
