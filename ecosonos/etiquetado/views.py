@@ -17,7 +17,9 @@ from ecosonos.utils.carpeta_utils import (
     cambiar_diagonales_carpeta,
     selecciono_carpeta,
     guardar_ruta_csv_session,
-    obtener_ruta_csv_session
+    obtener_ruta_csv_session,
+    guardar_ruta_xlsx_session,
+    obtener_ruta_xlsx_session
 )
 
 from .utils.spectograma import (
@@ -31,7 +33,10 @@ from ecosonos.utils.archivos_utils import (
     obtener_archivos_wav,
     reemplazar_caracter,
     crear_csv,
-    agregar_fila_csv
+    agregar_fila_csv,
+    crear_xlsx,
+    crear_hoja_xlsx,
+    agregar_fila_xlsx
 )
 
 from tkinter.filedialog import askdirectory
@@ -54,17 +59,21 @@ def etiquetado(request):
             guardar_raiz_carpeta_session(
                 request, carpeta_raiz, app="etiquetado")
 
-            csv_ruta = crear_csv(carpeta_raiz)
-            guardar_ruta_csv_session(request, csv_ruta)
+            # csv_ruta = crear_csv(carpeta_raiz)
+            # guardar_ruta_csv_session(request, csv_ruta)
+
+            xlsx_ruta = crear_xlsx(carpeta_raiz)
+            guardar_ruta_xlsx_session(request, xlsx_ruta)
 
             archivos, nombres_base = obtener_archivos_wav([carpeta_raiz])
 
-            # Reemplazar los '/' por '_' para poder ser usados en la peticion get
+            # Reemplazar los '/' por '-' para poder ser usados en la peticion get
             reemplazar_caracter(archivos, caracter='/', reemplazo='-')
 
             data['archivos'] = zip(archivos, nombres_base)
 
             return render(request, 'etiquetado/etiquetado.html', data)
+
 
     return render(request, 'etiquetado/etiquetado.html')
 
@@ -111,12 +120,15 @@ def espectrograma(request, ruta):
     data['nombre'] = os.path.basename(ruta)
     data['archivos'] = zip(archivos, nombres_base)
 
+
+
     return render(request, 'etiquetado/etiquetado.html', data)
 
 
 # @csrf_exempt
 def reproducir_sonido_archivo(request, ruta):
     ruta = ruta.replace('-', '/')
+    print(ruta)
 
     data = json.loads(request.body)
     etiqueta = data.get('etiqueta')
@@ -135,8 +147,13 @@ def reproducir_sonido_archivo(request, ruta):
     print(f'y1: {y1}')
     print(f'etiqueta: {etiqueta}')
 
+    xlsx_ruta = obtener_ruta_xlsx_session(request)
+    nombre = os.path.basename(ruta).split(".")[0]
+    crear_hoja_xlsx(xlsx_ruta, nombre)
+    agregar_fila_xlsx(xlsx_ruta, nombre, etiqueta, x0, x1, y0, y1)
+
     csv_ruta = obtener_ruta_csv_session(request)
     agregar_fila_csv(csv_ruta, etiqueta, x0, x1, y0, y1)
-    play_sound(ruta, x0, x1)
+    # play_sound(ruta, x0, x1)
 
     return render(request, 'etiquetado/etiquetado.html')

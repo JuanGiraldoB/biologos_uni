@@ -80,3 +80,11 @@ def guardar_ruta_csv_session(request, ruta_csv):
 
 def obtener_ruta_csv_session(request):
     return request.session['csv_etiquetado']
+
+
+def guardar_ruta_xlsx_session(request, ruta_xlsx):
+    request.session['xlsx_etiquetado'] = ruta_xlsx
+
+
+def obtener_ruta_xlsx_session(request):
+    return request.session['xlsx_etiquetado']

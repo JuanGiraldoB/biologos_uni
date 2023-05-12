@@ -3,6 +3,7 @@ import shutil
 import os
 from datetime import datetime
 import csv
+import openpyxl as xl
 
 from .carpeta_utils import guardar_ruta_csv_session
 
@@ -82,3 +83,44 @@ def agregar_fila_csv(csv_ruta, etiqueta, x0, x1, y0, y1):
 
         fila = [etiqueta, x0, x1, y0, y1]
         writer.writerow(fila)
+
+
+def crear_xlsx(carpeta_raiz):
+    nombre = 'etiquetas.xlsx'
+    xlsx_ruta = os.path.join(carpeta_raiz, nombre).replace('\\','/')
+
+    print(xlsx_ruta)
+    if not os.path.exists(xlsx_ruta):
+        wb = xl.Workbook()
+        wb.save(xlsx_ruta)
+        wb.close()
+
+    return xlsx_ruta
+
+
+def crear_hoja_xlsx(xlsx_ruta, nombre_archivo):
+    wb = xl.load_workbook(filename=xlsx_ruta) # wb = workbook
+    nombre_hojas = wb.sheetnames
+
+    if nombre_archivo in nombre_hojas:
+        ws = wb[nombre_archivo]
+    else:
+        ws = wb.create_sheet(title=nombre_archivo)
+        ws.append(["etiqueta,t_min,t_max,f_min,f_max"])
+
+    if "Sheet" in nombre_hojas:
+        del wb["Sheet"]
+
+    wb.save(xlsx_ruta)
+    wb.close()
+
+
+def agregar_fila_xlsx(xlsx_ruta, nombre_archivo, etiqueta, x0, x1, y0, y1):
+    wb = xl.load_workbook(filename=xlsx_ruta) # wb = workbook
+    ws = wb[nombre_archivo]
+
+    fila = [f"{etiqueta},{x0},{x1},{y0},{y1}"]
+    ws.append(fila)
+
+    wb.save(xlsx_ruta)
+    wb.close()
