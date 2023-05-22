@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'procesamiento',
     'indices',
     'etiquetado',
+    'etiquetado_auto',
 ]
 
 MIDDLEWARE = [
