@@ -1,6 +1,6 @@
 from django.urls import path, include
-from .views import test
+from .views import etiquetado_auto
 
 urlpatterns = [
-    path('', test, name='test'),
+    path('', etiquetado_auto, name='etiquetado-auto'),
 ]

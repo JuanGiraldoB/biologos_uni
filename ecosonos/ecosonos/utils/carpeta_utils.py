@@ -38,11 +38,13 @@ def subcarpetas_seleccionadas(carpetas):
     return not carpetas
 
 
-def guardar_raiz_carpeta_session(request, raiz, app=False):
+def guardar_raiz_carpeta_session(request, raiz, app='preproceso'):
     if app == 'indices':
         request.session['raiz_indices'] = raiz
     elif app == 'etiquetado':
         request.session['raiz_etiquetado'] = raiz
+    elif app == 'etiquetado-auto':
+        request.session['raiz_etiquetado_auto'] = raiz
     else:
         request.session['raiz_preproceso'] = raiz
 
@@ -52,6 +54,8 @@ def obtener_carpeta_raiz(request, app=False):
         return request.session['raiz_indices']
     elif app == 'etiquetado':
         return request.session['raiz_etiquetado']
+    elif app == 'etiquetado-auto':
+        return request.session['raiz_etiquetado_auto']
 
     return request.session['raiz_preproceso']
 
@@ -59,6 +63,8 @@ def obtener_carpeta_raiz(request, app=False):
 def guardar_carpetas_seleccionadas(request, carpetas, app=False):
     if app == 'indices':
         request.session['carpetas_indices'] = carpetas
+    elif app == 'etiquetado-auto':
+        request.session['carpetas_etiquetado_auto'] = carpetas
     else:
         request.session['carpetas_preproceso'] = carpetas
 

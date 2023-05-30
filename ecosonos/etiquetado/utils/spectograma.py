@@ -43,8 +43,10 @@ def calcular_espectrograma(ruta):
 
     if len(x.shape) == 1:
         senal_audio = x
-    elif len(x.shape) == 2:
-        senal_audio = x[:, 0]
+    else:
+        x = x.mean(axis=1)
+        x = np.squeeze(x)
+        senal_audio = x
 
     nmin = round(len(senal_audio) / (60 * fs))
     bio_band = (2000, 8000)

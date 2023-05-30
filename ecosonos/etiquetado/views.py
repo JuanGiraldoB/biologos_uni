@@ -74,33 +74,7 @@ def etiquetado(request):
 
             return render(request, 'etiquetado/etiquetado.html', data)
 
-
     return render(request, 'etiquetado/etiquetado.html')
-
-    # return render(request, 'etiquetado/upload.html')
-
-
-# async def espectrograma(request, ruta):
-#     data = {}
-
-#     carpeta_raiz = await sync_to_async(obtener_carpeta_raiz)(request, app='etiquetado')
-#     archivos, nombres_base = await sync_to_async(obtener_archivos_wav)([carpeta_raiz])
-#     await sync_to_async(reemplazar_caracter)(archivos, caracter='/', reemplazo='-')
-
-#     ruta = ruta.replace('-', '/')
-
-    # asyncio.create_task(run_calcular_spectrogram(ruta, carpeta_raiz))
-    # f, t, s = await sync_to_async(calcular_espectrograma)(ruta)
-    # sync_to_async(play_sound)(ruta, 37, 40)
-    # spectrogram(ruta, carpeta_raiz)
-
-    # data['archivos'] = zip(archivos, nombres_base)
-    # data['frequencies'] = f.tolist()
-    # data['times'] = t.tolist()
-    # data['spectrogram'] = s.tolist()
-    # data = json.dumps(data)
-
-    # return render(request, 'etiquetado/pruebas.html', data)
 
 
 def espectrograma(request, ruta):
@@ -119,8 +93,6 @@ def espectrograma(request, ruta):
     data['spectrogram'] = s.tolist()
     data['nombre'] = os.path.basename(ruta)
     data['archivos'] = zip(archivos, nombres_base)
-
-
 
     return render(request, 'etiquetado/etiquetado.html', data)
 
@@ -141,19 +113,13 @@ def reproducir_sonido_archivo(request, ruta):
     y0 = data.get('y0')
     y1 = data.get('y1')
 
-    print(f'x0: {x0}')
-    print(f'x1: {x1}')
-    print(f'y0: {y0}')
-    print(f'y1: {y1}')
-    print(f'etiqueta: {etiqueta}')
-
     xlsx_ruta = obtener_ruta_xlsx_session(request)
     nombre = os.path.basename(ruta).split(".")[0]
     crear_hoja_xlsx(xlsx_ruta, nombre)
     agregar_fila_xlsx(xlsx_ruta, nombre, etiqueta, x0, x1, y0, y1)
 
-    csv_ruta = obtener_ruta_csv_session(request)
-    agregar_fila_csv(csv_ruta, etiqueta, x0, x1, y0, y1)
-    # play_sound(ruta, x0, x1)
+    # csv_ruta = obtener_ruta_csv_session(request)
+    # agregar_fila_csv(csv_ruta, etiqueta, x0, x1, y0, y1)
+    play_sound(ruta, x0, x1)
 
     return render(request, 'etiquetado/etiquetado.html')

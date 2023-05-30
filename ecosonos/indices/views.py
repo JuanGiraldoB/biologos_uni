@@ -29,10 +29,6 @@ from .utils.new_indices import (
     ALL_INDICES
 )
 
-# TODO:
-# 1: if name has '__' replace to '_'
-# 2: if len(name.split('_')) == 3 or == 4
-
 
 async def indices(request):
     data = {}
@@ -62,7 +58,7 @@ async def indices(request):
         carpetas_seleccionadas = request.POST.getlist('carpetas')
 
         if subcarpetas_seleccionadas(carpetas_seleccionadas):
-            return render(request, 'indices/indices.html', data)
+            return render(request, 'indices/new_indices.html', data)
 
         await sync_to_async(guardar_carpetas_seleccionadas)(request, carpetas_seleccionadas,  app='indices')
         carpeta_raiz = await sync_to_async(obtener_carpeta_raiz)(request, app='indices')

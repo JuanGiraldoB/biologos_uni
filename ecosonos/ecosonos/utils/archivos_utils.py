@@ -22,7 +22,7 @@ def mover_archivos_lluvia(carpeta_raiz, carpeta_destino):
 
 def obtener_archivos_wav(carpetas):
     archivos = []
-    formatos = ['wav', 'WAV']
+    formatos = ['wav', 'WAV', 'mp3']
     nombres_base = []
 
     for carpeta in carpetas:
@@ -86,8 +86,9 @@ def agregar_fila_csv(csv_ruta, etiqueta, x0, x1, y0, y1):
 
 
 def crear_xlsx(carpeta_raiz):
-    nombre = 'etiquetas.xlsx'
-    xlsx_ruta = os.path.join(carpeta_raiz, nombre).replace('\\','/')
+    base = os.path.basename(carpeta_raiz)
+    nombre = f'etiquetas-{base}.xlsx'
+    xlsx_ruta = os.path.join(carpeta_raiz, nombre).replace('\\', '/')
 
     print(xlsx_ruta)
     if not os.path.exists(xlsx_ruta):
@@ -99,7 +100,7 @@ def crear_xlsx(carpeta_raiz):
 
 
 def crear_hoja_xlsx(xlsx_ruta, nombre_archivo):
-    wb = xl.load_workbook(filename=xlsx_ruta) # wb = workbook
+    wb = xl.load_workbook(filename=xlsx_ruta)  # wb = workbook
     nombre_hojas = wb.sheetnames
 
     if nombre_archivo in nombre_hojas:
@@ -116,7 +117,7 @@ def crear_hoja_xlsx(xlsx_ruta, nombre_archivo):
 
 
 def agregar_fila_xlsx(xlsx_ruta, nombre_archivo, etiqueta, x0, x1, y0, y1):
-    wb = xl.load_workbook(filename=xlsx_ruta) # wb = workbook
+    wb = xl.load_workbook(filename=xlsx_ruta)  # wb = workbook
     ws = wb[nombre_archivo]
 
     fila = [f"{etiqueta},{x0},{x1},{y0},{y1}"]
