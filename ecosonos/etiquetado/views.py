@@ -63,7 +63,7 @@ def etiquetado(request):
             # guardar_ruta_csv_session(request, csv_ruta)
 
             xlsx_ruta = crear_xlsx(carpeta_raiz)
-            guardar_ruta_xlsx_session(request, xlsx_ruta)
+            guardar_ruta_xlsx_session(request, xlsx_ruta, app='etiquetado')
 
             archivos, nombres_base = obtener_archivos_wav([carpeta_raiz])
 
@@ -113,7 +113,7 @@ def reproducir_sonido_archivo(request, ruta):
     y0 = data.get('y0')
     y1 = data.get('y1')
 
-    xlsx_ruta = obtener_ruta_xlsx_session(request)
+    xlsx_ruta = obtener_ruta_xlsx_session(request, app='etiquetado')
     nombre = os.path.basename(ruta).split(".")[0]
     crear_hoja_xlsx(xlsx_ruta, nombre)
     agregar_fila_xlsx(xlsx_ruta, nombre, etiqueta, x0, x1, y0, y1)

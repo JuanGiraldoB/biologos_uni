@@ -11,6 +11,8 @@ import numpy.matlib
 from scipy import signal
 import scipy
 import soundfile as sf
+import asyncio
+import pandas as pd
 
 
 def fcc5(canto, nfiltros, nc, nframes):
@@ -299,7 +301,7 @@ def ZscoreMV(datos_carac, zscore_min, rel_zscore):
     return out_zscore
 
 
-def segmentacion(archivos_full_dir, archivos_nombre_base, banda, canal):
+def segmentacion(archivos_full_dir, archivos_nombre_base, banda, canal, progreso):
     """Extrae los segmentos significativos en un rango de frecuencia presentes
     en los espectrogramas analizados de la carpeta seleccionada obteniendo 
     sus nombres y frecuencia de muestreo.
@@ -471,7 +473,9 @@ def segmentacion(archivos_full_dir, archivos_nombre_base, banda, canal):
             except:
                 0
 
-        print(archivo)
+        progreso.archivos_completados += 1
+        progreso.save()
+        print(progreso.archivos_completados)
 
     segment_data = np.array(segment_data)
     nombre_archivo = np.array(nombre_archivo)
@@ -757,7 +761,11 @@ def seleccion_features(it_num, dat_norma):
     return feat, gadso, recon, mean_clas, std_class
 
 
-def Metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, visualize):
+async def run_metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, visualize, progreso, nombre_xlsx):
+    await asyncio.to_thread(Metodologia, archivos_full_dir, archivos_nombre_base, banda, canal, autosel, visualize, progreso, nombre_xlsx)
+
+
+def Metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, visualize, progreso, nombre_xlsx):
     """Esta funcion genera la tabla con toda la informacion recopilada de los audios asi
     como una etiqueta para los audios con cierta similitud
 
@@ -791,10 +799,10 @@ def Metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, 
 
     if type(banda[0]) == str and type(banda[1]) == str:
         datos, nombre_archivo, fs = segmentacion(
-            archivos_full_dir, archivos_nombre_base, ["min", "max"], canal)
+            archivos_full_dir, archivos_nombre_base, ["min", "max"], canal, progreso)
     else:
         datos, nombre_archivo, fs = segmentacion(
-            archivos_full_dir, archivos_nombre_base, banda, canal)
+            archivos_full_dir, archivos_nombre_base, banda, canal, progreso)
 
     if visualize == 1:
         0
@@ -905,10 +913,18 @@ def Metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, 
     salida = np.array(np.concatenate(
         [datos[:, 0:10], (fs/2)*(datos[:, 10:12])], axis=1))
     tarr = np.concatenate([salida, np.transpose(recon)], axis=1)
+
     table = np.concatenate([nombre_archivo, tarr], axis=1, dtype="object")
 
     for i in range(0, np.max(recon)):
         dispersion.append(
             np.sum(np.std(datos_clasifi[(recon[0, :] == i), :], axis=1)))
     dispersion = np.expand_dims(np.array(dispersion), axis=0)
-    return table, datos_clasifi, mean_class, infoZC, gadso, repre, dispersion, frecuencia
+
+    Tabla_NewSpecies = pd.DataFrame(table)
+    Tabla_NewSpecies.to_excel(
+        nombre_xlsx, index=False)
+
+    # request.session['table'] = table
+    # print(request.session['table'])
+    # return table, datos_clasifi, mean_class, infoZC, gadso, repre, dispersion, frecuencia

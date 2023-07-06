@@ -88,9 +88,15 @@ def obtener_ruta_csv_session(request):
     return request.session['csv_etiquetado']
 
 
-def guardar_ruta_xlsx_session(request, ruta_xlsx):
-    request.session['xlsx_etiquetado'] = ruta_xlsx
+def guardar_ruta_xlsx_session(request, ruta_xlsx, app=False):
+    if app == 'etiquetado':
+        request.session['xlsx_etiquetado'] = ruta_xlsx
+    elif app == 'etiquetado-auto':
+        request.session['xlsx_etiquetado_auto'] = ruta_xlsx
 
 
-def obtener_ruta_xlsx_session(request):
-    return request.session['xlsx_etiquetado']
+def obtener_ruta_xlsx_session(request, app=False):
+    if app == 'etiquetado':
+        return request.session['xlsx_etiquetado']
+    elif app == 'etiquetado-auto':
+        return request.session['xlsx_etiquetado_auto']

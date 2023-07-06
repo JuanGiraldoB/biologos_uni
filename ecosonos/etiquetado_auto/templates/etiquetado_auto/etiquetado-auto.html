@@ -115,20 +115,28 @@
                         <form class="mosgrafica" method="POST" action="">
                             {% csrf_token %}
                             <div class="contenidos">
-                                <button type="submit" name="mostrar-grafica">Mostar grafica</button>
+                                <button type="submit" name="mostrar-tabla">Mostar tabla</button>
                             </div>
                         </form>
 
-                        {% if graficas %}
-
-                        {% for grafica, indice in zipped %}
-                        <ul>
-                            <h2>{{indice}}</h2>
-                            <li>{{ grafica|safe }}</li>
-                        </ul>
-                        {% endfor %}
-
-                        {% endif %}
+                        <table>
+                            <tr>
+                                {% for col in df.columns %}
+                                <td>
+                                    {{col}}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% for index, row in df.iterrows %}
+                            <tr>
+                                {% for cell in row %}
+                                <td>
+                                    {{cell}}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </table>
 
                         <!-- {{ grafica|safe }} -->
                     </section>
@@ -246,9 +254,7 @@
     <script src="{% static 'ecosonos/assets/js/util.js' %}"></script>
     <script src="{% static 'ecosonos/assets/js/main.js' %}"></script>
 
-    <!-- <script src="{% static 'indices/indicesProgressBar.js' %}"></script> -->
-    <!-- <script src="{% static 'indices/selectAll.js' %}"></script> -->
-
+    <script src="{% static 'etiquetado_auto/progressBar.js' %}"></script>
 </body>
 
 </html>

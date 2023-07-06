@@ -1,12 +1,18 @@
 from django.shortcuts import render
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import TableData
+import numpy as np
 from .utils.Bioacustica_Completo import (
     Metodologia,
     ZscoreMV,
     lamda_unsup,
     segmentacion,
     seleccion_features,
-    time_and_date
+    time_and_date,
+    run_metodologia
 )
+import ast
 
 from ecosonos.utils.carpeta_utils import (
     obtener_subcarpetas,
@@ -16,7 +22,9 @@ from ecosonos.utils.carpeta_utils import (
     obtener_carpeta_raiz,
     selecciono_carpeta,
     subcarpetas_seleccionadas,
-    obtener_nombre_base
+    obtener_nombre_base,
+    guardar_ruta_xlsx_session,
+    obtener_ruta_xlsx_session
 )
 
 from ecosonos.utils.archivos_utils import obtener_archivos_wav
@@ -37,8 +45,10 @@ async def etiquetado_auto(request):
             carpeta_raiz = askdirectory(title='Seleccionar carpeta raiz')
             root.destroy()
 
+            await sync_to_async(TableData.objects.all().delete)()
+
             if selecciono_carpeta(carpeta_raiz):
-                (request, "etiquetado_auto/etiquetado-auto.html")
+                return render(request, "etiquetado_auto/etiquetado-auto.html")
 
             await sync_to_async(guardar_raiz_carpeta_session)(request, carpeta_raiz, app='etiquetado-auto')
 
@@ -64,15 +74,8 @@ async def etiquetado_auto(request):
 
             archivos_full_dir, archivos_nombre_base = await sync_to_async(obtener_archivos_wav)(carpetas_seleccionadas)
 
-            print(len(archivos_full_dir))
-
-            # progreso = await sync_to_async(Progreso.objects.create)(cantidad_archivos=len(archivos))
-
-            # asyncio.create_task(run_calcular_indices(
-            #     carpeta_raiz, archivos, progreso))
-
-            # await sync_to_async(calcular_indices)(carpeta_raiz, archivos, progreso)
-
+            progreso = await sync_to_async(Progreso.objects.create)(cantidad_archivos=len(archivos_full_dir))
+            request.session['tabla'] = None
             carpetas_seleccionadas = obtener_nombre_base(
                 carpetas_seleccionadas)
             data['carpetas_procesando'] = carpetas_seleccionadas
@@ -82,19 +85,57 @@ async def etiquetado_auto(request):
             visualize = 0
             banda = ["min", "max"]
 
-            table, datos_clasifi, mean_class, infoZC, gadso, repre, dispersion, frecuencia = Metodologia(
-                archivos_full_dir, archivos_nombre_base, banda, canal, autosel, visualize)
-
             nombre_xlsx = 'Tabla_Nuevas_especies'
-
             for nombre in carpetas_seleccionadas:
                 nombre_xlsx += f'_{nombre}'
 
-            nombre_xlsx += '.xlsx'
+            nombre_xlsx = f'{carpeta_raiz}/{nombre_xlsx}.xlsx'
+            await sync_to_async(guardar_ruta_xlsx_session)(
+                request, nombre_xlsx, app='etiquetado-auto')
 
-            Tabla_NewSpecies = pd.DataFrame(table)
-            Tabla_NewSpecies.to_excel(
-                f'{carpeta_raiz}/{nombre_xlsx}', index=False)
+            asyncio.create_task(run_metodologia(
+                archivos_full_dir, archivos_nombre_base, banda, canal, autosel, visualize, progreso, nombre_xlsx))
+
+            # Tabla_NewSpecies = pd.DataFrame(table)
+            # Tabla_NewSpecies.to_excel(
+            #     f'{carpeta_raiz}/{nombre_xlsx}', index=False)
+
+            return render(request, "etiquetado_auto/etiquetado-auto.html", data)
+
+        elif 'mostrar-tabla' in request.POST:
+            carpeta_raiz = await sync_to_async(obtener_carpeta_raiz)(request, app='etiquetado-auto')
+            ruta_xlsx = await sync_to_async(obtener_ruta_xlsx_session)(
+                request, app='etiquetado-auto')
+
+            df = pd.read_excel(ruta_xlsx)
+            data['df'] = df
+
             return render(request, "etiquetado_auto/etiquetado-auto.html", data)
 
     return render(request, "etiquetado_auto/etiquetado-auto.html")
+
+
+@csrf_exempt
+def barra_progreso(request):
+    progreso = Progreso.objects.first()
+    data = {}
+
+    if not progreso:
+        data['procentaje_completado'] = 0
+        return JsonResponse(data)
+
+    archivos_completados = progreso.archivos_completados
+    cantidad_archivos = progreso.cantidad_archivos
+
+    try:
+        porcentaje_completado = int(
+            (archivos_completados / cantidad_archivos) * 100)
+    except:
+        porcentaje_completado = 0
+
+    data['procentaje_completado'] = porcentaje_completado
+
+    if archivos_completados == cantidad_archivos:
+        Progreso.objects.all().delete()
+
+    return JsonResponse(data)
