@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'indices',
     'etiquetado',
     'etiquetado_auto',
+    'conectividad'
 ]
 
 MIDDLEWARE = [

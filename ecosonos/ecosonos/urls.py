@@ -24,4 +24,5 @@ urlpatterns = [
     path('indices/', include('indices.urls')),
     path('etiquetado/', include('etiquetado.urls')),
     path('etiquetado-auto/', include('etiquetado_auto.urls')),
+    path('conectividad/', include('conectividad.urls')),
 ]
