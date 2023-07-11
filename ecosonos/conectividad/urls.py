@@ -3,6 +3,6 @@ from . import views
 
 
 urlpatterns = [
-    path('', views.mapa, name='preproceso'),
+    path('', views.mapa, name='conectividad'),
     # path('barra_progreso', views.barra_progreso, name='barra_progreso'),
 ]

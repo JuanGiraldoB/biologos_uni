@@ -11,7 +11,7 @@ import json
 import plotly.express as px
 
 
-def create_map(df_points):
+def create_map(departamentos, df_points):
     fig = go.Figure(go.Choroplethmapbox(
         # geojson=departamentos,
         # locations=locs,
@@ -58,6 +58,12 @@ def create_map(df_points):
         )
     )
 
+    # Create an empty list to store the border traces
+
+    # Add all border traces to the figure
+    border_traces = obtener_bordes_colombia(departamentos)
+    fig.add_traces(border_traces)
+
     fig.update_layout(mapbox_style="carto-positron",
                       mapbox_zoom=10,
                       mapbox_center={
@@ -68,3 +74,28 @@ def create_map(df_points):
     fig = fig.to_html()
 
     return fig
+
+
+def obtener_bordes_colombia(departamentos):
+    border_traces = []
+
+    # Iterate over each departamento feature in the JSON data
+    for feature in departamentos['features']:
+        # Extract the departamento code and border coordinates
+        dpto_code = feature['properties']['DPTO']
+        border_coords = feature['geometry']['coordinates'][0]
+
+        # Create a trace for the departamento border
+        border_trace = go.Scattermapbox(
+            lat=[coord[1] for coord in border_coords],
+            lon=[coord[0] for coord in border_coords],
+            mode='lines',
+            line=dict(color='green', width=1),
+            showlegend=False,
+            name=dpto_code
+        )
+
+        # Add the border trace to the list
+        border_traces.append(border_trace)
+
+    return border_traces

@@ -125,3 +125,10 @@ def agregar_fila_xlsx(xlsx_ruta, nombre_archivo, etiqueta, x0, x1, y0, y1):
 
     wb.save(xlsx_ruta)
     wb.close()
+
+
+def selecciono_archivo(archivo):
+    """
+        Verifica si fue seleccionada una carpeta
+    """
+    return not archivo
