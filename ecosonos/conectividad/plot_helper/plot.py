@@ -1,9 +1,6 @@
 import pandas as pd
 import numpy as np
 import random
-from shapely.geometry import Polygon, Point
-import geopandas as gpd
-import contextily as ctx
 import matplotlib.pyplot as plt
 
 import plotly.graph_objects as go

@@ -191,13 +191,12 @@ input, select, textarea {
 	.container {
 		margin: 0 auto;
 		max-width: 100%;
-		width: 1400px;
 	}
 
 		@media screen and (max-width: 1680px) {
 
 			.container {
-				width: 1200px;
+				width: 100%;
 			}
 
 		}
@@ -2540,6 +2539,8 @@ input, select, textarea {
 		background-position: top left,					top left,					top left;
 		background-size: 100% 6em,					100% 6em,					auto;
 		background-repeat: no-repeat,					no-repeat,					repeat;
+		display: flex;
+		justify-content: flex-start;
 	}
 
 		#header h1 {
@@ -2561,6 +2562,9 @@ input, select, textarea {
 		background-image: -ms-linear-gradient(top, rgba(0,0,0,0), rgba(0,0,0,0.3)), url("images/bg01.png");
 		background-image: linear-gradient(top, rgba(0,0,0,0), rgba(0,0,0,0.3)), url("images/bg01.png");
 		padding: 0;
+		width: 100%;
+		margin-top: 30px;
+		position: static;
 	}
 
 		#nav:after {
@@ -2587,7 +2591,7 @@ input, select, textarea {
 					text-decoration: none;
 					border: 0;
 					display: block;
-					padding: 1.5em 0.5em 1.35em 0.5em;
+					padding: 1.5em 0.2em 1.35em 0.2em;
 				}
 
 				#nav > ul > li:first-child {
@@ -2723,7 +2727,7 @@ input, select, textarea {
 /* Wrapper */
 
 	.wrapper {
-		padding: 5em 0 3em 0;
+		padding: 0 0 0 0;
 	}
 
 		.wrapper.style1 {
@@ -2736,6 +2740,7 @@ input, select, textarea {
 			background-position: top left,						bottom left,					top left;
 			background-size: 100% 6em,						100% 6em,						auto;
 			background-repeat: no-repeat,						no-repeat,						repeat;
+			margin-top: 90px;
 		}
 
 		.wrapper.style3 {
@@ -2777,7 +2782,7 @@ input, select, textarea {
 /* Footer */
 
 	#footer {
-		padding: 4em 0 8em 0;
+		padding: 4em 0 .4em 0;
 	}
 
 		#footer a {
@@ -3362,12 +3367,19 @@ input, select, textarea {
 
 	}
 
-	.logoup{
-		display: flexbox;
-	}
-
 	.logoup img{
-		width: 150px;
+		width: 170px;
+		z-index: 160;
+		position: absolute;
+		margin-left: 170px;
+		padding-left: 5px;
+		padding-right: 5px;
+		padding-top: 15px;
+		padding-bottom: 15px;
+		display: block;
+		box-shadow: 5px 5px 5px 5px rgba(14, 89, 73, 0.2);
+		background-color: #fff;
+		border-radius: 8%;
 	}
 
 	input[type="checkbox"] {
@@ -3399,7 +3411,7 @@ input, select, textarea {
 
 	  input[type="checkbox"] {
 		/* ...existing styles */
-
+	  
 		display: grid;
 		place-content: center;
 	  }
@@ -3458,57 +3470,203 @@ input, select, textarea {
 		padding-top: 20px;;
 	  }
 
-	  .carpetas-cargadas{
-		display: inline-flex !important;
-		align-items: baseline;
-		margin-top: 10px;
-		width: 100%;
-		margin-left: 60px;
+	  :root {
+		--surface-color: #fff;
+		--curve: 40;
 	  }
-
-	  .carpetas-cargadas label{
-		margin-left: 10px;;
+	  
+	  * {
+		box-sizing: border-box;
 	  }
-
-	  .chart {
-		background: rgba(25, 161, 115, 0.2);
-		justify-content: flex-start;
-		border-radius: 100px;
-		align-items: center;
+	  
+	  .cards {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+		gap: 1rem;
+		margin: 4rem 5vw;
+		padding: 0;
+		list-style-type: none;
+	  }
+	  
+	  .card {
 		position: relative;
-		padding: 0 5px;
+		display: block;
+		height: 100%;  
+		border-radius: calc(var(--curve) * 1px);
+		overflow: hidden;
+		text-decoration: none;
+	  }
+	  
+	  .card__image {      
+		width: 100%;
+		height: auto;
+	  }
+	  
+	  .card__overlay {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		z-index: 1;      
+		border-radius: calc(var(--curve) * 1px);    
+		background-color: var(--surface-color);      
+		transform: translateY(100%);
+		transition: .2s ease-in-out;
+	  }
+	  
+	  .card:hover .card__overlay {
+		transform: translateY(0);
+	  }
+	  
+	  .card__header {
+		position: relative;
 		display: flex;
-		height: 20px;
-		width: 500px;
+		align-items: center;
+		gap: 2em;
+		padding: 2em;
+		border-radius: calc(var(--curve) * 1px) 0 0 0;    
+		background-color: var(--surface-color);
+		transform: translateY(-100%);
+		transition: .2s ease-in-out;
+	  }
+	  
+	  .card__arc {
+		width: 80px;
+		height: 80px;
+		position: absolute;
+		bottom: 100%;
+		right: 0;      
+		z-index: 1;
+	  }
+	  
+	  .card__arc path {
+		fill: var(--surface-color);
+		d: path("M 40 80 c 22 0 40 -22 40 -40 v 40 Z");
+	  }       
+	  
+	  .card:hover .card__header {
+		transform: translateY(0);
+	  }
+	  
+	  .card__thumb {
+		flex-shrink: 0;
+		width: 50px;
+		height: 50px;      
+		border-radius: 50%;      
+	  }
+	  
+	  .card__title {
+		font-size: 1em;
+		margin: 0 0 .3em;
+		color: #6A515E;
+	  }
+	  
+	  .card__tagline {
+		display: block;
+		margin: 1em 0;
+		font-family: "MockFlowFont";  
+		font-size: .8em; 
+		color: #D7BDCA;  
+	  }
+	  
+	  .card__status {
+		font-size: .8em;
+		color: #5a5a5a;
+	  }
+	  
+	  .card__description {
+		padding: 0 2em 2em;
+		margin: 0;
+		color: #303030; 
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 3;
+		overflow: hidden;
+	  }
+
+	  .wrapper2.style3 .container {
+		background-color: #19a173;
+		background-image: -moz-linear-gradient(top, rgba(0,0,0,0), rgba(0,0,0,0.15)), url("images/bg01.png");
+		background-image: -webkit-linear-gradient(top, rgba(0,0,0,0), rgba(0,0,0,0.15)), url("images/bg01.png");
+		background-image: -ms-linear-gradient(top, rgba(0,0,0,0), rgba(0,0,0,0.15)), url("images/bg01.png");
+		background-image: linear-gradient(top, rgba(0,0,0,0), rgba(0,0,0,0.15)), url("images/bg01.png");
+		color: #fff;
+		bottom: 0;
+		width: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		margin-bottom: 0 !important;
 	}
-		.chart span {
-			/* You can modify the value below to change the distance between the percentage number and the bar */
-			margin-left: 5px;
-			color: #19a173;
-			font-weight: bolder;
-		}
-	
-	.bar {
-		/* You can modify the total time used for the animation here */
-		animation: load 1s normal forwards;
-		/* 
-		Add a little spice by having a shadow below the bar.
-		Feel free to comment out this line below to have an even LITE version :D 
-		*/
-		box-shadow: 0 10px 40px -10px #fff;
-	
-		border-radius: 100px;
+
+	.logos{
+		padding: 15px;
+	}
+
+	.logos img{
+		width: 100px;
+		height: auto;
+		z-index: 160;
+	}
+
+	.logos.texto{
+		padding: 0 !important;
+		height: 50px;
+	}
+
+	.overlay {
+		position: fixed;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		background: rgba(0, 0, 0, 0.7);
+		transition: opacity 500ms;
+		visibility: hidden;
+		opacity: 0;
+	  }
+	  .overlay:target {
+		visibility: visible;
+		opacity: 1;
+	  }
+	  
+	  .popup {
+		margin: 70px auto;
+		padding: 20px;
 		background: #19a173;
-		height: 15px;
-		width: 0;
-	} 
-	
-	@keyframes load {
-		0% {
-			width: 0;
-		}
-		100% {
-			/* You need to change the percentage below to match the value in the corresponding <span> */
-			width: calc(var(--percentage));
-		}
-	}
+		border-radius: 5px;
+		width: 30%;
+		position: relative;
+		transition: all 5s ease-in-out;
+	  }
+	  
+	  .popup h2 {
+		margin-top: 0;
+		color: #fff;
+		font-size: 26px !important;
+	  }
+
+	  .popup .close {
+		position: absolute;
+		top: 20px;
+		right: 30px;
+		transition: all 200ms;
+		font-size: 30px;
+		font-weight: bold;
+		text-decoration: none;
+		color: #fff;
+	  }
+	  .popup .close:hover {
+		color: #8b1f07;
+	  }
+	  .popup .content {
+		max-height: 30%;
+		overflow: auto;
+	  }
+
+	  .popup .content p{
+		color: #fff;
+		font-size: 18px !important;
+		font-weight: bold !important;
+		margin-top: 15px;
+	  }
