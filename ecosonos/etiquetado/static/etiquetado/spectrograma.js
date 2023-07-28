@@ -163,6 +163,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	// Add the callback function to the plotly_selected event
 	plot.on("plotly_selected", function (data) {
+		console.log(data);
 		let range = data.range;
 		// X
 		let leftX = range.x[0];

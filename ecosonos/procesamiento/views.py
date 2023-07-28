@@ -7,11 +7,13 @@ from asgiref.sync import sync_to_async
 from tkinter.filedialog import askdirectory
 
 from .utils.lluvia_edison import run_algoritmo_lluvia_edison
+from .utils.procesos_lluvia_progress import grafica_polar
 from .models import Progreso
+from .utils.plot import obtener_plot
 
 
 from ecosonos.utils.archivos_utils import (
-    mover_archivos_lluvia
+    mover_archivos_segun_tipo
 )
 
 from ecosonos.utils.carpeta_utils import (
@@ -59,10 +61,6 @@ async def lluvia(request):
             carpeta_raiz = await sync_to_async(obtener_carpeta_raiz)(request)
 
             carpetas_nombre_completo, carpetas_nombre_base = await sync_to_async(obtener_subcarpetas)(carpeta_raiz)
-            # data['carpetas_nombre_completo'] = carpetas_nombre_completo
-            # data['carpetas_nombre_base'] = carpetas_nombre_base
-            # data['completo_base_zip'] = zip(
-            #     carpetas_nombre_completo, carpetas_nombre_base)
 
             asyncio.create_task(run_algoritmo_lluvia_edison(
                 carpetas_seleccionadas, carpeta_raiz, progreso))
@@ -74,24 +72,39 @@ async def lluvia(request):
             return render(request, 'procesamiento/preproceso.html', data)
 
         elif 'mover_archivos' in request.POST:
+
             try:
                 root = mostrar_ventana_encima()
                 carpeta_destino = askdirectory(
                     title='Carpeta de destino de audios con lluvia')
                 root.destroy()
+
             except Exception as e:
                 return render(request, 'procesamiento/preproceso.html')
 
             if selecciono_carpeta(carpeta_destino):
                 return render(request, 'procesamiento/preproceso.html')
 
+            tipo_boton = request.POST['mover_archivos']
+            tipo_archivos_a_mover = "YES" if "Lluvia" in tipo_boton else "ALTO PSD"
+
             try:
                 carpeta_raiz = await sync_to_async(obtener_carpeta_raiz)(request)
-                mover_archivos_lluvia(carpeta_raiz, carpeta_destino)
+
+                mover_archivos_segun_tipo(
+                    carpeta_raiz, carpeta_destino, tipo_archivos_a_mover)
             except Exception as e:
                 return render(request, 'procesamiento/preproceso.html')
 
             return render(request, 'procesamiento/preproceso.html')
+
+        elif 'mostrar-grafica' in request.POST:
+            carpeta_raiz = await sync_to_async(obtener_carpeta_raiz)(request)
+            grafica = obtener_plot(carpeta_raiz)
+            data['grafica'] = grafica
+
+            return render(request, 'procesamiento/preproceso.html', data)
+
     else:
         return render(request, 'procesamiento/preproceso.html')
 

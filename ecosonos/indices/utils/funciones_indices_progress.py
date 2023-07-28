@@ -227,10 +227,14 @@ def calcularIndice(indices_seleccionados, carpeta, grabacion, Valores):
 
 
 def grafica_polar(carpeta_raiz, grabaciones, indice):
-    nombreGrabacion = grabaciones[0].split("/")[-1]
-    grabadora = nombreGrabacion.split('_')[0]
+    # nombreGrabacion = grabaciones[0].split("/")[-1]
+    # grabadora = nombreGrabacion.split('_')[0]
 
-    df_all = pd.read_csv(carpeta_raiz + '/indices_acusticos.csv')
+    if ".csv" in carpeta_raiz:
+        df_all = pd.read_csv(carpeta_raiz)
+    else:
+        df_all = pd.read_csv(carpeta_raiz + '/indices_acusticos.csv')
+
     rdns = np.linspace(0, 360, 24, endpoint=False)
 
     df = df_all[['Date', indice]].copy()

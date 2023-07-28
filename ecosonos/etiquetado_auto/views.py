@@ -96,10 +96,6 @@ async def etiquetado_auto(request):
             asyncio.create_task(run_metodologia(
                 archivos_full_dir, archivos_nombre_base, banda, canal, autosel, visualize, progreso, nombre_xlsx))
 
-            # Tabla_NewSpecies = pd.DataFrame(table)
-            # Tabla_NewSpecies.to_excel(
-            #     f'{carpeta_raiz}/{nombre_xlsx}', index=False)
-
             return render(request, "etiquetado_auto/etiquetado-auto.html", data)
 
         elif 'mostrar-tabla' in request.POST:

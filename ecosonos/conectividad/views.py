@@ -1,12 +1,11 @@
 from django.shortcuts import render
-from asgiref.sync import sync_to_async
-from django.http import HttpResponse
+# from asgiref.sync import sync_to_async
+# from django.http import HttpResponse
 
 from ecosonos.utils.tkinter_utils import mostrar_ventana_encima
 from ecosonos.utils.archivos_utils import selecciono_archivo
 
-
-from tkinter.filedialog import askdirectory, askopenfilename
+from tkinter.filedialog import askopenfilename
 
 import pandas as pd
 from .plot_helper.plot import create_map
@@ -18,7 +17,8 @@ def mapa(request):
 
     if 'cargar' in request.POST:
         root = mostrar_ventana_encima()
-        archivo = askopenfilename(title='Seleccionar carpeta raiz')
+        archivo = askopenfilename(
+            title='Seleccionar carpeta raiz')
         root.destroy()
 
         if selecciono_archivo(archivo):
@@ -27,8 +27,11 @@ def mapa(request):
         with open('conectividad/static/conectividad/map_info.json') as f:
             departamentos = json.load(f)
 
+        # df_points = pd.read_excel(
+         #   "C:\\Users\\JuanG\\Downloads\\UDAS_CSG_2018_JAGUAS.xlsx", sheet_name="Proyecto Piloto YNC")
+
         df_points = pd.read_excel(
-            "C:\\Users\\JuanG\\Downloads\\UDAS_CSG_2018_JAGUAS.xlsx", sheet_name="Proyecto Piloto YNC")
+            "C:\\Users\\JuanG\\Downloads\\UDAS Pasivo_20221001_Zamuro.xlsx", sheet_name="Template")
 
         df_points = df_points[['latitude_IG', 'longitud_IG']]
 

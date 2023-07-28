@@ -4,11 +4,10 @@ import os
 from datetime import datetime
 import csv
 import openpyxl as xl
+import pathlib
 
-from .carpeta_utils import guardar_ruta_csv_session
 
-
-def mover_archivos_lluvia(carpeta_raiz, carpeta_destino):
+def mover_archivos_segun_tipo(carpeta_raiz, carpeta_destino, tipo):
     ruta_xlsx = f'{carpeta_raiz}/resultado.xlsx'
     xlsx_file = pd.read_excel(ruta_xlsx)
 
@@ -16,7 +15,7 @@ def mover_archivos_lluvia(carpeta_raiz, carpeta_destino):
         ruta_archivo = row['path_FI']
         lluvia = row['rain_FI']
 
-        if lluvia == 'YES':
+        if lluvia == tipo:
             shutil.move(ruta_archivo, carpeta_destino)
 
 
@@ -47,6 +46,10 @@ def reemplazar_caracter(archivos, caracter, reemplazo):
 
 
 def obtener_fecha(archivo):
+
+    if "." in archivo:
+        archivo = pathlib.Path(archivo).stem
+
     archivo_partes = archivo.split('_')
     fecha = archivo_partes[-2]
     hora = archivo_partes[-1]

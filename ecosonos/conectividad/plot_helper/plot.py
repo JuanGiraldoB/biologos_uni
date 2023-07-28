@@ -1,11 +1,7 @@
 import pandas as pd
 import numpy as np
-import random
-import matplotlib.pyplot as plt
 
 import plotly.graph_objects as go
-import json
-import plotly.express as px
 
 
 def create_map(departamentos, df_points):

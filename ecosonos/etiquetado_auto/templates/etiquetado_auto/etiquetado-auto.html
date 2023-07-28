@@ -31,18 +31,17 @@
         <div id="header">
 
             <!-- Logo -->
-            <div class="logoup"><img src="{% static 'ecosonos/images/logo_econosonos.png' %}"></div>
+            <div class="logoup"><a href="{% url 'index' %}"><img
+                        src="{% static 'ecosonos/images/logo_econosonos.png' %}"></a></div>
 
             <!-- Nav -->
             <nav id="nav">
                 <ul>
-                    <li><a href="{% url 'index' %}">Inicio</a></li>
                     <li> <a href="{% url 'preproceso' %}">Preprocesamiento</a></li>
                     <li><a href="{% url 'indices' %}">Índices</a></li>
-                    <li><a href="{% url 'etiquetado' %}">Etiquetado</a></li>
-                    <li class="current"><a href="{% url 'etiquetado-auto' %}">Etiquetado Automático</a></li>
-                    <li><a href="{% url 'conectividad' %}">Conectividad</a></li>
-                    <li><a href="#">Contacto</a></li>
+                    <li><a href="{% url 'etiquetado' %}">Etiquetado manual</a></li>
+                    <li class="current"><a href="{% url 'etiquetado-auto' %}">Sonotipos</a></li>
+                    <li><a href="{% url 'conectividad' %}">Heterogeneidad acústica</a></li>
                 </ul>
             </nav>
 
@@ -56,8 +55,25 @@
             </header>
         </section>
 
+        <!-- Descripción Módulo -->
+        <section class="wrapper style2">
+            <div class="container">
+                <header class="major">
+                    <h2
+                        style="font-family: hocus_regularregular; letter-spacing: 0.1em; font-size: 4em; line-height: 0.2em; color: #19a173;">
+                        SONOTIPOS</h2>
+                    <p>Este módulo sugiere automáticamente segmentos donde posiblemente hay vocalizaciones de animales.
+                        El software realiza un análisis de clustering y propone agrupaciones de segmentos llamados
+                        sonotipos, de tal manera que el usuario asocia los sonotipos propuestos a
+                        vocalizaciones/llamados de una especie de interés. Se puede almacenar la información, de tal
+                        manera que luego se pueden reconocer las vocalizaciones/llamados de especies en nuevos audios.
+                    </p>
+                </header>
+            </div>
+        </section>
+
         <!-- Posts -->
-        <section class="wrapper style1">
+        <section class="wrapper style1 wrappeados">
             <div class="container">
                 <div class="row">
                     <section class="col-12 col-12-narrower">
@@ -67,6 +83,21 @@
                                 <div class="contenidos">
                                     <input type="submit" value="Seleccionar Carpeta Principal" id="cargar"
                                         name="cargar"></input>
+                                </div>
+                                <div class="row gtr-50 campostxt">
+                                    <div class="col-6 col-12-mobilep">
+                                        <label for="frecuenciaminima">Frecuencia Mínima</label>
+                                        <input type="text" name="name" id="frecuenciaminima"
+                                            placeholder="Ingrese frecuencia mínima" />
+                                    </div>
+                                    <div class="col-6 col-12-mobilep">
+                                        <label for="frecuenciaminima">Frecuencia Máxima</label>
+                                        <input type="text" name="email" id="frecuenciamaxima"
+                                            placeholder="Ingrese frecuencia máxima" />
+                                    </div>
+                                </div>
+                                <div class="botonprocesar">
+                                    <input type="submit" value="Procesar Archivos" id="cargar" name="cargar"></input>
                                 </div>
                             </section>
                         </form>
@@ -116,7 +147,11 @@
                         <form class="mosgrafica" method="POST" action="">
                             {% csrf_token %}
                             <div class="contenidos">
-                                <button type="submit" name="mostrar-tabla">Mostar tabla</button>
+                                <button type="submit" name="mostrar-tabla">Mostrar tabla</button>
+                                <button type="submit" name="mostrar-tabla">Cluster</button>
+                                <button type="submit" name="mostrar-tabla">Reconocer</button>
+                                <button type="submit" name="mostrar-tabla">Visualizar Clasificación </button>
+                                <button type="submit" name="mostrar-tabla">Patrones temporales del sonotipo</button>
                             </div>
                         </form>
 
@@ -145,95 +180,32 @@
             </div>
         </section>
 
-        <!-- Gigantic Heading -->
-        <section class="wrapper style2">
-            <div class="container">
-                <header class="major">
-                    <h2
-                        style="font-family: hocus_regularregular; letter-spacing: 0.1em; font-size: 4em; line-height: 0.2em; color: #19a173;">
-                        ECOSONOS</h2>
-                    <p>Herramienta computacional para hacer del escuchar un observar. La herramienta permite analizar el
-                        paisaje acústico para entender que está sucediendo en el ecosistema. Para esto identifica
-                        automáticamente presencia de cantos de animales en las diferentes frecuencias (desde 300Hz hasta
-                        80kHhz) y reconoce los cantos de especies para las que el usuario entrena el algoritmo. También
-                        permite analizar el paisaje acústico de una manera global, estimando índices acústicos. Con esta
-                        información el software estima similitud acústica entre los puntos geográficos que se quieren
-                        analizar a través del audio</p>
-                </header>
-            </div>
-        </section>
-
-
-        <!-- CTA -->
-        <section id="cta" class="wrapper style3">
-            <div class="container">
-                <header>
-                    <h2>¿Cómo puedo cargar un audio?</h2>
-                    <a href="#" class="button">¡Te Explicamos!</a>
-                </header>
-            </div>
-        </section>
-
         <!-- Footer -->
         <div id="footer">
             <div class="container">
-                <div class="row">
-                    <section class="col-3 col-6-narrower col-12-mobilep">
-                        <h3>Enlaces 1</h3>
-                        <ul class="links">
-                            <li><a href="#">Mattis et quis rutrum</a></li>
-                            <li><a href="#">Suspendisse amet varius</a></li>
-                            <li><a href="#">Sed et dapibus quis</a></li>
-                            <li><a href="#">Rutrum accumsan dolor</a></li>
-                            <li><a href="#">Mattis rutrum accumsan</a></li>
-                            <li><a href="#">Suspendisse varius nibh</a></li>
-                            <li><a href="#">Sed et dapibus mattis</a></li>
-                        </ul>
-                    </section>
-                    <section class="col-3 col-6-narrower col-12-mobilep">
-                        <h3>Enlaces 2</h3>
-                        <ul class="links">
-                            <li><a href="#">Duis neque nisi dapibus</a></li>
-                            <li><a href="#">Sed et dapibus quis</a></li>
-                            <li><a href="#">Rutrum accumsan sed</a></li>
-                            <li><a href="#">Mattis et sed accumsan</a></li>
-                            <li><a href="#">Duis neque nisi sed</a></li>
-                            <li><a href="#">Sed et dapibus quis</a></li>
-                            <li><a href="#">Rutrum amet varius</a></li>
-                        </ul>
-                    </section>
-                    <section class="col-6 col-12-narrower">
-                        <h3>¡Contáctanos!</h3>
-                        <form>
-                            <div class="row gtr-50">
-                                <div class="col-6 col-12-mobilep">
-                                    <input type="text" name="name" id="name" placeholder="Nombre" />
-                                </div>
-                                <div class="col-6 col-12-mobilep">
-                                    <input type="email" name="email" id="email" placeholder="Email" />
-                                </div>
-                                <div class="col-12">
-                                    <textarea name="message" id="message" placeholder="Mensaje" rows="5"></textarea>
-                                </div>
-                                <div class="col-12">
-                                    <ul class="actions">
-                                        <li><input type="submit" class="button alt" value="Enviar" /></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </form>
-                    </section>
-                </div>
+                <!-- Creditos -->
+                <section id="cta2" class="wrapper2 style3">
+                    <div class="container">
+                        <div class="logos participantes">
+                            <img src="{% static 'ecosonos/images/u_antioquia.png' %}">
+                        </div>
+                        <div class="logos participantes">
+                            <img src="{% static 'ecosonos/images/ITM.png' %}">
+                        </div>
+                        <div class="logos participantes">
+                            <img src="{% static 'ecosonos/images/humboldt_v1.png' %}">
+                        </div>
+                        <div class="logos texto">
+                            <p>Apoya:</p>
+                        </div>
+                        <div class="logos participantes">
+                            <img src="{% static 'ecosonos/images/Ciencias.png' %}">
+                        </div>
+                    </div>
+                </section>
             </div>
 
-            <!-- Icons -->
-            <ul class="icons">
-                <li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
-                <li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
-                <li><a href="#" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
-                <li><a href="#" class="icon brands fa-linkedin-in"><span class="label">LinkedIn</span></a></li>
-                <li><a href="#" class="icon brands fa-google-plus-g"><span class="label">Google+</span></a></li>
-            </ul>
+
 
             <!-- Copyright -->
             <div class="copyright">
@@ -254,7 +226,6 @@
     <script src="{% static 'ecosonos/assets/js/breakpoints.min.js' %}"></script>
     <script src="{% static 'ecosonos/assets/js/util.js' %}"></script>
     <script src="{% static 'ecosonos/assets/js/main.js' %}"></script>
-
     <script src="{% static 'etiquetado_auto/progressBar.js' %}"></script>
 </body>
 

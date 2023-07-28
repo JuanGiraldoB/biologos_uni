@@ -26,10 +26,9 @@
 				<ul>
 					<li> <a href="{% url 'preproceso' %}">Preprocesamiento</a></li>
 					<li><a href="{% url 'indices' %}">Índices</a></li>
-					<li><a href="{% url 'etiquetado' %}">Etiquetado</a></li>
-					<li><a href="{% url 'etiquetado-auto' %}">Etiquetado Automático</a></li>
-					<li><a href="{% url 'conectividad' %}">Conectividad</a></li>
-					<li><a href="#">Contacto</a></li>
+					<li><a href="{% url 'etiquetado' %}">Etiquetado Manual</a></li>
+					<li><a href="{% url 'etiquetado-auto' %}">Sonotipos</a></li>
+					<li><a href="{% url 'conectividad' %}">Heterogeneidad acústica</a></li>
 				</ul>
 			</nav>
 
@@ -56,7 +55,7 @@
 				<div class="container">
 					<header class="major">
 						<h2 style="font-family: hocus_regularregular; letter-spacing: 0.1em; font-size: 4em; line-height: 0.2em; color: #19a173;">ECOSONOS</h2>
-						<p>Herramienta computacional para  hacer del escuchar un observar. La herramienta permite analizar el paisaje acústico para entender que está sucediendo en el ecosistema.  Para esto identifica automáticamente presencia de cantos de animales en las diferentes frecuencias (desde 300Hz  hasta 80kHhz) y reconoce los cantos de especies para las que el usuario entrena el algoritmo.  También permite analizar el paisaje acústico de una manera global, estimando índices acústicos. Con esta información el software estima similitud acústica entre los puntos geográficos que se quieren analizar a través del audio</p>
+						<p>Herramienta computacional para hacer del escuchar un observar. La herramienta permite analizar el paisaje acústico para entender que está sucediendo en el ecosistema identificando automáticamente la presencia de cantos de animales en las diferentes frecuencias (desde 300Hz hasta 80kHhz) y reconociendo los cantos de especies para las que fue entrenado el algoritmo de inteligencia artificial. También permite analizar el paisaje acústico de una manera global, estimando índices acústicos. Con esta información el software estima similitud acústica entre los puntos geográficos que se quieren analizar a través del audio</p>
 					</header>
 				</div>
 			</section>
@@ -88,7 +87,7 @@
 					<!-- opciones:index.opciones.html -->
 					<ul class="cards">
 						<li>
-						<a href="" class="card">
+						<a href="{% url 'preproceso' %}" class="card">
 							<img src="{% static 'ecosonos/images/muestra_01.jpg' %}" class="card__image" alt="" />
 							<div class="card__overlay">
 							<div class="card__header">
@@ -99,12 +98,12 @@
 								<span class="card__status">Ecosonos</span>
 								</div>
 							</div>
-							<p class="card__description">Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores, blanditiis?</p>
+							<p class="card__description">Este módulo permite identificar los audios que presentan...</p>
 							</div>
 						</a>      
 						</li>
 						<li>
-						<a href="" class="card">
+						<a href="{% url 'indices' %}" class="card">
 							<img src="{% static 'ecosonos/images/muestra_02.jpg' %}" class="card__image" alt="" />
 							<div class="card__overlay">        
 							<div class="card__header">
@@ -115,23 +114,23 @@
 								<span class="card__status">Ecosonos</span>
 								</div>
 							</div>
-							<p class="card__description">Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores, blanditiis?</p>
+							<p class="card__description">Este módulo estima 54 índices acústicos de los audios usando la librería scikit-maad</p>
 							</div>
 						</a>
 						</li>
 						<li>
-						<a href="" class="card">
+						<a href="{% url 'etiquetado' %}" class="card">
 							<img src="{% static 'ecosonos/images/muestra_03.jpg' %}" class="card__image" alt="" />
 							<div class="card__overlay">
 							<div class="card__header">
 								<svg class="card__arc" xmlns="http://www.w3.org/2000/svg"><path /></svg>                     
 								<img class="card__thumb" src="{% static 'ecosonos/images/icono_sound_wave.png' %}" alt="" />
 								<div class="card__header-text">
-								<h3 class="card__title">Etiquetado</h3>          
+								<h3 class="card__title">Etiquetado manual</h3>          
 								<span class="card__status">Ecosonos</span>
 								</div>
 							</div>
-							<p class="card__description">Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores, blanditiis?</p>
+							<p class="card__description">Este módulo permite visualizar el espectrograma del audio que se elija y marcar los...</p>
 							</div>
 						</a>
 						</li>
@@ -143,14 +142,30 @@
 								<svg class="card__arc" xmlns="http://www.w3.org/2000/svg"><path /></svg>                 
 								<img class="card__thumb" src="{% static 'ecosonos/images/icono_sound_wave.png' %}" alt="" />
 								<div class="card__header-text">
-								<h3 class="card__title">Movimientos</h3>
+								<h3 class="card__title">Heterogeneidad acústica</h3>
 								<span class="card__status">Ecosonos</span>
 								</div>          
 							</div>
-							<p class="card__description">Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores, blanditiis?</p>
+							<p class="card__description">Este módulo permite representar sobre un mapa geográfico el valor de una...</p>
 							</div>
 						</a>
-						</li>    
+						</li>   
+						<li>
+							<a href="" class="card">
+								<img src="{% static 'ecosonos/images/muestra_05.jpg' %}" class="card__image" alt="" />
+								<div class="card__overlay">
+								<div class="card__header">
+									<svg class="card__arc" xmlns="http://www.w3.org/2000/svg"><path /></svg>                 
+									<img class="card__thumb" src="{% static 'ecosonos/images/icono_sound_wave.png' %}" alt="" />
+									<div class="card__header-text">
+									<h3 class="card__title">Sonotipos</h3>
+									<span class="card__status">Ecosonos</span>
+									</div>          
+								</div>
+								<p class="card__description">Este módulo sugiere automáticamente segmentos donde posiblemente hay...</p>
+								</div>
+							</a>
+						</li> 
 					</ul>
 					<!-- opciones -->
 				</div>

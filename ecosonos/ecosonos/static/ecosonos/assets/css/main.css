@@ -1961,8 +1961,7 @@ input, select, textarea {
 	}
 
 	header p {
-		color: #999;
-		font-size: 1.25em;
+		color: #000 !important;
 		position: relative;
 		margin-top: -1.25em;
 		margin-bottom: 2.25em;
@@ -1970,7 +1969,7 @@ input, select, textarea {
 
 	header.major {
 		text-align: center;
-		margin: 0 0 2em 0;
+		margin: 0 0 0 0;
 	}
 
 		header.major h2 {
@@ -1980,10 +1979,10 @@ input, select, textarea {
 		header.major p {
 			position: relative;
 			border-top: solid 1px #e0e0e0;
-			padding: 1em 0 0 0;
+			padding: 1em 4.2em 0 4.2em;
 			margin: 0;
 			top: -1em;
-			font-size: 1.5em;
+			font-size: 1.1em;
 			letter-spacing: -0.025em;
 		}
 
@@ -2564,6 +2563,7 @@ input, select, textarea {
 		padding: 0;
 		width: 100%;
 		margin-top: 30px;
+		padding-left: 100px;
 		position: static;
 	}
 
@@ -2730,6 +2730,10 @@ input, select, textarea {
 		padding: 0 0 0 0;
 	}
 
+	.wrappeados{
+		padding: 2em 4.8em 2em 4.8em;
+	}
+
 		.wrapper.style1 {
 			background: #fff;
 		}
@@ -2782,7 +2786,7 @@ input, select, textarea {
 /* Footer */
 
 	#footer {
-		padding: 4em 0 .4em 0;
+		padding: 4em 4.8em .4em 4.8em;
 	}
 
 		#footer a {
@@ -3371,7 +3375,7 @@ input, select, textarea {
 		width: 170px;
 		z-index: 160;
 		position: absolute;
-		margin-left: 170px;
+		margin-left: 100px;
 		padding-left: 5px;
 		padding-right: 5px;
 		padding-top: 15px;
@@ -3481,7 +3485,7 @@ input, select, textarea {
 	  
 	  .cards {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 		gap: 1rem;
 		margin: 4rem 5vw;
 		padding: 0;
@@ -3522,8 +3526,8 @@ input, select, textarea {
 		position: relative;
 		display: flex;
 		align-items: center;
-		gap: 2em;
-		padding: 2em;
+		gap: 1em;
+		padding: 1em;
 		border-radius: calc(var(--curve) * 1px) 0 0 0;    
 		background-color: var(--surface-color);
 		transform: translateY(-100%);
@@ -3556,9 +3560,10 @@ input, select, textarea {
 	  }
 	  
 	  .card__title {
-		font-size: 1em;
-		margin: 0 0 .3em;
+		font-size: .8em;
+		margin: 0 0 .1em;
 		color: #6A515E;
+		line-height: 1em !important;
 	  }
 	  
 	  .card__tagline {
@@ -3575,12 +3580,14 @@ input, select, textarea {
 	  }
 	  
 	  .card__description {
-		padding: 0 2em 2em;
+		padding: 0 1em 2em 1em;
 		margin: 0;
 		color: #303030; 
 		display: -webkit-box;
 		-webkit-box-orient: vertical;
-		-webkit-line-clamp: 3;
+		-webkit-line-clamp: 4;
+		line-height: 1em !important;
+		font-size: .9em !important;
 		overflow: hidden;
 	  }
 
@@ -3670,3 +3677,80 @@ input, select, textarea {
 		font-weight: bold !important;
 		margin-top: 15px;
 	  }
+
+	  .carpetas-cargadas{
+		display: inline-flex !important;
+		align-items: baseline;
+		margin-top: 10px;
+		width: 100%;
+		margin-left: 60px;
+	  }
+
+	  .carpetas-cargadas label{
+		margin-left: 10px;;
+	  }
+
+	  .chart {
+		background: rgba(25, 161, 115, 0.2);
+		justify-content: flex-start;
+		border-radius: 100px;
+		align-items: center;
+		position: relative;
+		padding: 0 5px;
+		display: flex;
+		height: 20px;
+		width: 500px;
+	}
+		.chart span {
+			/* You can modify the value below to change the distance between the percentage number and the bar */
+			margin-left: 5px;
+			color: #19a173;
+			font-weight: bolder;
+		}
+	
+	.bar {
+		/* You can modify the total time used for the animation here */
+		animation: load 1s normal forwards;
+		/* 
+		Add a little spice by having a shadow below the bar.
+		Feel free to comment out this line below to have an even LITE version :D 
+		*/
+		box-shadow: 0 10px 40px -10px #fff;
+	
+		border-radius: 100px;
+		background: #19a173;
+		height: 15px;
+		width: 0;
+	} 
+	
+	@keyframes load {
+		0% {
+			width: 0;
+		}
+		100% {
+			/* You need to change the percentage below to match the value in the corresponding <span> */
+			width: calc(var(--percentage));
+		}
+	}
+
+	.campostxt{
+		margin-top: 1em !important;
+		margin-right: 40em;
+	}
+
+	.botonprocesar{
+		margin-top: 2em !important;
+		
+	}
+
+	.botmalos{
+		margin-left: 1em !important;
+	}
+
+	.warningtext p{
+		font-weight: 400 !important;
+	}
+
+	.warningtext span{
+		font-weight: 900;
+	}

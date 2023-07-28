@@ -2,21 +2,14 @@ import os
 import numpy as np
 import soundfile as sf
 import shutil
-import sys
-import time
 import os
-import tkinter as tk
 from tkinter import *
-from tkinter import filedialog
 from tkinter.filedialog import askdirectory
-import tkinter.filedialog
-from tkinter import ttk
-# from flask import Flask, jsonify
 from scipy import signal
-# from Indices import *
 import pandas as pd
 from tqdm import tqdm
 from scipy.stats.mstats import gmean
+import plotly.express as px
 
 
 def getRutasArchivos():
@@ -256,3 +249,51 @@ def removeRainFiles(ruta, ruta_csv):
 
             if fileStatus[1] == 'Lluvia':
                 shutil.move(sourcePath+'/'+fileStatus[0], receivePath)
+
+
+def grafica_polar(carpeta_raiz, grabaciones, indice):
+    # nombreGrabacion = grabaciones[0].split("/")[-1]
+    # grabadora = nombreGrabacion.split('_')[0]
+
+    if ".csv" in carpeta_raiz:
+        df_all = pd.read_csv(carpeta_raiz)
+    else:
+        df_all = pd.read_csv(carpeta_raiz + '/indices_acusticos.csv')
+
+    rdns = np.linspace(0, 360, 24, endpoint=False)
+
+    df = df_all[['Date', indice]].copy()
+    df['Dates'] = pd.to_datetime(df['Date']).dt.strftime('%m/%d')
+    df['Time'] = pd.to_datetime(df['Date']).dt.hour
+    df['Hora'] = (df['Time'] / 24) * 360
+    df.drop('Date', inplace=True, axis=1)
+    df = df.groupby(['Dates', 'Time']).mean().reset_index()
+
+    fig = px.bar_polar(df, r="Dates", theta="Hora",
+                       color=indice, template="plotly_dark",
+                       color_discrete_sequence=px.colors.sequential.Plasma_r)
+
+    fig.update_layout(
+        width=600,
+        height=400,
+        polar=dict(
+            # hole=0.1,
+            angularaxis=dict(
+                rotation=90,
+                direction="clockwise",
+                tickmode="array",
+                tickvals=rdns,
+                ticktext=["{}:00".format(int(h)) for h in range(24)],
+                ticks="inside"
+            ),
+            radialaxis=dict(
+                tickprefix='',
+                ticksuffix='',
+                showticklabels=False,
+                range=(min(df['Dates'].unique()), max(df['Dates'].unique()))
+            )
+        )
+    )
+
+    fig = fig.to_html()
+    return fig

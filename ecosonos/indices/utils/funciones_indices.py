@@ -8,6 +8,8 @@ import numpy as np
 from django.http import JsonResponse
 import asyncio
 import datetime
+from ecosonos.utils.archivos_utils import obtener_fecha
+import pathlib
 
 # import matplotlib.pyplot as plt
 
@@ -72,19 +74,26 @@ def csvIndices(indicesCalculados, ruta, indices_select):
     fechas = []
 
     for nombre in Valores[0]:
-        fecha, tiempo = nombre.split('_')[1:3]
-        tiempo = tiempo.split('.')[0]
+        archivo_sin_extension = pathlib.Path(nombre).stem
 
-        dt_obj = datetime.datetime.strptime(
-            fecha + tiempo, '%Y%m%d%H%M%S')
+        if '__' in archivo_sin_extension:
+            archivo_sin_extension = archivo_sin_extension.replace(
+                '__', '_')
 
-        fechas.append(dt_obj)
+        fechas.append(obtener_fecha(archivo_sin_extension))
+        # fecha, tiempo = nombre.split('_')[1:3]
+        # tiempo = tiempo.split('.')[0]
+
+        # dt_obj = datetime.datetime.strptime(
+        #    fecha + tiempo, '%Y%m%d%H%M%S')
+
+        # fechas.append(dt_obj)
 
     Valores.append(fechas)
 
     data = None
     indices_select.insert(0, 'File')
-    indices_select.append('Fecha')
+    indices_select.append('Date')
     indicesDF = pd.DataFrame(data, columns=indices_select)
 
     for j in range(len(indices_select)):
@@ -92,7 +101,8 @@ def csvIndices(indicesCalculados, ruta, indices_select):
 
     nombreGrabacion = Valores[0][0]
     nombreGrabadora = nombreGrabacion.split('_')[0]
-    indicesDF.to_csv(ruta + '/Indices_acusticos_' + nombreGrabadora +
+    print("++++++++++++++++++++++++++++", ruta)
+    indicesDF.to_csv(ruta + '/indices_acusticos' +
                      '.csv', encoding='utf_8_sig', index=False, sep=',')
 
 
