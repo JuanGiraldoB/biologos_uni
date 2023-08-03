@@ -1,4 +1,21 @@
 import os
+import platform
+
+
+def abrir_administrador_archivos(carpeta):
+    sistema_operativo = platform.system()
+
+    try:
+        if sistema_operativo == "Windows":
+            os.system(f'start {carpeta}')
+        elif sistema_operativo == "Linux":
+            os.system(f'xdg-open {carpeta}')
+        elif sistema_operativo == "Darwin":
+            os.system(f'open {carpeta}')
+        else:
+            print("Unknown OS")
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
 
 def obtener_subcarpetas(carpeta):
