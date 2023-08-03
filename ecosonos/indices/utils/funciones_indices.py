@@ -10,6 +10,7 @@ import asyncio
 import datetime
 from ecosonos.utils.archivos_utils import obtener_fecha
 import pathlib
+from ast import literal_eval
 
 # import matplotlib.pyplot as plt
 
@@ -99,11 +100,19 @@ def csvIndices(indicesCalculados, ruta, indices_select):
     for j in range(len(indices_select)):
         indicesDF[indices_select[j]] = Valores[j]
 
+    if 'ADIm' in indicesDF:
+        for i in range(len(indicesDF['ADIm'][0])):
+            indicesDF[f'ADIm_{i}'] = indicesDF['ADIm'].apply(lambda x: x[i])
+
+    indicesDF = indicesDF.drop(columns=['ADIm'])
+
+    date_column = indicesDF.pop('Date')
+    indicesDF['Date'] = date_column
+
     nombreGrabacion = Valores[0][0]
     nombreGrabadora = nombreGrabacion.split('_')[0]
-    print("++++++++++++++++++++++++++++", ruta)
-    indicesDF.to_csv(ruta + '/indices_acusticos' +
-                     '.csv', encoding='utf_8_sig', index=False, sep=',')
+    indicesDF.to_csv(ruta + '/indices_acusticos.csv',
+                     encoding='utf_8_sig', index=False, sep=',')
 
 
 async def run_calcular_indice(indices_select, carpeta, archivos, progreso):

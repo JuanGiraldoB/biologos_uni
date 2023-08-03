@@ -109,6 +109,11 @@ async def mostrar_grafica(request):
         detalle_archivos = await sync_to_async(obtener_session_detalle_archivos)(request, app='indices')
         archivos = detalle_archivos[0]
 
+    except Exception as e:
+        print(e, "sss")
+        return render(request, 'indices/indices.html')
+
+    try:
         graficas = []
         for indice in indices_seleccionados:
 
@@ -117,9 +122,18 @@ async def mostrar_grafica(request):
 
             graficas.append(await sync_to_async(grafica_polar)(carpeta_raiz, archivos, indice))
 
+        if "ADIm" in indices_seleccionados:
+            adim = []
+            for i in range(30):
+                adim_i = f'ADIm_{i}'
+                adim.append(adim_i)
+                graficas.append(await sync_to_async(grafica_polar)(carpeta_raiz, archivos, indice, adim_i))
+
+    # Exception occurs when there are less ADIm_{i} than in the for range
     except Exception as e:
+        indices_seleccionados.remove("ADIm")
+        indices_seleccionados.extend(adim)
         print(e)
-        return render(request, 'indices/indices.html')
 
     zipped = zip(graficas, indices_seleccionados)
     context = {'graficas': graficas,

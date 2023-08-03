@@ -226,7 +226,7 @@ def calcularIndice(indices_seleccionados, carpeta, grabacion, Valores):
     # return JsonResponse({"Indices calculados": Indices_grabaciones})
 
 
-def grafica_polar(carpeta_raiz, grabaciones, indice):
+def grafica_polar(carpeta_raiz, grabaciones, indice, ADIm_index=False):
     # nombreGrabacion = grabaciones[0].split("/")[-1]
     # grabadora = nombreGrabacion.split('_')[0]
 
@@ -237,6 +237,9 @@ def grafica_polar(carpeta_raiz, grabaciones, indice):
 
     rdns = np.linspace(0, 360, 24, endpoint=False)
 
+    if ADIm_index:
+        indice = ADIm_index
+
     df = df_all[['Date', indice]].copy()
     df['Dates'] = pd.to_datetime(df['Date']).dt.strftime('%m/%d')
     df['Time'] = pd.to_datetime(df['Date']).dt.hour
@@ -246,7 +249,7 @@ def grafica_polar(carpeta_raiz, grabaciones, indice):
 
     fig = px.bar_polar(df, r="Dates", theta="Hora",
                        color=indice, template="plotly_dark",
-                       color_discrete_sequence=px.colors.sequential.Plasma_r)
+                       color_discrete_sequence=px.colors.sequential.Plasma_r[::-1])
 
     config = {
         'toImageButtonOptions': {
