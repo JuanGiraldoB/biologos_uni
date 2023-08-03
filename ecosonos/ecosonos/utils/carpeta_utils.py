@@ -80,7 +80,7 @@ def guardar_raiz_carpeta_session(request, raiz, app='preproceso'):
         request.session['raiz_preproceso'] = raiz
 
 
-def obtener_carpeta_raiz(request, app=False):
+def obtener_carpeta_raiz(request, app='preproceso'):
     if app == 'indices':
         return request.session['raiz_indices']
     elif app == 'etiquetado':
@@ -91,7 +91,7 @@ def obtener_carpeta_raiz(request, app=False):
     return request.session['raiz_preproceso']
 
 
-def guardar_carpetas_seleccionadas(request, carpetas, app=False):
+def guardar_carpetas_seleccionadas(request, carpetas, app='preproceso'):
     if app == 'indices':
         request.session['carpetas_indices'] = carpetas
     elif app == 'etiquetado-auto':
@@ -100,7 +100,7 @@ def guardar_carpetas_seleccionadas(request, carpetas, app=False):
         request.session['carpetas_preproceso'] = carpetas
 
 
-def obtener_carpetas_seleccionadas(request, app=False):
+def obtener_carpetas_seleccionadas(request, app='preproceso'):
     if app == 'indices':
         return request.session['carpetas_indices']
 
@@ -119,14 +119,14 @@ def obtener_ruta_csv_session(request):
     return request.session['csv_etiquetado']
 
 
-# def guardar_ruta_csv_session(request, ruta_csv, app=False):
+# def guardar_ruta_csv_session(request, ruta_csv, app='preproceso'):
 #     if app == 'etiquetado':
 #         request.session['csv_etiquetado'] = ruta_csv
 #     elif app == 'etiquetado-auto':
 #         request.session['csv_etiquetado_auto'] = ruta_csv
 
 
-# def obtener_ruta_csv_session(request, app=False):
+# def obtener_ruta_csv_session(request, app='preproceso'):
 #     if app == 'etiquetado':
 #         return request.session['csv_etiquetado']
 #     elif app == 'etiquetado-auto':

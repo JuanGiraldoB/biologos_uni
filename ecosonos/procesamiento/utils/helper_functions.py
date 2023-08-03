@@ -5,7 +5,7 @@ from tkinter.filedialog import askdirectory
 import asyncio
 import os
 
-from ..models import Progreso
+from procesamiento.models import Progreso
 
 from .lluvia_edison import run_algoritmo_lluvia_edison
 from .plot import obtener_plot
@@ -21,12 +21,12 @@ from ecosonos.utils.carpeta_utils import (
     subcarpetas_seleccionadas,
     obtener_carpeta_raiz,
     obtener_nombres_base,
-    obtener_cantidad_archivos_por_subdir
 )
 
 from ecosonos.utils.archivos_utils import (
     mover_archivos_segun_tipo,
-    obtener_detalle_archivos_wav
+    obtener_detalle_archivos_wav,
+    guardar_session_detalle_archivos
 )
 
 
@@ -48,13 +48,18 @@ async def cargar_carpeta(request):
     await sync_to_async(guardar_raiz_carpeta_session)(request, carpeta_raiz)
     carpetas_nombre_completo, carpetas_nombre_base = await sync_to_async(obtener_subcarpetas)(carpeta_raiz)
 
-    _, _, cantidad_archivos_subdir, duracion_archivos_subdir, fecha_archivos_subdir = obtener_detalle_archivos_wav(
+    archivos, nombres_base, cantidad_archivos_subdir, duracion_archivos_subdir, fecha_archivos_subdir = obtener_detalle_archivos_wav(
         carpetas_nombre_completo)
+
+    detalle_archivos = [archivos, nombres_base, cantidad_archivos_subdir,
+                        duracion_archivos_subdir, fecha_archivos_subdir]
+
+    await sync_to_async(guardar_session_detalle_archivos)(request, detalle_archivos)
 
     data['carpetas_nombre_completo'] = carpetas_nombre_completo
     data['carpetas_nombre_base'] = carpetas_nombre_base
     data['completo_base_zip'] = zip(
-        carpetas_nombre_completo, carpetas_nombre_base, cantidad_archivos_subdir, duracion_archivos_subdir, fecha_archivos_subdir)
+        carpetas_nombre_completo, carpetas_nombre_base, detalle_archivos[2], duracion_archivos_subdir[3], fecha_archivos_subdir[4])
 
     await sync_to_async(Progreso.objects.all().delete)()
 

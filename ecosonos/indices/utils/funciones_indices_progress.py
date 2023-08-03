@@ -248,6 +248,16 @@ def grafica_polar(carpeta_raiz, grabaciones, indice):
                        color=indice, template="plotly_dark",
                        color_discrete_sequence=px.colors.sequential.Plasma_r)
 
+    config = {
+        'toImageButtonOptions': {
+            'format': 'svg',  # one of png, svg, jpeg, webp
+            'filename': 'custom_image',
+            'height': 500,
+            'width': 700,
+            'scale': 1  # Multiply title/legend/axis/canvas sizes by this factor
+        }
+    }
+
     fig.update_layout(
         width=600,
         height=400,
@@ -267,10 +277,10 @@ def grafica_polar(carpeta_raiz, grabaciones, indice):
                 showticklabels=False,
                 range=(min(df['Dates'].unique()), max(df['Dates'].unique()))
             )
-        )
+        ),
     )
 
-    fig = fig.to_html()
+    fig = fig.to_html(config=config)
     return fig
 
 

@@ -8,6 +8,20 @@ from pydub import AudioSegment
 from concurrent.futures import ThreadPoolExecutor
 
 
+def guardar_session_detalle_archivos(request, detalle_archivos, app='preproceso'):
+    if app == 'indices':
+        request.session['detalle_archivos_indices'] = detalle_archivos
+    else:
+        request.session['detalle_archivos_preproceso'] = detalle_archivos
+
+
+def obtener_session_detalle_archivos(request, app='preproceso'):
+    if app == 'indices':
+        return request.session['detalle_archivos_indices']
+    else:
+        return request.session['detalle_archivos_preproceso']
+
+
 def mover_archivos_segun_tipo(carpeta_raiz, carpeta_destino, tipo):
     ruta_csv = f'{carpeta_raiz}/resultado_preproceso.csv'
     csv_file = pd.read_csv(ruta_csv)
@@ -33,6 +47,19 @@ def obtener_rango_fecha_archivos(fecha_archivos):
     return (min(fecha_archivos), max(fecha_archivos))
 
 
+def obtener_archivos_carpetas(carpetas):
+    archivos_wav = []
+
+    for carpeta in carpetas:
+        for root, _, archivos in os.walk(carpeta):
+            for archivo in archivos:
+                if archivo.lower().endswith('.wav'):
+                    archivo_path = os.path.join(root, archivo)
+                    archivos_wav.append(archivo_path)
+
+    return archivos_wav
+
+
 def procesar_carpeta(carpeta):
     archivos = []
     nombres_base = []
@@ -40,20 +67,18 @@ def procesar_carpeta(carpeta):
     duracion_archivos_carpeta = []
     fecha_archivos_carpeta = []
 
-    formatos = ['.wav', '.WAV', '.mp3']
-
     contador_archivos_carpeta = 0
 
     for archivo in os.listdir(carpeta):
         dir_archivo = pathlib.Path(os.path.join(carpeta, archivo))
 
-        if os.path.isfile(dir_archivo) and dir_archivo.suffix in formatos:
+        if os.path.isfile(dir_archivo) and dir_archivo.suffix.lower() == ".wav":
             # Obtener y guardar nombre base
             nombre_base = os.path.basename(dir_archivo)
             nombres_base.append(nombre_base)
 
             # Guardar direccion completa archivo
-            archivos.append(dir_archivo)
+            archivos.append(str(dir_archivo))
 
             # Obtener y guardar duracion del archivo por carpeta
             duracion_archivos_carpeta.append(
