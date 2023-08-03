@@ -4,22 +4,36 @@ import os
 def obtener_subcarpetas(carpeta):
     carpetas_nombre_completo = []
     carpetas_nombre_base = []
+
     carpetas_nombre_completo.append(carpeta)
     carpetas_nombre_base.append(os.path.basename(carpeta))
 
     for ruta, carpetas_subdir, _ in os.walk(carpeta):
-        # Add all directories to the carpetas list
         for carpeta_subdir in carpetas_subdir:
             nombre_completo = os.path.join(
-                ruta, carpeta_subdir).replace('\\', '/')
-            # os.path.join(ruta, carpeta_subdir).replace('\\', '/')
+                ruta, carpeta_subdir)  # .replace(os.path.sep, '/')
             carpetas_nombre_completo.append(nombre_completo)
+
             nombre_base = os.path.basename(os.path.join(ruta, carpeta_subdir))
             carpetas_nombre_base.append(nombre_base)
+
     return carpetas_nombre_completo, carpetas_nombre_base
 
 
-def obtener_nombre_base(carpetas):
+def obtener_cantidad_archivos_por_subdir(carpetas):
+    carpetas_cantidad_archivos = []
+
+    for carpeta in carpetas:
+        ruta_carpeta = os.path.join(carpeta, carpeta)
+        archivos_carpeta = [archivo for archivo in os.listdir(
+            ruta_carpeta) if os.path.isfile(os.path.join(ruta_carpeta, archivo))]
+        cantidad_archivos = len(archivos_carpeta)
+        carpetas_cantidad_archivos.append(cantidad_archivos)
+
+    return carpetas_cantidad_archivos
+
+
+def obtener_nombres_base(carpetas):
     nombres_base = [os.path.basename(carpeta) for carpeta in carpetas]
     return nombres_base
 
@@ -88,15 +102,15 @@ def obtener_ruta_csv_session(request):
     return request.session['csv_etiquetado']
 
 
-def guardar_ruta_xlsx_session(request, ruta_xlsx, app=False):
-    if app == 'etiquetado':
-        request.session['xlsx_etiquetado'] = ruta_xlsx
-    elif app == 'etiquetado-auto':
-        request.session['xlsx_etiquetado_auto'] = ruta_xlsx
+# def guardar_ruta_csv_session(request, ruta_csv, app=False):
+#     if app == 'etiquetado':
+#         request.session['csv_etiquetado'] = ruta_csv
+#     elif app == 'etiquetado-auto':
+#         request.session['csv_etiquetado_auto'] = ruta_csv
 
 
-def obtener_ruta_xlsx_session(request, app=False):
-    if app == 'etiquetado':
-        return request.session['xlsx_etiquetado']
-    elif app == 'etiquetado-auto':
-        return request.session['xlsx_etiquetado_auto']
+# def obtener_ruta_csv_session(request, app=False):
+#     if app == 'etiquetado':
+#         return request.session['csv_etiquetado']
+#     elif app == 'etiquetado-auto':
+#         return request.session['csv_etiquetado_auto']

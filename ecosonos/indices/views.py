@@ -22,7 +22,7 @@ from ecosonos.utils.carpeta_utils import (
     obtener_carpeta_raiz,
     selecciono_carpeta,
     subcarpetas_seleccionadas,
-    obtener_nombre_base
+    obtener_nombres_base
 )
 
 from .utils.new_indices import (
@@ -150,7 +150,7 @@ async def indices(request):
             asyncio.create_task(run_calcular_indice(
                 indices_seleccionados, carpeta_raiz, archivos, progreso))
 
-            carpetas_seleccionadas = obtener_nombre_base(
+            carpetas_seleccionadas = obtener_nombres_base(
                 carpetas_seleccionadas)
             data['carpetas_procesando'] = carpetas_seleccionadas
 

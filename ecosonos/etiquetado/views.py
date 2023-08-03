@@ -18,8 +18,8 @@ from ecosonos.utils.carpeta_utils import (
     selecciono_carpeta,
     guardar_ruta_csv_session,
     obtener_ruta_csv_session,
-    guardar_ruta_xlsx_session,
-    obtener_ruta_xlsx_session
+    guardar_ruta_csv_session,
+    obtener_ruta_csv_session
 )
 
 from .utils.spectograma import (
@@ -32,11 +32,9 @@ from .utils.spectograma import (
 from ecosonos.utils.archivos_utils import (
     obtener_archivos_wav,
     reemplazar_caracter,
-    crear_csv,
     agregar_fila_csv,
-    crear_xlsx,
-    crear_hoja_xlsx,
-    agregar_fila_xlsx
+    crear_csv,
+    agregar_fila_csv
 )
 
 from tkinter.filedialog import askdirectory
@@ -59,11 +57,13 @@ def etiquetado(request):
             guardar_raiz_carpeta_session(
                 request, carpeta_raiz, app="etiquetado")
 
-            # csv_ruta = crear_csv(carpeta_raiz)
-            # guardar_ruta_csv_session(request, csv_ruta)
+            nombre_carpeta = os.path.basename(carpeta_raiz).split(".")[0]
 
-            xlsx_ruta = crear_xlsx(carpeta_raiz)
-            guardar_ruta_xlsx_session(request, xlsx_ruta, app='etiquetado')
+            csv_ruta = crear_csv(carpeta_raiz, nombre_carpeta)
+            guardar_ruta_csv_session(request, csv_ruta)
+
+            # xlsx_ruta = crear_xlsx(carpeta_raiz)
+            # guardar_ruta_csv_session(request, xlsx_ruta, app='etiquetado')
 
             archivos, nombres_base = obtener_archivos_wav([carpeta_raiz])
 
@@ -100,7 +100,6 @@ def espectrograma(request, ruta):
 # @csrf_exempt
 def reproducir_sonido_archivo(request, ruta):
     ruta = ruta.replace('-', '/')
-    print(ruta)
 
     data = json.loads(request.body)
     etiqueta = data.get('etiqueta')
@@ -113,13 +112,9 @@ def reproducir_sonido_archivo(request, ruta):
     y0 = data.get('y0')
     y1 = data.get('y1')
 
-    xlsx_ruta = obtener_ruta_xlsx_session(request, app='etiquetado')
-    nombre = os.path.basename(ruta).split(".")[0]
-    crear_hoja_xlsx(xlsx_ruta, nombre)
-    agregar_fila_xlsx(xlsx_ruta, nombre, etiqueta, x0, x1, y0, y1)
-
-    # csv_ruta = obtener_ruta_csv_session(request)
-    # agregar_fila_csv(csv_ruta, etiqueta, x0, x1, y0, y1)
+    nombre_grabacion = os.path.basename(ruta)
+    csv_ruta = obtener_ruta_csv_session(request)
+    agregar_fila_csv(csv_ruta, nombre_grabacion, etiqueta, x0, x1, y0, y1)
     play_sound(ruta, x0, x1)
 
     return render(request, 'etiquetado/etiquetado.html')

@@ -5,7 +5,7 @@ from ecosonos.utils.archivos_utils import obtener_fecha
 
 def obtener_plot(carpeta_raiz):
     # Step 1: Read the xlsx file and extract the necessary information
-    df = pd.read_excel(carpeta_raiz + "/resultado.xlsx")
+    df = pd.read_csv(carpeta_raiz + "/resultado_preproceso.csv")
 
     # Step 2: Extract the date from the filename using the function `get_date_from_filename`
     df['Date'] = df['name_FI'].apply(obtener_fecha)

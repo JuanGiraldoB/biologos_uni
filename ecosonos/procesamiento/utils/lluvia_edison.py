@@ -382,8 +382,8 @@ def algoritmo_lluvia_edison(carpetas, raiz, progreso):
     # Ruta donde se guardan los resultados
     folder_rain = raiz
 
-    # Nombre csv/.xlsx
-    name_file = 'resultado.xlsx'
+    # Nombre csv
+    name_file = 'resultado_preproceso.csv'
 
     formatos = ['wav', 'WAV']
     n_cores = 14
@@ -399,7 +399,7 @@ def algoritmo_lluvia_edison(carpetas, raiz, progreso):
     numero_archivos = 0
     for carpeta in carpetas:
         for archivo in os.listdir(carpeta):
-            file_name = os.path.join(carpeta, archivo).replace('\\', '/')
+            file_name = os.path.join(carpeta, archivo)  # .replace('\\', '/')
 
             if os.path.isfile(file_name):
                 if any([f".{formato}" in archivo for formato in formatos]):
@@ -502,7 +502,7 @@ def algoritmo_lluvia_edison(carpetas, raiz, progreso):
         path_file = os.path.join(folder_rain, name_file)
 
         # print(f"Saving in {path_file} ...")
-        df_y.to_excel(path_file, index=False)
+        df_y.to_csv(path_file, index=False)
         # print(f"Results saved in {path_file}")
         print(
             f"Execution Time {str(timedelta(seconds=time.time() - start_time))}")

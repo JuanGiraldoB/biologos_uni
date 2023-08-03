@@ -22,9 +22,9 @@ from ecosonos.utils.carpeta_utils import (
     obtener_carpeta_raiz,
     selecciono_carpeta,
     subcarpetas_seleccionadas,
-    obtener_nombre_base,
-    guardar_ruta_xlsx_session,
-    obtener_ruta_xlsx_session
+    obtener_nombres_base,
+    guardar_ruta_csv_session,
+    obtener_ruta_csv_session
 )
 
 from ecosonos.utils.archivos_utils import obtener_archivos_wav
@@ -76,7 +76,7 @@ async def etiquetado_auto(request):
 
             progreso = await sync_to_async(Progreso.objects.create)(cantidad_archivos=len(archivos_full_dir))
             request.session['tabla'] = None
-            carpetas_seleccionadas = obtener_nombre_base(
+            carpetas_seleccionadas = obtener_nombres_base(
                 carpetas_seleccionadas)
             data['carpetas_procesando'] = carpetas_seleccionadas
 
@@ -90,7 +90,7 @@ async def etiquetado_auto(request):
                 nombre_xlsx += f'_{nombre}'
 
             nombre_xlsx = f'{carpeta_raiz}/{nombre_xlsx}.xlsx'
-            await sync_to_async(guardar_ruta_xlsx_session)(
+            await sync_to_async(guardar_ruta_csv_session)(
                 request, nombre_xlsx, app='etiquetado-auto')
 
             asyncio.create_task(run_metodologia(
@@ -100,7 +100,7 @@ async def etiquetado_auto(request):
 
         elif 'mostrar-tabla' in request.POST:
             carpeta_raiz = await sync_to_async(obtener_carpeta_raiz)(request, app='etiquetado-auto')
-            ruta_xlsx = await sync_to_async(obtener_ruta_xlsx_session)(
+            ruta_xlsx = await sync_to_async(obtener_ruta_csv_session)(
                 request, app='etiquetado-auto')
 
             df = pd.read_excel(ruta_xlsx)

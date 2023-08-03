@@ -8,10 +8,12 @@ import pathlib
 
 
 def mover_archivos_segun_tipo(carpeta_raiz, carpeta_destino, tipo):
-    ruta_xlsx = f'{carpeta_raiz}/resultado.xlsx'
-    xlsx_file = pd.read_excel(ruta_xlsx)
+    ruta_csv = f'{carpeta_raiz}/resultado_preproceso.csv'
+    csv_file = pd.read_csv(ruta_csv)
 
-    for _, row in xlsx_file.iterrows():
+    print(csv_file.head())
+
+    for _, row in csv_file.iterrows():
         ruta_archivo = row['path_FI']
         lluvia = row['rain_FI']
 
@@ -27,7 +29,7 @@ def obtener_archivos_wav(carpetas):
     for carpeta in carpetas:
         for archivo in os.listdir(carpeta):
             file_name = os.path.join(
-                carpeta, archivo).replace('\\', '/')
+                carpeta, archivo).replace(os.path.sep, '/')
 
             # Verifica que sea un archivo y que la extension corresponda con las de la variable formatos
             if os.path.isfile(file_name):
@@ -54,8 +56,6 @@ def obtener_fecha(archivo):
     fecha = archivo_partes[-2]
     hora = archivo_partes[-1]
 
-    print(f'partes archivo: {archivo_partes}', end='\n\n')
-
     yy = int(fecha[0:4])
     mm = int(fecha[4:6])
     dd = int(fecha[6:8])
@@ -70,68 +70,71 @@ def obtener_fecha(archivo):
     return date
 
 
-def crear_csv(carpeta_raiz):
-    csv_ruta = os.path.join(carpeta_raiz, 'etiquetas.csv')
+def crear_csv(carpeta_raiz, nombre_carpeta):
+    nombre_csv = f'etiquetas_{nombre_carpeta}.csv'
+    csv_ruta = os.path.join(carpeta_raiz, nombre_csv)
+
     if not os.path.exists(csv_ruta):
         with open(csv_ruta, mode='w', newline='') as csv_file:
             writer = csv.writer(csv_file)
-            writer.writerow(["etiqueta", "t_min", "t_max", "f_min", "f_max"])
+            writer.writerow(["grabacion", "etiqueta", "t_min",
+                            "t_max", "f_min", "f_max"])
 
     return csv_ruta
 
 
-def agregar_fila_csv(csv_ruta, etiqueta, x0, x1, y0, y1):
+def agregar_fila_csv(csv_ruta, nombre_grabacion, etiqueta, x0, x1, y0, y1):
     with open(csv_ruta, "a", newline='') as file:
         writer = csv.writer(file)
 
-        fila = [etiqueta, x0, x1, y0, y1]
+        fila = [nombre_grabacion, etiqueta, x0, x1, y0, y1]
         writer.writerow(fila)
 
 
-def crear_xlsx(carpeta_raiz):
-    base = os.path.basename(carpeta_raiz)
-    nombre = f'etiquetas-{base}.xlsx'
-    xlsx_ruta = os.path.join(carpeta_raiz, nombre).replace('\\', '/')
+# def crear_xlsx(carpeta_raiz):
+#     base = os.path.basename(carpeta_raiz)
+#     nombre = f'etiquetas-{base}.xlsx'
+#     xlsx_ruta = os.path.join(carpeta_raiz, nombre).replace('\\', '/')
 
-    print(xlsx_ruta)
-    if not os.path.exists(xlsx_ruta):
-        wb = xl.Workbook()
-        wb.save(xlsx_ruta)
-        wb.close()
+#     print(xlsx_ruta)
+#     if not os.path.exists(xlsx_ruta):
+#         wb = xl.Workbook()
+#         wb.save(xlsx_ruta)
+#         wb.close()
 
-    return xlsx_ruta
-
-
-def crear_hoja_xlsx(xlsx_ruta, nombre_archivo):
-    wb = xl.load_workbook(filename=xlsx_ruta)  # wb = workbook
-    nombre_hojas = wb.sheetnames
-
-    if nombre_archivo in nombre_hojas:
-        ws = wb[nombre_archivo]
-    else:
-        ws = wb.create_sheet(title=nombre_archivo)
-        ws.append(["etiqueta,t_min,t_max,f_min,f_max"])
-
-    if "Sheet" in nombre_hojas:
-        del wb["Sheet"]
-
-    wb.save(xlsx_ruta)
-    wb.close()
+#     return xlsx_ruta
 
 
-def agregar_fila_xlsx(xlsx_ruta, nombre_archivo, etiqueta, x0, x1, y0, y1):
-    wb = xl.load_workbook(filename=xlsx_ruta)  # wb = workbook
-    ws = wb[nombre_archivo]
+# def crear_hoja_xlsx(xlsx_ruta, nombre_archivo):
+#     wb = xl.load_workbook(filename=xlsx_ruta)  # wb = workbook
+#     nombre_hojas = wb.sheetnames
 
-    fila = [f"{etiqueta},{x0},{x1},{y0},{y1}"]
-    ws.append(fila)
+#     if nombre_archivo in nombre_hojas:
+#         ws = wb[nombre_archivo]
+#     else:
+#         ws = wb.create_sheet(title=nombre_archivo)
+#         ws.append(["etiqueta,t_min,t_max,f_min,f_max"])
 
-    wb.save(xlsx_ruta)
-    wb.close()
+#     if "Sheet" in nombre_hojas:
+#         del wb["Sheet"]
+
+#     wb.save(xlsx_ruta)
+#     wb.close()
+
+
+# def agregar_fila_csv(csv_ruta, nombre_archivo, etiqueta, x0, x1, y0, y1):
+#     wb = xl.load_workbook(filename=csv_ruta)
+#     ws = wb[nombre_archivo]
+
+#     fila = [f"{etiqueta},{x0},{x1},{y0},{y1}"]
+#     ws.append(fila)
+
+#     wb.save(csv_ruta)
+#     wb.close()
 
 
 def selecciono_archivo(archivo):
     """
-        Verifica si fue seleccionada una carpeta
+        Verifica si fue seleccionada un archivo
     """
     return not archivo

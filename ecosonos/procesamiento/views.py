@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-import asyncio
 from asgiref.sync import sync_to_async
 
 from tkinter.filedialog import askdirectory
@@ -17,93 +16,36 @@ from ecosonos.utils.archivos_utils import (
 )
 
 from ecosonos.utils.carpeta_utils import (
-    obtener_subcarpetas,
     guardar_raiz_carpeta_session,
     obtener_carpeta_raiz,
     selecciono_carpeta,
     subcarpetas_seleccionadas,
-    obtener_nombre_base
+    obtener_nombres_base
 )
 
 from ecosonos.utils.tkinter_utils import mostrar_ventana_encima
 
+from .utils.helper_functions import (
+    cargar_carpeta,
+    procesar_carpetas,
+    mover_archivos,
+    mostrar_grafica
+)
+
 
 async def lluvia(request):
-    data = {}
-
     if request.method == 'POST':
         if 'cargar' in request.POST:
-            root = mostrar_ventana_encima()
-            carpeta_raiz = askdirectory(title='Seleccionar carpeta raiz')
-            root.destroy()
-
-            if selecciono_carpeta(carpeta_raiz):
-                return render(request, 'procesamiento/preproceso.html')
-
-            await sync_to_async(guardar_raiz_carpeta_session)(request, carpeta_raiz)
-            carpetas_nombre_completo, carpetas_nombre_base = await sync_to_async(obtener_subcarpetas)(carpeta_raiz)
-            data['carpetas_nombre_completo'] = carpetas_nombre_completo
-            data['carpetas_nombre_base'] = carpetas_nombre_base
-            data['completo_base_zip'] = zip(
-                carpetas_nombre_completo, carpetas_nombre_base)
-
-            await sync_to_async(Progreso.objects.all().delete)()
-
-            return render(request, 'procesamiento/preproceso.html', data)
+            return await cargar_carpeta(request)
 
         elif 'procesar_carpetas' in request.POST:
-            carpetas_seleccionadas = request.POST.getlist('carpetas')
-
-            if subcarpetas_seleccionadas(carpetas_seleccionadas):
-                return render(request, 'procesamiento/preproceso.html')
-
-            progreso = await sync_to_async(Progreso.objects.create)()
-            carpeta_raiz = await sync_to_async(obtener_carpeta_raiz)(request)
-
-            carpetas_nombre_completo, carpetas_nombre_base = await sync_to_async(obtener_subcarpetas)(carpeta_raiz)
-
-            asyncio.create_task(run_algoritmo_lluvia_edison(
-                carpetas_seleccionadas, carpeta_raiz, progreso))
-
-            carpetas_seleccionadas = obtener_nombre_base(
-                carpetas_seleccionadas)
-            data['carpetas_procesando'] = carpetas_seleccionadas
-
-            return render(request, 'procesamiento/preproceso.html', data)
+            return await procesar_carpetas(request)
 
         elif 'mover_archivos' in request.POST:
-
-            try:
-                root = mostrar_ventana_encima()
-                carpeta_destino = askdirectory(
-                    title='Carpeta de destino de audios con lluvia')
-                root.destroy()
-
-            except Exception as e:
-                return render(request, 'procesamiento/preproceso.html')
-
-            if selecciono_carpeta(carpeta_destino):
-                return render(request, 'procesamiento/preproceso.html')
-
-            tipo_boton = request.POST['mover_archivos']
-            tipo_archivos_a_mover = "YES" if "Lluvia" in tipo_boton else "ALTO PSD"
-
-            try:
-                carpeta_raiz = await sync_to_async(obtener_carpeta_raiz)(request)
-
-                mover_archivos_segun_tipo(
-                    carpeta_raiz, carpeta_destino, tipo_archivos_a_mover)
-            except Exception as e:
-                return render(request, 'procesamiento/preproceso.html')
-
-            return render(request, 'procesamiento/preproceso.html')
+            return await mover_archivos(request)
 
         elif 'mostrar-grafica' in request.POST:
-            carpeta_raiz = await sync_to_async(obtener_carpeta_raiz)(request)
-            grafica = obtener_plot(carpeta_raiz)
-            data['grafica'] = grafica
-
-            return render(request, 'procesamiento/preproceso.html', data)
+            return await mostrar_grafica(request)
 
     else:
         return render(request, 'procesamiento/preproceso.html')
