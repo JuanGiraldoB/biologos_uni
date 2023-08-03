@@ -30,7 +30,7 @@ from .utils.spectograma import (
 )
 
 from ecosonos.utils.archivos_utils import (
-    obtener_archivos_wav,
+    obtener_detalle_archivos_wav,
     reemplazar_caracter,
     agregar_fila_csv,
     crear_csv,
@@ -65,7 +65,8 @@ def etiquetado(request):
             # xlsx_ruta = crear_xlsx(carpeta_raiz)
             # guardar_ruta_csv_session(request, xlsx_ruta, app='etiquetado')
 
-            archivos, nombres_base = obtener_archivos_wav([carpeta_raiz])
+            archivos, nombres_base = obtener_detalle_archivos_wav([
+                                                                  carpeta_raiz])
 
             # Reemplazar los '/' por '-' para poder ser usados en la peticion get
             reemplazar_caracter(archivos, caracter='/', reemplazo='-')
@@ -80,7 +81,7 @@ def etiquetado(request):
 def espectrograma(request, ruta):
     data = {}
     carpeta_raiz = obtener_carpeta_raiz(request, app='etiquetado')
-    archivos, nombres_base = obtener_archivos_wav([carpeta_raiz])
+    archivos, nombres_base = obtener_detalle_archivos_wav([carpeta_raiz])
     reemplazar_caracter(archivos, caracter='/', reemplazo='-')
 
     data['ruta'] = ruta

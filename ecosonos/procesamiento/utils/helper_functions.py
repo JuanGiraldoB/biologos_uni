@@ -25,7 +25,8 @@ from ecosonos.utils.carpeta_utils import (
 )
 
 from ecosonos.utils.archivos_utils import (
-    mover_archivos_segun_tipo
+    mover_archivos_segun_tipo,
+    obtener_detalle_archivos_wav
 )
 
 
@@ -46,12 +47,14 @@ async def cargar_carpeta(request):
 
     await sync_to_async(guardar_raiz_carpeta_session)(request, carpeta_raiz)
     carpetas_nombre_completo, carpetas_nombre_base = await sync_to_async(obtener_subcarpetas)(carpeta_raiz)
-    cantidad_archivos_subdir = obtener_cantidad_archivos_por_subdir(
+
+    _, _, cantidad_archivos_subdir, duracion_archivos_subdir, fecha_archivos_subdir = obtener_detalle_archivos_wav(
         carpetas_nombre_completo)
+
     data['carpetas_nombre_completo'] = carpetas_nombre_completo
     data['carpetas_nombre_base'] = carpetas_nombre_base
     data['completo_base_zip'] = zip(
-        carpetas_nombre_completo, carpetas_nombre_base, cantidad_archivos_subdir)
+        carpetas_nombre_completo, carpetas_nombre_base, cantidad_archivos_subdir, duracion_archivos_subdir, fecha_archivos_subdir)
 
     await sync_to_async(Progreso.objects.all().delete)()
 

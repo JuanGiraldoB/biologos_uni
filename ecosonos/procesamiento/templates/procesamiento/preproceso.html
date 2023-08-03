@@ -85,10 +85,12 @@
 							<form class="carpetaprincipal" method="POST">
 								{% csrf_token %}
 								<div>
-									{% for completo, base, cantidad_archivos in completo_base_zip %}
+									{% for completo, base, cantidad_archivos, rango_duracion, rango_fecha in completo_base_zip %}
 									<div class="carpetas-cargadas">
 										<input type="checkbox" name="carpetas" value="{{ completo }}" checked>
-										<label for="carpetas">{{ base }} - {{cantidad_archivos}}</label>
+										<label for="carpetas">{{ base }} - Numero de Archivos: {{cantidad_archivos}} -
+											Rango de duracion: {{rango_duracion}} -
+											Rango de fechas: {{rango_fecha}}</label>
 									</div>
 									{% endfor %}
 								</div>

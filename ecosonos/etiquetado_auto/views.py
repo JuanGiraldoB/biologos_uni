@@ -27,7 +27,7 @@ from ecosonos.utils.carpeta_utils import (
     obtener_ruta_csv_session
 )
 
-from ecosonos.utils.archivos_utils import obtener_archivos_wav
+from ecosonos.utils.archivos_utils import obtener_detalle_archivos_wav
 from procesamiento.models import Progreso
 import pandas as pd
 from tkinter.filedialog import askdirectory
@@ -72,7 +72,7 @@ async def etiquetado_auto(request):
             await sync_to_async(guardar_carpetas_seleccionadas)(request, carpetas_seleccionadas,  app='etiquetado-auto')
             carpeta_raiz = await sync_to_async(obtener_carpeta_raiz)(request, app='etiquetado-auto')
 
-            archivos_full_dir, archivos_nombre_base = await sync_to_async(obtener_archivos_wav)(carpetas_seleccionadas)
+            archivos_full_dir, archivos_nombre_base = await sync_to_async(obtener_detalle_archivos_wav)(carpetas_seleccionadas)
 
             progreso = await sync_to_async(Progreso.objects.create)(cantidad_archivos=len(archivos_full_dir))
             request.session['tabla'] = None

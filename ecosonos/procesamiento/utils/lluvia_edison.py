@@ -413,6 +413,7 @@ def algoritmo_lluvia_edison(carpetas, raiz, progreso):
                             os.path.join(carpeta, archivo))
 
                         # Obtener la duración del audio
+                        print("*********", file_name)
                         audio_file = AudioSegment.from_file(file_name)
                         # Duración en segundos
                         duration = len(audio_file) / 1000

@@ -1,17 +1,16 @@
 import pandas as pd
 import shutil
 import os
+import pathlib
 from datetime import datetime
 import csv
-import openpyxl as xl
-import pathlib
+from pydub import AudioSegment
+from concurrent.futures import ThreadPoolExecutor
 
 
 def mover_archivos_segun_tipo(carpeta_raiz, carpeta_destino, tipo):
     ruta_csv = f'{carpeta_raiz}/resultado_preproceso.csv'
     csv_file = pd.read_csv(ruta_csv)
-
-    print(csv_file.head())
 
     for _, row in csv_file.iterrows():
         ruta_archivo = row['path_FI']
@@ -21,25 +20,91 @@ def mover_archivos_segun_tipo(carpeta_raiz, carpeta_destino, tipo):
             shutil.move(ruta_archivo, carpeta_destino)
 
 
-def obtener_archivos_wav(carpetas):
+def obtener_duracion_archivo(archivo):
+    archivo = AudioSegment.from_file(archivo)
+    return int(len(archivo) / 1000)
+
+
+def obtener_rango_duracion_archivos(duracion_archivos):
+    return (min(duracion_archivos), max(duracion_archivos))
+
+
+def obtener_rango_fecha_archivos(fecha_archivos):
+    return (min(fecha_archivos), max(fecha_archivos))
+
+
+def procesar_carpeta(carpeta):
     archivos = []
-    formatos = ['wav', 'WAV', 'mp3']
     nombres_base = []
+    cantidad_archivos_carpeta = []
+    duracion_archivos_carpeta = []
+    fecha_archivos_carpeta = []
 
-    for carpeta in carpetas:
-        for archivo in os.listdir(carpeta):
-            file_name = os.path.join(
-                carpeta, archivo).replace(os.path.sep, '/')
+    formatos = ['.wav', '.WAV', '.mp3']
 
-            # Verifica que sea un archivo y que la extension corresponda con las de la variable formatos
-            if os.path.isfile(file_name):
-                file_extension = file_name.split(".")[1]
-                if file_extension in formatos:
-                    nombre_base = os.path.basename(file_name)
-                    nombres_base.append(nombre_base)
-                    archivos.append(file_name)
+    contador_archivos_carpeta = 0
 
-    return archivos, nombres_base
+    for archivo in os.listdir(carpeta):
+        dir_archivo = pathlib.Path(os.path.join(carpeta, archivo))
+
+        if os.path.isfile(dir_archivo) and dir_archivo.suffix in formatos:
+            # Obtener y guardar nombre base
+            nombre_base = os.path.basename(dir_archivo)
+            nombres_base.append(nombre_base)
+
+            # Guardar direccion completa archivo
+            archivos.append(dir_archivo)
+
+            # Obtener y guardar duracion del archivo por carpeta
+            duracion_archivos_carpeta.append(
+                obtener_duracion_archivo(dir_archivo))
+
+            # Obtener y guardar fecha del archivo por carpeta
+            fecha_archivo = obtener_fecha(nombre_base)
+            # fecha_formato = fecha_archivo.strftime("%d-%m-%Y")
+            fecha_archivos_carpeta.append(fecha_archivo)
+
+            contador_archivos_carpeta += 1
+
+    if duracion_archivos_carpeta:
+        rango_duracion = obtener_rango_duracion_archivos(
+            duracion_archivos_carpeta)
+    else:
+        rango_duracion = "Sin duracion"
+
+    if fecha_archivos_carpeta:
+        fecha_min, fecha_max = obtener_rango_fecha_archivos(
+            fecha_archivos_carpeta)
+        fecha_min_formato = fecha_min.strftime("%d-%m-%Y")
+        fecha_max_formato = fecha_max.strftime("%d-%m-%Y")
+
+        rango_fecha = (fecha_min_formato, fecha_max_formato)
+    else:
+        rango_fecha = "Sin fechas"
+
+    cantidad_archivos_carpeta.append(contador_archivos_carpeta)
+
+    return archivos, nombres_base, cantidad_archivos_carpeta, rango_duracion, rango_fecha
+
+
+def obtener_detalle_archivos_wav(carpetas):
+    archivos = []
+    nombres_base = []
+    cantidad_archivos_carpeta = []
+    rango_duracion_archivos_carpetas = []
+    rango_fechas_archivos_carpetas = []
+
+    with ThreadPoolExecutor() as executor:
+        results = executor.map(procesar_carpeta, carpetas)
+
+        for result in results:
+            archivos.extend(result[0])
+            nombres_base.extend(result[1])
+            cantidad_archivos_carpeta.extend(result[2])
+            rango_duracion_archivos_carpetas.append(result[3])
+            rango_fechas_archivos_carpetas.append(result[4])
+
+    return archivos, nombres_base, cantidad_archivos_carpeta, rango_duracion_archivos_carpetas, rango_fechas_archivos_carpetas
 
 
 def reemplazar_caracter(archivos, caracter, reemplazo):

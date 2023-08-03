@@ -8,7 +8,7 @@ from asgiref.sync import sync_to_async
 import asyncio
 from .utils.funciones_indices import run_calcular_indice
 from .utils.session_utils import guardar_indices_session, obtener_indices_session
-from ecosonos.utils.archivos_utils import obtener_archivos_wav, selecciono_archivo, reemplazar_caracter
+from ecosonos.utils.archivos_utils import obtener_detalle_archivos_wav, selecciono_archivo, reemplazar_caracter
 from ecosonos.utils.tkinter_utils import mostrar_ventana_encima
 from procesamiento.models import Progreso
 import pathlib
@@ -143,7 +143,7 @@ async def indices(request):
             carpeta_raiz = await sync_to_async(obtener_carpeta_raiz)(request, app='indices')
             indices_seleccionados = await sync_to_async(obtener_indices_session)(request)
 
-            archivos, _ = await sync_to_async(obtener_archivos_wav)(carpetas_seleccionadas)
+            archivos, _ = await sync_to_async(obtener_detalle_archivos_wav)(carpetas_seleccionadas)
 
             progreso = await sync_to_async(Progreso.objects.create)(cantidad_archivos=len(archivos))
 
@@ -160,7 +160,7 @@ async def indices(request):
             try:
                 carpeta_raiz = await sync_to_async(obtener_carpeta_raiz)(request, app='indices')
                 carpetas_seleccionadas = await sync_to_async(obtener_carpetas_seleccionadas)(request, app='indices')
-                archivos, _ = await sync_to_async(obtener_archivos_wav)(carpetas_seleccionadas)
+                archivos, _ = await sync_to_async(obtener_detalle_archivos_wav)(carpetas_seleccionadas)
                 indices_seleccionados = await sync_to_async(obtener_indices_session)(request)
 
                 graficas = []
