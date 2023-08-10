@@ -1,14 +1,16 @@
 import pandas as pd
 import plotly.express as px
-from ecosonos.utils.archivos_utils import obtener_fecha
+from ecosonos.utils.archivos_utils import get_date_from_filename
+import os
 
 
-def obtener_plot(carpeta_raiz):
+def get_plot(csv_folder):
     # Step 1: Read the xlsx file and extract the necessary information
-    df = pd.read_csv(carpeta_raiz + "/resultado_preproceso.csv")
+    csv_path = os.path.join(csv_folder, 'resultado_preproceso.csv')
+    df = pd.read_csv(csv_path)
 
     # Step 2: Extract the date from the filename using the function `get_date_from_filename`
-    df['Date'] = df['name_FI'].apply(obtener_fecha)
+    df['Date'] = df['name_FI'].apply(get_date_from_filename)
 
     # Step 3: Sort the DataFrame by the 'Date' column
     df = df.sort_values(by='Date')

@@ -4,5 +4,5 @@ from . import views
 
 urlpatterns = [
     path('', views.lluvia, name='preproceso'),
-    path('barra_progreso', views.barra_progreso, name='barra_progreso'),
+    path('barra_progreso', views.progress_bar, name='barra_progreso'),
 ]

@@ -8,7 +8,7 @@ import numpy as np
 from django.http import JsonResponse
 import asyncio
 import datetime
-from ecosonos.utils.archivos_utils import obtener_fecha
+from ecosonos.utils.archivos_utils import get_date_from_filename
 import pathlib
 from ast import literal_eval
 
@@ -81,7 +81,7 @@ def csvIndices(indicesCalculados, ruta, indices_select):
             archivo_sin_extension = archivo_sin_extension.replace(
                 '__', '_')
 
-        fechas.append(obtener_fecha(archivo_sin_extension))
+        fechas.append(get_date_from_filename(archivo_sin_extension))
         # fecha, tiempo = nombre.split('_')[1:3]
         # tiempo = tiempo.split('.')[0]
 
@@ -104,7 +104,7 @@ def csvIndices(indicesCalculados, ruta, indices_select):
         for i in range(len(indicesDF['ADIm'][0])):
             indicesDF[f'ADIm_{i}'] = indicesDF['ADIm'].apply(lambda x: x[i])
 
-    indicesDF = indicesDF.drop(columns=['ADIm'])
+        indicesDF = indicesDF.drop(columns=['ADIm'])
 
     date_column = indicesDF.pop('Date')
     indicesDF['Date'] = date_column
@@ -113,6 +113,8 @@ def csvIndices(indicesCalculados, ruta, indices_select):
     nombreGrabadora = nombreGrabacion.split('_')[0]
     indicesDF.to_csv(ruta + '/indices_acusticos.csv',
                      encoding='utf_8_sig', index=False, sep=',')
+
+    print(indicesDF.head())
 
 
 async def run_calcular_indice(indices_select, carpeta, archivos, progreso):
@@ -242,6 +244,7 @@ def calcular_indice(indices_select, carpeta, archivos, progreso):
         progreso.save()
         Indices_grabaciones.append({"Grabacion": g, "Indices": list(aux)})
 
+    print("seomgaoisdmgklasmgklasmglkasmglkasmglkasmaslkmdlk")
     csvIndices(Valores, carpeta, indices_select)
     # graficaErrorBar(carpeta, grabaciones)
     return carpeta, grabaciones

@@ -1,7 +1,7 @@
 import tkinter as tk
 
 
-def mostrar_ventana_encima():
+def show_tkinter_windown_top():
     '''
     Forzar el popup de seleccionar carpeta a aparecer 'encima' de las otras ventanas
     '''

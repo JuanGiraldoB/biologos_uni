@@ -1,6 +1,4 @@
 from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
 import pandas as pd
 from tkinter.filedialog import askdirectory, askopenfilename
 from asgiref.sync import sync_to_async
@@ -8,24 +6,26 @@ import asyncio
 import pathlib
 
 from .session_utils import guardar_indices_session, obtener_indices_session
+
+from ecosonos.utils.session_utils import (
+    save_subfolders_details_session,
+    get_files_detail_session,
+    save_selected_subfolders_session,
+    save_root_folder_session,
+    get_root_folder_session,
+)
+
 from ecosonos.utils.archivos_utils import (
     obtener_detalle_archivos_wav,
     selecciono_archivo,
-    reemplazar_caracter,
-    guardar_session_detalle_archivos,
-    obtener_session_detalle_archivos,
     obtener_archivos_carpetas
 )
-from ecosonos.utils.tkinter_utils import mostrar_ventana_encima
+from ecosonos.utils.tkinter_utils import show_tkinter_windown_top
 from procesamiento.models import Progreso
 from .funciones_indices_progress import grafica_polar
 from .funciones_indices import run_calcular_indice
 from ecosonos.utils.carpeta_utils import (
     obtener_subcarpetas,
-    guardar_carpetas_seleccionadas,
-    guardar_raiz_carpeta_session,
-    obtener_carpetas_seleccionadas,
-    obtener_carpeta_raiz,
     selecciono_carpeta,
     subcarpetas_seleccionadas,
     obtener_nombres_base
@@ -36,26 +36,24 @@ async def cargar_carpeta(request):
     data = {}
 
     try:
-        root = mostrar_ventana_encima()
+        root = show_tkinter_windown_top()
         carpeta_raiz = askdirectory(title='Seleccionar carpeta raiz')
         carpeta_raiz = str(pathlib.Path(carpeta_raiz))
         root.destroy()
     except Exception as e:
-        print("Error en cargar carpeta en indices")
+        print("Error en cargar carpeta en indices", e)
         return render(request, 'indices/indices.html')
 
     if selecciono_carpeta(carpeta_raiz):
         return render(request, 'indices/indices.html')
-
-    await sync_to_async(guardar_raiz_carpeta_session)(request, carpeta_raiz, app='indices')
 
     indices_seleccionados = request.POST.getlist('options')
 
     if not indices_seleccionados:
         return render(request, 'indices/indices.html')
 
+    await sync_to_async(save_root_folder_session)(request, carpeta_raiz, app='indices')
     await sync_to_async(guardar_indices_session)(request, indices_seleccionados)
-
     await sync_to_async(Progreso.objects.all().delete)()
 
     carpetas_nombre_completo, carpetas_nombre_base = await sync_to_async(obtener_subcarpetas)(carpeta_raiz)
@@ -66,7 +64,7 @@ async def cargar_carpeta(request):
     detalle_archivos = [archivos, nombres_base, cantidad_archivos_subdir,
                         duracion_archivos_subdir, fecha_archivos_subdir]
 
-    await sync_to_async(guardar_session_detalle_archivos)(request, detalle_archivos, app='indices')
+    await sync_to_async(save_subfolders_details_session)(request, detalle_archivos, app='indices')
 
     data['carpetas_nombre_completo'] = carpetas_nombre_completo
     data['carpetas_nombre_base'] = carpetas_nombre_base
@@ -83,11 +81,11 @@ async def procesar_carpetas(request):
     if subcarpetas_seleccionadas(carpetas_seleccionadas):
         return render(request, 'indices/indices.html', data)
 
-    await sync_to_async(guardar_carpetas_seleccionadas)(request, carpetas_seleccionadas,  app='indices')
-    carpeta_raiz = await sync_to_async(obtener_carpeta_raiz)(request, app='indices')
+    await sync_to_async(save_selected_subfolders_session)(request, carpetas_seleccionadas,  app='indices')
+    carpeta_raiz = await sync_to_async(get_root_folder_session)(request, app='indices')
     indices_seleccionados = await sync_to_async(obtener_indices_session)(request)
 
-    archivos = obtener_archivos_carpetas(carpetas_seleccionadas)
+    archivos, _ = obtener_archivos_carpetas(carpetas_seleccionadas)
 
     progreso = await sync_to_async(Progreso.objects.create)(cantidad_archivos=len(archivos))
 
@@ -103,10 +101,10 @@ async def procesar_carpetas(request):
 
 async def mostrar_grafica(request):
     try:
-        carpeta_raiz = await sync_to_async(obtener_carpeta_raiz)(request, app='indices')
+        carpeta_raiz = await sync_to_async(get_root_folder_session)(request, app='indices')
         # carpetas_seleccionadas = await sync_to_async(obtener_carpetas_seleccionadas)(request, app='indices')
         indices_seleccionados = await sync_to_async(obtener_indices_session)(request)
-        detalle_archivos = await sync_to_async(obtener_session_detalle_archivos)(request, app='indices')
+        detalle_archivos = await sync_to_async(get_files_detail_session)(request, app='indices')
         archivos = detalle_archivos[0]
 
     except Exception as e:
@@ -144,7 +142,7 @@ async def mostrar_grafica(request):
 
 async def cargar_csv(request):
     try:
-        root = mostrar_ventana_encima()
+        root = show_tkinter_windown_top()
         archivo = askopenfilename(
             title='Seleccionar archivo csv')
         root.destroy()

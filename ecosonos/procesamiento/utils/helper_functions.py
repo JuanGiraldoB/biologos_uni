@@ -8,125 +8,148 @@ import os
 from procesamiento.models import Progreso
 
 from .lluvia_edison import run_algoritmo_lluvia_edison
-from .plot import obtener_plot
+from .plot import get_plot
 
 from ecosonos.utils.tkinter_utils import (
-    mostrar_ventana_encima
+    show_tkinter_windown_top
+)
+
+from ecosonos.utils.session_utils import (
+    save_root_folder_session,
+    get_root_folder_session,
+    save_subfolders_details_session,
+    save_statistics_state_session,
+    save_destination_folder_session,
+    get_destination_folder_session
 )
 
 from ecosonos.utils.carpeta_utils import (
     selecciono_carpeta,
-    guardar_raiz_carpeta_session,
-    obtener_subcarpetas,
     subcarpetas_seleccionadas,
-    obtener_carpeta_raiz,
-    obtener_nombres_base,
+    get_folders_with_wav,
+    get_folders_details,
+    get_subfolders_basename
 )
 
 from ecosonos.utils.archivos_utils import (
-    mover_archivos_segun_tipo,
-    obtener_detalle_archivos_wav,
-    guardar_session_detalle_archivos
+    move_files_depending_type,
 )
 
 
-async def cargar_carpeta(request):
+async def load_folder(request):
     data = {}
-
-    try:
-        root = mostrar_ventana_encima()
-        carpeta_raiz = askdirectory(title='Seleccionar carpeta raiz')
-        carpeta_raiz = str(pathlib.Path(carpeta_raiz))
-        root.destroy()
-    except Exception as e:
-        print("Error en cargar carpeta")
-        return render(request, 'procesamiento/preproceso.html')
-
-    if selecciono_carpeta(carpeta_raiz):
-        return render(request, 'procesamiento/preproceso.html')
-
-    await sync_to_async(guardar_raiz_carpeta_session)(request, carpeta_raiz)
-    carpetas_nombre_completo, carpetas_nombre_base = await sync_to_async(obtener_subcarpetas)(carpeta_raiz)
-
-    archivos, nombres_base, cantidad_archivos_subdir, duracion_archivos_subdir, fecha_archivos_subdir = obtener_detalle_archivos_wav(
-        carpetas_nombre_completo)
-
-    detalle_archivos = [archivos, nombres_base, cantidad_archivos_subdir,
-                        duracion_archivos_subdir, fecha_archivos_subdir]
-
-    await sync_to_async(guardar_session_detalle_archivos)(request, detalle_archivos)
-
-    data['carpetas_nombre_completo'] = carpetas_nombre_completo
-    data['carpetas_nombre_base'] = carpetas_nombre_base
-    data['completo_base_zip'] = zip(
-        carpetas_nombre_completo, carpetas_nombre_base, detalle_archivos[2], duracion_archivos_subdir[3], fecha_archivos_subdir[4])
 
     await sync_to_async(Progreso.objects.all().delete)()
 
-    return render(request, 'procesamiento/preproceso.html', data)
-
-
-async def procesar_carpetas(request):
-    data = {}
-
-    carpetas_seleccionadas = request.POST.getlist('carpetas')
-
-    if subcarpetas_seleccionadas(carpetas_seleccionadas):
+    try:
+        root = show_tkinter_windown_top()
+        root_folder = askdirectory(title='Seleccionar carpeta raiz')
+        root_folder = str(pathlib.Path(root_folder))
+        root.destroy()
+    except Exception as e:
+        print("Error en cargar carpeta", e)
         return render(request, 'procesamiento/preproceso.html')
 
-    progreso = await sync_to_async(Progreso.objects.create)()
-    carpeta_raiz = await sync_to_async(obtener_carpeta_raiz)(request)
+    if not root_folder:
+        return render(request, 'procesamiento/preproceso.html')
 
-    asyncio.create_task(run_algoritmo_lluvia_edison(
-        carpetas_seleccionadas, carpeta_raiz, progreso))
+    await sync_to_async(save_root_folder_session)(request, root_folder)
 
-    carpetas_seleccionadas = obtener_nombres_base(
-        carpetas_seleccionadas)
-    data['carpetas_procesando'] = carpetas_seleccionadas
+    estadisticas_checked = request.POST.get('estadisticas')
+    folders_wav_path, folders_wav_basename = get_folders_with_wav(
+        root_folder)
+
+    if estadisticas_checked:
+        folder_details = get_folders_details(folders_wav_path)
+        await sync_to_async(save_subfolders_details_session)(request, folder_details)
+        data['statistics'] = True
+        data['folders_details'] = folder_details
+    else:
+        data['statistics'] = False
+        data['folders'] = zip(folders_wav_path, folders_wav_basename)
 
     return render(request, 'procesamiento/preproceso.html', data)
 
 
-async def mover_archivos(request):
+async def prepare_destination_folder(request):
     try:
-        root = mostrar_ventana_encima()
-        carpeta_destino = askdirectory(
+        root = show_tkinter_windown_top()
+        destination_folder = askdirectory(title='Seleccionar carpeta destino')
+        destination_folder = str(pathlib.Path(destination_folder))
+        root.destroy()
+    except Exception as e:
+        print("Error en destino carpeta", e)
+        return render(request, 'procesamiento/preproceso.html')
+
+    if not destination_folder:
+        return render(request, 'procesamiento/preproceso.html')
+
+    await sync_to_async(save_destination_folder_session)(request, destination_folder)
+
+    return render(request, 'procesamiento/preproceso.html')
+
+
+async def process_folders(request):
+    data = {}
+
+    selected_subdfolders = request.POST.getlist('carpetas')
+
+    if subcarpetas_seleccionadas(selected_subdfolders):
+        return render(request, 'procesamiento/preproceso.html')
+
+    progress = await sync_to_async(Progreso.objects.create)()
+    root_folder = await sync_to_async(get_root_folder_session)(request)
+    destination_folder = await sync_to_async(get_destination_folder_session)(request)
+
+    asyncio.create_task(run_algoritmo_lluvia_edison(
+        selected_subdfolders, root_folder, destination_folder, progress))
+
+    selected_subdfolders_base_name = get_subfolders_basename(
+        selected_subdfolders)
+
+    data['carpetas_procesando'] = selected_subdfolders_base_name
+
+    return render(request, 'procesamiento/preproceso.html', data)
+
+
+async def move_files(request):
+    try:
+        root = show_tkinter_windown_top()
+        destination_folder = askdirectory(
             title='Carpeta de destino de audios con lluvia')
-        carpeta_destino = str(pathlib.Path(carpeta_destino))
+        destination_folder = str(pathlib.Path(destination_folder))
         root.destroy()
 
     except Exception as e:
+        print(e)
         return render(request, 'procesamiento/preproceso.html')
 
-    if selecciono_carpeta(carpeta_destino):
+    if not destination_folder:
         return render(request, 'procesamiento/preproceso.html')
 
-    tipo_boton = request.POST['mover_archivos']
-    tipo_archivos_a_mover = "YES" if "Lluvia" in tipo_boton else "ALTO PSD"
+    button_type = request.POST['mover_archivos']
+    type_of_files_to_move = "YES" if "Lluvia" in button_type else "ALTO PSD"
 
     try:
-        carpeta_raiz = await sync_to_async(obtener_carpeta_raiz)(request)
+        csv_folder = await sync_to_async(get_destination_folder_session)(request)
 
-        mover_archivos_segun_tipo(
-            carpeta_raiz, carpeta_destino, tipo_archivos_a_mover)
+        move_files_depending_type(
+            csv_folder, destination_folder, type_of_files_to_move)
     except Exception as e:
+        print(e)
         return render(request, 'procesamiento/preproceso.html')
 
     return render(request, 'procesamiento/preproceso.html')
 
 
-async def mostrar_grafica(request):
+async def show_plot(request):
     data = {}
     try:
-        carpeta_raiz = await sync_to_async(obtener_carpeta_raiz)(request)
+        csv_folder = await sync_to_async(get_destination_folder_session)(request)
+        plot = get_plot(csv_folder)
+        data['plot'] = plot
     except Exception as e:
         print(e)
         return render(request, 'procesamiento/preproceso.html')
-
-    if not os.path.exists(carpeta_raiz):
-        return render(request, 'procesamiento/preproceso.html')
-
-    grafica = obtener_plot(carpeta_raiz)
-    data['grafica'] = grafica
 
     return render(request, 'procesamiento/preproceso.html', data)

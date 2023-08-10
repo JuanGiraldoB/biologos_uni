@@ -369,11 +369,11 @@ def algoritmo_lluvia_imp_intensidad(df_ind, arraymeanspect_ind):
     return df_indices_lluvia
 
 
-async def run_algoritmo_lluvia_edison(carpetas, raiz, request):
-    await asyncio.to_thread(algoritmo_lluvia_edison, carpetas, raiz, request)
+async def run_algoritmo_lluvia_edison(carpetas, raiz, destino, progreso):
+    await asyncio.to_thread(algoritmo_lluvia_edison, carpetas, raiz, destino, progreso)
 
 
-def algoritmo_lluvia_edison(carpetas, raiz, progreso):
+def algoritmo_lluvia_edison(carpetas, raiz, destino, progreso):
     Edison_Duque = True
 
     # Ruta donde se encuentran los archivos
@@ -500,7 +500,7 @@ def algoritmo_lluvia_edison(carpetas, raiz, progreso):
         cols2 = cols[:-2] + cols[-1:] + ['Duracion(seg)']
         df_y = df_y[cols2]
 
-        path_file = os.path.join(folder_rain, name_file)
+        path_file = os.path.join(destino, name_file)
 
         # print(f"Saving in {path_file} ...")
         df_y.to_csv(path_file, index=False)

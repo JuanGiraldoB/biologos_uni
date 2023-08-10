@@ -8,47 +8,65 @@ from pydub import AudioSegment
 from concurrent.futures import ThreadPoolExecutor
 
 
-def guardar_session_detalle_archivos(request, detalle_archivos, app='preproceso'):
-    if app == 'indices':
-        request.session['detalle_archivos_indices'] = detalle_archivos
-    else:
-        request.session['detalle_archivos_preproceso'] = detalle_archivos
+# def save_files_detail_session(request, detalle_archivos, app='preproceso'):
+#     if app == 'indices':
+#         request.session['detalle_archivos_indices'] = detalle_archivos
+#     else:
+#         request.session['detalle_archivos_preproceso'] = detalle_archivos
 
 
-def obtener_session_detalle_archivos(request, app='preproceso'):
-    if app == 'indices':
-        return request.session['detalle_archivos_indices']
-    else:
-        return request.session['detalle_archivos_preproceso']
+# def get_files_detail_session(request, app='preproceso'):
+#     if app == 'indices':
+#         return request.session['detalle_archivos_indices']
+#     else:
+#         return request.session['detalle_archivos_preproceso']
 
 
-def mover_archivos_segun_tipo(carpeta_raiz, carpeta_destino, tipo):
-    ruta_csv = f'{carpeta_raiz}/resultado_preproceso.csv'
-    csv_file = pd.read_csv(ruta_csv)
+def move_files_depending_type(root_folder, destination_folder, type):
+    csv_path = os.path.join(root_folder, 'resultado_preproceso.csv')
+    csv_file = pd.read_csv(csv_path)
 
     for _, row in csv_file.iterrows():
-        ruta_archivo = row['path_FI']
+        file_path = row['path_FI']
         lluvia = row['rain_FI']
 
-        if lluvia == tipo:
-            shutil.move(ruta_archivo, carpeta_destino)
+        if lluvia == type:
+            shutil.move(file_path, destination_folder)
 
 
-def obtener_duracion_archivo(archivo):
-    archivo = AudioSegment.from_file(archivo)
-    return int(len(archivo) / 1000)
+def get_file_length(file):
+    file = AudioSegment.from_file(file)
+    return int(len(file) / 1000)
+
+
+def get_files_range_length(files):
+    files_length = []
+
+    for file in files:
+        file = AudioSegment.from_file(file)
+        length = int(len(file) / 1000)
+        files_length.append(length)
+
+    return (min(files_length), max(files_length))
 
 
 def obtener_rango_duracion_archivos(duracion_archivos):
     return (min(duracion_archivos), max(duracion_archivos))
 
 
-def obtener_rango_fecha_archivos(fecha_archivos):
+def get_date_range_files(fecha_archivos):
+    # min_date = min(fecha_archivos)
+    # max_date = max(fecha_archivos)
+
+    # min_date = min_date.strftime("%d-%m-%Y")
+    # max_date = max_date.strftime("%d-%m-%Y")
+    # return (min_date, max_date)
     return (min(fecha_archivos), max(fecha_archivos))
 
 
 def obtener_archivos_carpetas(carpetas):
     archivos_wav = []
+    nombres_base = []
 
     for carpeta in carpetas:
         for root, _, archivos in os.walk(carpeta):
@@ -57,7 +75,9 @@ def obtener_archivos_carpetas(carpetas):
                     archivo_path = os.path.join(root, archivo)
                     archivos_wav.append(archivo_path)
 
-    return archivos_wav
+                    nombres_base.append(os.path.basename(archivo))
+
+    return archivos_wav, nombres_base
 
 
 def procesar_carpeta(carpeta):
@@ -82,10 +102,10 @@ def procesar_carpeta(carpeta):
 
             # Obtener y guardar duracion del archivo por carpeta
             duracion_archivos_carpeta.append(
-                obtener_duracion_archivo(dir_archivo))
+                get_file_length(dir_archivo))
 
             # Obtener y guardar fecha del archivo por carpeta
-            fecha_archivo = obtener_fecha(nombre_base)
+            fecha_archivo = get_date_from_filename(nombre_base)
             # fecha_formato = fecha_archivo.strftime("%d-%m-%Y")
             fecha_archivos_carpeta.append(fecha_archivo)
 
@@ -98,7 +118,7 @@ def procesar_carpeta(carpeta):
         rango_duracion = "Sin duracion"
 
     if fecha_archivos_carpeta:
-        fecha_min, fecha_max = obtener_rango_fecha_archivos(
+        fecha_min, fecha_max = get_date_range_files(
             fecha_archivos_carpeta)
         fecha_min_formato = fecha_min.strftime("%d-%m-%Y")
         fecha_max_formato = fecha_max.strftime("%d-%m-%Y")
@@ -137,14 +157,27 @@ def reemplazar_caracter(archivos, caracter, reemplazo):
         archivos[i] = archivos[i].replace(caracter, reemplazo)
 
 
-def obtener_fecha(archivo):
+def get_date_range_from_filenames(files):
+    dates = []
+    for file in files:
+        dates.append(get_date_from_filename(file))
 
-    if "." in archivo:
-        archivo = pathlib.Path(archivo).stem
+    min_date = min(dates)
+    max_date = max(dates)
 
-    archivo_partes = archivo.split('_')
-    fecha = archivo_partes[-2]
-    hora = archivo_partes[-1]
+    min_date = min_date.strftime("%d-%m-%Y")
+    max_date = max_date.strftime("%d-%m-%Y")
+    return (min_date, max_date)
+
+
+def get_date_from_filename(file):
+
+    if "." in file:
+        file = pathlib.Path(file).stem
+
+    file_parts = file.split('_')
+    fecha = file_parts[-2]
+    hora = file_parts[-1]
 
     yy = int(fecha[0:4])
     mm = int(fecha[4:6])

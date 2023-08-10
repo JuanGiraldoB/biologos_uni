@@ -80,24 +80,51 @@
 								<p>Seleccionar la carpeta raiz que contiene los archivos (.wav)</p>
 								<input type="submit" value="Seleccionar Carpeta Principal" id="cargar"
 									name="cargar"></input>
+								<div class="checks">
+									{% if statistics %}
+									<input type="checkbox" name="estadisticas" value="estadisticas" checked></input>
+									{% else %}
+									<input type="checkbox" name="estadisticas" value="estadisticas"></input>
+									{% endif %}
+									<label for="RMS">Estadisticas</label>
+								</div>
 							</form>
-							{% if carpetas_nombre_completo %}
+
+							<form method="POST" enctype="multipart/form-data">
+								{% csrf_token %}
+								<input type="submit" value="Seleccionar Carpeta Destino" id="destino"
+									name="destino"></input>
+							</form>
+
 							<form class="carpetaprincipal" method="POST">
+								{% if folders_details %}
 								{% csrf_token %}
 								<div>
-									{% for completo, base, cantidad_archivos, rango_duracion, rango_fecha in completo_base_zip %}
+									{% for folder_detail in folders_details %}
 									<div class="carpetas-cargadas">
-										<input type="checkbox" name="carpetas" value="{{ completo }}" checked>
-										<label for="carpetas">{{ base }} - Numero de Archivos: {{cantidad_archivos}} -
-											Rango de duracion: {{rango_duracion}} -
-											Rango de fechas: {{rango_fecha}}</label>
+										<input type="checkbox" name="carpetas" value="{{ folder_detail.folder_path }}"
+											checked>
+										<label for="carpetas">{{ folder_detail.folder_name }} - Numero de Archivos:
+											{{folder_detail.number_of_files}} -
+											Rango de duracion: {{folder_detail.range_of_lengths}} -
+											Rango de fechas: {{folder_detail.range_of_dates}}</label>
 									</div>
 									{% endfor %}
+									<input type="submit" value="Procesar" id="procesar_carpetas"
+										name="procesar_carpetas"></input>
 								</div>
-								<input type="submit" value="Procesar Carpetas con Lluvia" id="procesar_carpetas"
+								{% elif folders %}
+								{% for path, basename in folders %}
+								<div class="carpetas-cargadas">
+									<input type="checkbox" name="carpetas" value="{{ path }}" checked>
+									<label for="carpetas">{{ basename }}</label>
+								</div>
+								{% endfor %}
+
+								<input type="submit" value="Procesar" id="procesar_carpetas"
 									name="procesar_carpetas"></input>
+								{% endif %}
 							</form>
-							{% endif %}
 
 							{% if carpetas_procesando %}
 
@@ -117,19 +144,9 @@
 							{% endif %}
 						</div>
 					</section>
-					<!-- <section class="col-12 col-12-narrower">
-						<div class="contenidos">
-							<form method="POST">
-								{% csrf_token %}
-								<input type="submit" value="Procesar Carpetas con Lluvia" id="procesar_carpetas"
-									name="procesar_carpetas"></input>
-							</form>
-						</div>
-					</section> -->
 					<section>
 						<div class="chart">
 							<div class="bar"></div>
-							<!-- Change the value below -->
 							<span id="value1">0%</span>
 						</div>
 					</section>
@@ -151,8 +168,8 @@
 						<input type="submit" value="Mostrar gráfica" id="mostrar-grafica"
 							name="mostrar-grafica"></input>
 					</form>
-					{% if grafica %}
-					{{ grafica|safe }}
+					{% if plot %}
+					{{ plot|safe }}
 					{% endif %}
 				</div>
 			</div>
