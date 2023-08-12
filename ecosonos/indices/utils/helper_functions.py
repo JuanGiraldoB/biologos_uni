@@ -5,107 +5,114 @@ from asgiref.sync import sync_to_async
 import asyncio
 import pathlib
 
-from .session_utils import guardar_indices_session, obtener_indices_session
+from .session_utils import save_indices_session, get_indices_session
 
 from ecosonos.utils.session_utils import (
-    save_subfolders_details_session,
-    get_files_detail_session,
     save_selected_subfolders_session,
     save_root_folder_session,
     get_root_folder_session,
+    save_destination_folder_session,
+    get_destination_folder_session
 )
 
-from ecosonos.utils.archivos_utils import (
-    obtener_detalle_archivos_wav,
-    selecciono_archivo,
-    obtener_archivos_carpetas
-)
 from ecosonos.utils.tkinter_utils import show_tkinter_windown_top
 from procesamiento.models import Progreso
-from .funciones_indices_progress import grafica_polar
+from .funciones_indices_progress import polar_plot
 from .funciones_indices import run_calcular_indice
+
 from ecosonos.utils.carpeta_utils import (
-    obtener_subcarpetas,
-    selecciono_carpeta,
-    subcarpetas_seleccionadas,
-    obtener_nombres_base
+    get_folders_with_wav,
+    get_subfolders_basename,
+    get_files_in_folder
 )
 
 
-async def cargar_carpeta(request):
+async def load_folder(request):
     data = {}
 
     try:
         root = show_tkinter_windown_top()
-        carpeta_raiz = askdirectory(title='Seleccionar carpeta raiz')
-        carpeta_raiz = str(pathlib.Path(carpeta_raiz))
+        root_folder = askdirectory(title='Seleccionar carpeta raiz')
+        root_folder = str(pathlib.Path(root_folder))
         root.destroy()
     except Exception as e:
         print("Error en cargar carpeta en indices", e)
         return render(request, 'indices/indices.html')
 
-    if selecciono_carpeta(carpeta_raiz):
+    if not root_folder:
         return render(request, 'indices/indices.html')
 
-    indices_seleccionados = request.POST.getlist('options')
+    selected_indices = request.POST.getlist('options')
 
-    if not indices_seleccionados:
+    if not selected_indices:
         return render(request, 'indices/indices.html')
 
-    await sync_to_async(save_root_folder_session)(request, carpeta_raiz, app='indices')
-    await sync_to_async(guardar_indices_session)(request, indices_seleccionados)
+    await sync_to_async(save_root_folder_session)(request, root_folder, app='indices')
+    await sync_to_async(save_indices_session)(request, selected_indices)
     await sync_to_async(Progreso.objects.all().delete)()
 
-    carpetas_nombre_completo, carpetas_nombre_base = await sync_to_async(obtener_subcarpetas)(carpeta_raiz)
+    folders_wav_path, folders_wav_basename = get_folders_with_wav(
+        root_folder)
 
-    archivos, nombres_base, cantidad_archivos_subdir, duracion_archivos_subdir, fecha_archivos_subdir = obtener_detalle_archivos_wav(
-        carpetas_nombre_completo)
-
-    detalle_archivos = [archivos, nombres_base, cantidad_archivos_subdir,
-                        duracion_archivos_subdir, fecha_archivos_subdir]
-
-    await sync_to_async(save_subfolders_details_session)(request, detalle_archivos, app='indices')
-
-    data['carpetas_nombre_completo'] = carpetas_nombre_completo
-    data['carpetas_nombre_base'] = carpetas_nombre_base
-    data['completo_base_zip'] = zip(
-        carpetas_nombre_completo, carpetas_nombre_base, cantidad_archivos_subdir, duracion_archivos_subdir, fecha_archivos_subdir)
+    data['folders'] = zip(folders_wav_path, folders_wav_basename)
+    data['indices'] = selected_indices
 
     return render(request, 'indices/indices.html', data)
 
 
-async def procesar_carpetas(request):
-    data = {}
-    carpetas_seleccionadas = request.POST.getlist('carpetas')
+async def prepare_destination_folder(request):
+    try:
+        root = show_tkinter_windown_top()
+        destination_folder = askdirectory(title='Seleccionar carpeta destino')
+        destination_folder = str(pathlib.Path(destination_folder))
+        root.destroy()
+    except Exception as e:
+        print("Error en destino carpeta", e)
+        return render(request, 'indices/indices.html')
 
-    if subcarpetas_seleccionadas(carpetas_seleccionadas):
+    if not destination_folder:
+        return render(request, 'indices/indices.html')
+
+    await sync_to_async(save_destination_folder_session)(request, destination_folder, app="indices")
+
+    return render(request, 'indices/indices.html')
+
+
+async def process_folders(request):
+    data = {}
+    selected_folders = request.POST.getlist('carpetas')
+
+    if not selected_folders:
         return render(request, 'indices/indices.html', data)
 
-    await sync_to_async(save_selected_subfolders_session)(request, carpetas_seleccionadas,  app='indices')
-    carpeta_raiz = await sync_to_async(get_root_folder_session)(request, app='indices')
-    indices_seleccionados = await sync_to_async(obtener_indices_session)(request)
+    await sync_to_async(save_selected_subfolders_session)(request, selected_folders,  app='indices')
+    root_folder = await sync_to_async(get_root_folder_session)(request, app='indices')
+    selected_indices = await sync_to_async(get_indices_session)(request)
+    destination_folder = await sync_to_async(get_destination_folder_session)(request, app='indices')
 
-    archivos, _ = obtener_archivos_carpetas(carpetas_seleccionadas)
+    all_files = []
+    for folder in selected_folders:
+        files, _ = get_files_in_folder(folder)
+        all_files.extend(files)
 
-    progreso = await sync_to_async(Progreso.objects.create)(cantidad_archivos=len(archivos))
+    progress = await sync_to_async(Progreso.objects.create)(cantidad_archivos=len(all_files))
 
     asyncio.create_task(run_calcular_indice(
-        indices_seleccionados, carpeta_raiz, archivos, progreso))
+        selected_indices, root_folder, all_files, destination_folder, progress))
 
-    carpetas_seleccionadas = obtener_nombres_base(
-        carpetas_seleccionadas)
-    data['carpetas_procesando'] = carpetas_seleccionadas
+    selected_folders_basenames = get_subfolders_basename(
+        selected_folders)
+
+    data['carpetas_procesando'] = selected_folders_basenames
+    data['indices'] = selected_indices
 
     return render(request, 'indices/indices.html', data)
 
 
-async def mostrar_grafica(request):
+async def show_plot(request):
     try:
-        carpeta_raiz = await sync_to_async(get_root_folder_session)(request, app='indices')
-        # carpetas_seleccionadas = await sync_to_async(obtener_carpetas_seleccionadas)(request, app='indices')
-        indices_seleccionados = await sync_to_async(obtener_indices_session)(request)
-        detalle_archivos = await sync_to_async(get_files_detail_session)(request, app='indices')
-        archivos = detalle_archivos[0]
+        destination_folder = await sync_to_async(get_destination_folder_session)(request, app='indices')
+        selected_indices = await sync_to_async(get_indices_session)(request)
 
     except Exception as e:
         print(e, "sss")
@@ -113,56 +120,53 @@ async def mostrar_grafica(request):
 
     try:
         graficas = []
-        for indice in indices_seleccionados:
+        for indice in selected_indices:
 
             if "ADIm" == indice:
                 continue
 
-            graficas.append(await sync_to_async(grafica_polar)(carpeta_raiz, archivos, indice))
+            graficas.append(await sync_to_async(polar_plot)(destination_folder, indice))
 
-        if "ADIm" in indices_seleccionados:
+        if "ADIm" in selected_indices:
             adim = []
+
             for i in range(30):
                 adim_i = f'ADIm_{i}'
                 adim.append(adim_i)
-                graficas.append(await sync_to_async(grafica_polar)(carpeta_raiz, archivos, indice, adim_i))
+                graficas.append(await sync_to_async(polar_plot)(destination_folder, indice, adim_i))
 
     # Exception occurs when there are less ADIm_{i} than in the for range
     except Exception as e:
-        indices_seleccionados.remove("ADIm")
-        indices_seleccionados.extend(adim)
+        selected_indices.remove("ADIm")
+        selected_indices.extend(adim)
         print(e)
 
-    zipped = zip(graficas, indices_seleccionados)
+    zipped = zip(graficas, selected_indices)
     context = {'graficas': graficas,
-               'indices': indices_seleccionados, 'zipped': zipped}
+               'indices': selected_indices, 'zipped': zipped}
 
     return render(request, 'indices/indices.html', context)
 
 
-async def cargar_csv(request):
+async def load_csv(request):
     try:
         root = show_tkinter_windown_top()
-        archivo = askopenfilename(
+        file = askopenfilename(
             title='Seleccionar archivo csv')
         root.destroy()
     except Exception as e:
-        print("Error cargar csv")
+        print("Error cargar csv", e)
         return render(request, 'indices/indices.html')
 
-    if selecciono_archivo(archivo):
+    if not file:
         return render(request, 'indices/indices.html')
 
-    df = pd.read_csv(archivo)
+    df = pd.read_csv(file)
     indices = df.columns[1:-1].to_list()
 
     graficas = []
     for indice in indices:
-
-        if "ADIm" == indice:
-            continue
-
-        graficas.append(await sync_to_async(grafica_polar)(archivo, "archivos", indice))
+        graficas.append(await sync_to_async(polar_plot)(file, indice))
 
     zipped = zip(graficas, indices)
     context = {'graficas': graficas,

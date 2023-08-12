@@ -11,6 +11,7 @@ import datetime
 from ecosonos.utils.archivos_utils import get_date_from_filename
 import pathlib
 from ast import literal_eval
+import os
 
 # import matplotlib.pyplot as plt
 
@@ -69,7 +70,7 @@ def calcular_espectrograma(ruta):
     return f, t, s, senal_audio, fs
 
 
-def csvIndices(indicesCalculados, ruta, indices_select):
+def csvIndices(indicesCalculados, ruta, destino, indices_select):
     Valores = indicesCalculados
 
     fechas = []
@@ -109,19 +110,17 @@ def csvIndices(indicesCalculados, ruta, indices_select):
     date_column = indicesDF.pop('Date')
     indicesDF['Date'] = date_column
 
-    nombreGrabacion = Valores[0][0]
-    nombreGrabadora = nombreGrabacion.split('_')[0]
-    indicesDF.to_csv(ruta + '/indices_acusticos.csv',
+    csv_path = os.path.join(destino, 'indices_acusticos.csv')
+
+    indicesDF.to_csv(csv_path,
                      encoding='utf_8_sig', index=False, sep=',')
 
-    print(indicesDF.head())
+
+async def run_calcular_indice(indices_select, carpeta, archivos, destino, progreso):
+    await asyncio.to_thread(calcular_indice, indices_select, carpeta, archivos, destino, progreso)
 
 
-async def run_calcular_indice(indices_select, carpeta, archivos, progreso):
-    await asyncio.to_thread(calcular_indice, indices_select, carpeta, archivos, progreso)
-
-
-def calcular_indice(indices_select, carpeta, archivos, progreso):
+def calcular_indice(indices_select, carpeta, archivos, destino, progreso):
     """Calcula el valor de los indices seleccionados por el usuario.
 
     :param indices_select: Cadena de texto que agrupa las abreviaturas
@@ -244,8 +243,7 @@ def calcular_indice(indices_select, carpeta, archivos, progreso):
         progreso.save()
         Indices_grabaciones.append({"Grabacion": g, "Indices": list(aux)})
 
-    print("seomgaoisdmgklasmgklasmglkasmglkasmglkasmaslkmdlk")
-    csvIndices(Valores, carpeta, indices_select)
+    csvIndices(Valores, carpeta, destino, indices_select)
     # graficaErrorBar(carpeta, grabaciones)
     return carpeta, grabaciones
     # return JsonResponse({"Indices calculados": Indices_grabaciones})
@@ -255,9 +253,7 @@ def graficaErrorBar(ruta, grabaciones):
     nombreGrabacion = grabaciones[0].split("/")[-1]
     grabadora = nombreGrabacion.split('_')[0]
     df = pd.read_csv(ruta + '/Indices_acusticos_'+grabadora+'.csv')
-    print(df)
     normalized_df = df / df.max(axis=0, numeric_only=True)
-    print(normalized_df)
 
     meanDF = normalized_df.mean(axis=0, numeric_only=True)
     stdDF = normalized_df.std(axis=0, numeric_only=True)
@@ -266,14 +262,8 @@ def graficaErrorBar(ruta, grabaciones):
     std_DF = stdDF.to_list()
 
     keys = meanDF.keys()
-    print(meanDF)
-    print(stdDF)
-    print(keys.values)
-
-    print('DF', df)
 
     x_pos = np.arange(len(keys.values))
-    print('X_POS', x_pos)
 
     df_means = pd.DataFrame(
         {'Indices': meanDF.index, 'mean_DF': meanDF.values, 'std_DF': stdDF.values})

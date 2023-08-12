@@ -3,7 +3,6 @@ from asgiref.sync import sync_to_async
 import pathlib
 from tkinter.filedialog import askdirectory
 import asyncio
-import os
 
 from procesamiento.models import Progreso
 
@@ -24,7 +23,6 @@ from ecosonos.utils.session_utils import (
 )
 
 from ecosonos.utils.carpeta_utils import (
-    selecciono_carpeta,
     subcarpetas_seleccionadas,
     get_folders_with_wav,
     get_folders_details,
@@ -55,11 +53,11 @@ async def load_folder(request):
 
     await sync_to_async(save_root_folder_session)(request, root_folder)
 
-    estadisticas_checked = request.POST.get('estadisticas')
+    statistics_checked = request.POST.get('estadisticas')
     folders_wav_path, folders_wav_basename = get_folders_with_wav(
         root_folder)
 
-    if estadisticas_checked:
+    if statistics_checked:
         folder_details = get_folders_details(folders_wav_path)
         await sync_to_async(save_subfolders_details_session)(request, folder_details)
         data['statistics'] = True

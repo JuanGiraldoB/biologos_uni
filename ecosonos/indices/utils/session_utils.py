@@ -1,6 +1,6 @@
-def guardar_indices_session(request, indices_seleccionados):
-    request.session['indices_seleccionados'] = indices_seleccionados
+def save_indices_session(request, selected_indices):
+    request.session['indices_seleccionados'] = selected_indices
 
 
-def obtener_indices_session(request):
+def get_indices_session(request):
     return request.session['indices_seleccionados']

@@ -71,6 +71,22 @@
 			<div class="container">
 				<div class="row">
 					<section class="col-12 col-12-narrower">
+
+						{% if indices %}
+
+						Indices seleccionados
+
+						<ul>
+							{% for indice in indices %}
+
+							<li>
+								<label>{{indice}}</label>
+							</li>
+
+							{% endfor %}
+						</ul>
+
+						{% else %}
 						<form class="filtros" method="POST" action="">
 							{% csrf_token %}
 							<div class="fila1">
@@ -191,19 +207,25 @@
 								</div>
 							</section>
 						</form>
-						{% if carpetas_nombre_completo %}
+						{% endif %}
+
+						<br>
+
+						<form method="POST" enctype="multipart/form-data">
+							{% csrf_token %}
+							<input type="submit" value="Seleccionar Carpeta Destino" id="destino"
+								name="destino"></input>
+						</form>
+
+						{% if folders %}
 						<form method="POST">
 							{% csrf_token %}
-							<div>
-								{% for completo, base, cantidad_archivos, rango_duracion, rango_fecha in completo_base_zip %}
-								<div class="carpetas-cargadas">
-									<input type="checkbox" name="carpetas" value="{{ completo }}" checked>
-									<label for="carpetas">{{ base }} - Numero de Archivos: {{cantidad_archivos}} -
-										Rango de duracion: {{rango_duracion}} -
-										Rango de fechas: {{rango_fecha}}</label>
-								</div>
-								{% endfor %}
+							{% for path, basename in folders %}
+							<div class="carpetas-cargadas">
+								<input type="checkbox" name="carpetas" value="{{ path }}" checked>
+								<label for="carpetas">{{ basename }}</label>
 							</div>
+							{% endfor %}
 							<input type="submit" value="Procesar Carpetas" id="procesar_carpetas"
 								name="procesar_carpetas"></input>
 						</form>
@@ -212,15 +234,15 @@
 						{% if carpetas_procesando %}
 
 						Procesando
-						{% for procensando in carpetas_procesando %}
-
 						<ul>
+							{% for procensando in carpetas_procesando %}
+
 							<li>
 								<label>{{procensando}}</label>
 							</li>
-						</ul>
 
-						{% endfor %}
+							{% endfor %}
+						</ul>
 						<input type="submit" value="Procesar Carpetas" id="procesar_carpetas"
 							name="procesar_carpetas"></input>
 

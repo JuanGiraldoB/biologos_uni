@@ -1,13 +1,12 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
-from procesamiento.models import Progreso
 
 from .utils.helper_functions import (
-    cargar_carpeta,
-    procesar_carpetas,
-    mostrar_grafica,
-    cargar_csv,
+    load_folder,
+    prepare_destination_folder,
+    process_folders,
+    show_plot,
+    load_csv,
 )
 
 from ecosonos.utils.helper_functions import (
@@ -92,16 +91,19 @@ from ecosonos.utils.helper_functions import (
 async def indices_vista(request):
     if request.method == 'POST':
         if 'cargar' in request.POST:
-            return await cargar_carpeta(request)
+            return await load_folder(request)
+
+        elif 'destino' in request.POST:
+            return await prepare_destination_folder(request)
 
         elif 'procesar_carpetas' in request.POST:
-            return await procesar_carpetas(request)
+            return await process_folders(request)
 
         if 'mostrar-grafica' in request.POST:
-            return await mostrar_grafica(request)
+            return await show_plot(request)
 
         if 'cargar-csv' in request.POST:
-            return await cargar_csv(request)
+            return await load_csv(request)
 
     else:
         return render(request, 'indices/indices.html')

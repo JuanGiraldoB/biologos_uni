@@ -226,14 +226,11 @@ def calcularIndice(indices_seleccionados, carpeta, grabacion, Valores):
     # return JsonResponse({"Indices calculados": Indices_grabaciones})
 
 
-def grafica_polar(carpeta_raiz, grabaciones, indice, ADIm_index=False):
-    # nombreGrabacion = grabaciones[0].split("/")[-1]
-    # grabadora = nombreGrabacion.split('_')[0]
-
-    if ".csv" in carpeta_raiz:
-        df_all = pd.read_csv(carpeta_raiz)
+def polar_plot(csv_path, indice, ADIm_index=False):
+    if ".csv" in csv_path:
+        df_all = pd.read_csv(csv_path)
     else:
-        df_all = pd.read_csv(carpeta_raiz + '/indices_acusticos.csv')
+        df_all = pd.read_csv(os.path.join(csv_path, 'indices_acusticos.csv'))
 
     rdns = np.linspace(0, 360, 24, endpoint=False)
 
@@ -249,7 +246,7 @@ def grafica_polar(carpeta_raiz, grabaciones, indice, ADIm_index=False):
 
     fig = px.bar_polar(df, r="Dates", theta="Hora",
                        color=indice, template="plotly_dark",
-                       color_discrete_sequence=px.colors.sequential.Plasma_r[::-1])
+                       color_continuous_scale=px.colors.sequential.Plasma_r)
 
     config = {
         'toImageButtonOptions': {
