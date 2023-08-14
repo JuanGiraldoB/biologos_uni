@@ -84,23 +84,17 @@
                                     <input type="submit" value="Seleccionar Carpeta Principal" id="cargar"
                                         name="cargar"></input>
                                 </div>
-                                <div class="row gtr-50 campostxt">
-                                    <div class="col-6 col-12-mobilep">
-                                        <label for="frecuenciaminima">Frecuencia Mínima</label>
-                                        <input type="text" name="name" id="frecuenciaminima"
-                                            placeholder="Ingrese frecuencia mínima" />
-                                    </div>
-                                    <div class="col-6 col-12-mobilep">
-                                        <label for="frecuenciaminima">Frecuencia Máxima</label>
-                                        <input type="text" name="email" id="frecuenciamaxima"
-                                            placeholder="Ingrese frecuencia máxima" />
-                                    </div>
-                                </div>
-                                <div class="botonprocesar">
-                                    <input type="submit" value="Procesar Archivos" id="cargar" name="cargar"></input>
-                                </div>
                             </section>
                         </form>
+
+                        <br>
+
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="submit" value="Seleccionar Carpeta Destino" id="destino"
+                                name="destino"></input>
+                        </form>
+
                         {% if carpetas_nombre_completo %}
                         <form method="POST">
                             {% csrf_token %}
@@ -112,6 +106,19 @@
                                 </div>
                                 {% endfor %}
                             </div>
+                            <div class="row gtr-50 campostxt">
+                                <div class="col-6 col-12-mobilep">
+                                    <label for="frecuenciaminima">Frecuencia Mínima</label>
+                                    <input type="text" name="frecuenciaminima" id="frecuenciaminima"
+                                        placeholder="Ingrese frecuencia mínima" />
+                                </div>
+                                <div class="col-6 col-12-mobilep">
+                                    <label for="frecuenciaminima">Frecuencia Máxima</label>
+                                    <input type="text" name="frecuenciamaxima" id="frecuenciamaxima"
+                                        placeholder="Ingrese frecuencia máxima" />
+                                </div>
+                            </div>
+                            </br>
                             <input type="submit" value="Procesar Carpetas" id="procesar_carpetas"
                                 name="procesar_carpetas"></input>
                         </form>

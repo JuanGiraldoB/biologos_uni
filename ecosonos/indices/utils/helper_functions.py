@@ -23,7 +23,7 @@ from .funciones_indices import run_calcular_indice
 from ecosonos.utils.carpeta_utils import (
     get_folders_with_wav,
     get_subfolders_basename,
-    get_files_in_folder
+    get_all_files_in_all_folders
 )
 
 
@@ -90,10 +90,7 @@ async def process_folders(request):
     selected_indices = await sync_to_async(get_indices_session)(request)
     destination_folder = await sync_to_async(get_destination_folder_session)(request, app='indices')
 
-    all_files = []
-    for folder in selected_folders:
-        files, _ = get_files_in_folder(folder)
-        all_files.extend(files)
+    all_files, _ = get_all_files_in_all_folders(selected_folders)
 
     progress = await sync_to_async(Progreso.objects.create)(cantidad_archivos=len(all_files))
 

@@ -65,6 +65,8 @@ def save_statistics_state_session(request, statistics):
 def save_destination_folder_session(request, destination_folder, app='preproceso'):
     if app == 'indices':
         request.session['destination_indices'] = destination_folder
+    elif app == 'etiquetado-auto':
+        request.session['destination_etiquetado_auto'] = destination_folder
     else:
         request.session['destination_preproceso'] = destination_folder
 
@@ -72,5 +74,7 @@ def save_destination_folder_session(request, destination_folder, app='preproceso
 def get_destination_folder_session(request, app='preproceso'):
     if app == 'indices':
         return request.session['destination_indices']
+    elif app == 'etiquetado-auto':
+        return request.session['destination_etiquetado_auto']
     else:
         return request.session['destination_preproceso']

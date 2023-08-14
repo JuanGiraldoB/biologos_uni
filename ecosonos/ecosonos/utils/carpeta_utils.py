@@ -194,15 +194,27 @@ def get_folder_detail(folder):
     return folder_detail
 
 
+def get_all_files_in_all_folders(folders):
+    all_files_path = []
+    all_files_path_basename = []
+
+    for folder in folders:
+        files_path, files_basename = get_files_in_folder(folder)
+        all_files_path.extend(files_path)
+        all_files_path_basename.extend(files_basename)
+
+    return all_files_path, all_files_path_basename
+
+
 def get_files_in_folder(folder, file_extension='.wav'):
     files_path = []
-    files_base_name = []
+    files_basename = []
 
     for file in os.listdir(folder):
         file_path = os.path.join(folder, file)
 
         if os.path.isfile(file_path) and file.lower().endswith(file_extension):
             files_path.append(file_path)
-            files_base_name.append(file)
+            files_basename.append(file)
 
-    return files_path, files_base_name
+    return files_path, files_basename
