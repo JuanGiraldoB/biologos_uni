@@ -95,14 +95,15 @@
                                 name="destino"></input>
                         </form>
 
-                        {% if carpetas_nombre_completo %}
+                        {% if folders_details %}
                         <form method="POST">
                             {% csrf_token %}
                             <div>
-                                {% for completo, base in completo_base_zip %}
+                                {% for folder_details in folders_details %}
                                 <div class="carpetas-cargadas">
-                                    <input type="checkbox" name="carpetas" value="{{ completo }}" checked>
-                                    <label for="carpetas">{{ base }}</label>
+                                    <input type="checkbox" name="carpetas" value="{{ folder_details.folders_path }}"
+                                        checked>
+                                    <label for="carpetas">{{ folder_details.folders_basename }}</label>
                                 </div>
                                 {% endfor %}
                             </div>

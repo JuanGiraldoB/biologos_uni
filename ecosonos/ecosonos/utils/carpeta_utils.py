@@ -1,5 +1,6 @@
 import os
 import platform
+import pathlib
 from concurrent.futures import ThreadPoolExecutor
 
 
@@ -146,6 +147,7 @@ def get_folders_with_wav(folder, file_extension='.wav'):
     # Checks if the root folder has .wav files
     if any(file.lower().endswith(file_extension) for file in os.listdir(folder)):
         subfolders_wav_path.append(folder)
+        subfolders_wav_basename.append(os.path.basename(folder))
 
     for root, subdirs, _ in os.walk(folder):
         for subdir in subdirs:
@@ -214,7 +216,7 @@ def get_files_in_folder(folder, file_extension='.wav'):
         file_path = os.path.join(folder, file)
 
         if os.path.isfile(file_path) and file.lower().endswith(file_extension):
-            files_path.append(file_path)
+            files_path.append(str(pathlib.Path(file_path)))
             files_basename.append(file)
 
     return files_path, files_basename

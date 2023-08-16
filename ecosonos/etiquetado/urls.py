@@ -3,8 +3,8 @@ from . import views
 
 
 urlpatterns = [
-    path('', views.etiquetado, name='etiquetado'),
-    path('espectrograma/<str:ruta>', views.espectrograma, name='espectrograma'),
-    path('espectrograma/reproducir/<str:ruta>',
-         views.reproducir_sonido_archivo, name='reproducir'),
+    path('', views.label_view, name='etiquetado'),
+    path('espectrograma/<str:path>', views.spectrogram_view, name='espectrograma'),
+    path('espectrograma/reproducir/<str:path>',
+         views.play_segment_view, name='reproducir'),
 ]

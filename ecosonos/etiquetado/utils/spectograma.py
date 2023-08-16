@@ -84,7 +84,7 @@ def calcular_espectrograma(ruta):
     # return f, t, s, senal_audio, fs
 
 
-def reproducir_segmento(ruta, t_ini, t_fin):
+def play_segment(ruta, t_ini, t_fin):
     # Extract data and sampling rate from file
     data, fs = sf.read(ruta, dtype='float32')
     # print('tamaño de la señal', data.shape)
@@ -278,7 +278,7 @@ def spectrogram(ruta, carpeta_raiz):
         cv2.imwrite(ruta_img, img)
         x1, y1, x2, y2 = coordinate_box(ruta_csv, row1, row2)
         create_box(ruta_img, x1, y1, x2, y2)
-        reproducir_segmento(ruta, t[x1], t[x2])
+        play_segment(ruta, t[x1], t[x2])
         print("Coordenadas en tiempo: ["+"{:.2f}".format((t[int(x1)])) +
               " , "+"{:.2f}".format(t[int(x2)])+"]")
         print("Coordenadas en frecuencia: [" + "{:.2f}".format(24000-f[int(y1)]) +

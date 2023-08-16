@@ -1,13 +1,11 @@
 from django.shortcuts import render
 from ..models import TableData
 import pathlib
-import os
 
 from .Bioacustica_Completo import (
     run_metodologia
 )
 
-# from .. import prepare_xlsx_table_name
 from .utils import prepare_xlsx_table_name
 
 from ecosonos.utils.session_utils import (
@@ -17,7 +15,9 @@ from ecosonos.utils.session_utils import (
     save_csv_path_session,
     get_csv_path_session,
     save_destination_folder_session,
-    get_destination_folder_session
+    get_destination_folder_session,
+    save_subfolders_details_session,
+    get_subfolders_details_session
 )
 
 from ecosonos.utils.carpeta_utils import (
@@ -29,17 +29,14 @@ from ecosonos.utils.carpeta_utils import (
 from procesamiento.models import Progreso
 import pandas as pd
 from tkinter.filedialog import askdirectory
-from ecosonos.utils.tkinter_utils import show_tkinter_windown_top
+from ecosonos.utils.tkinter_utils import get_root_folder
 import asyncio
 from asgiref.sync import sync_to_async
 
 
 async def load_folder(request):
-    data = {}
     try:
-        root = show_tkinter_windown_top()
-        root_folder = askdirectory(title='Seleccionar carpeta raiz')
-        root.destroy()
+        root_folder = await sync_to_async(get_root_folder)()
     except Exception as e:
         print(e)
         return render(request, "etiquetado_auto/etiquetado-auto.html")
@@ -49,27 +46,34 @@ async def load_folder(request):
     if not root_folder:
         return render(request, "etiquetado_auto/etiquetado-auto.html")
 
-    await sync_to_async(save_root_folder_session)(request, root_folder, app='etiquetado-auto')
+    await sync_to_async(save_root_folder_session)(request, root_folder, app='etiquetado_auto')
 
     await sync_to_async(Progreso.objects.all().delete)()
 
     folders_wav_path, folders_wav_basename = get_folders_with_wav(
         root_folder)
 
-    data['carpetas_nombre_completo'] = folders_wav_path
-    data['carpetas_nombre_base'] = folders_wav_basename
-    data['completo_base_zip'] = zip(
-        folders_wav_path, folders_wav_basename)
+    folders_details = []
+    for path, basename in zip(folders_wav_path, folders_wav_basename):
+        folder_detail = {
+            'folders_path': path,
+            'folders_basename': basename,
+        }
+        folders_details.append(folder_detail)
 
-    return render(request, "etiquetado_auto/etiquetado-auto.html", data)
+    import pprint
+    pprint.pprint(folders_details)
+
+    await sync_to_async(save_subfolders_details_session)(request, folders_details, app='etiquetado_auto')
+
+    return render(request, "etiquetado_auto/etiquetado-auto.html")
 
 
 async def prepare_destination_folder(request):
+    data = {}
+
     try:
-        root = show_tkinter_windown_top()
-        destination_folder = askdirectory(title='Seleccionar carpeta destino')
-        destination_folder = str(pathlib.Path(destination_folder))
-        root.destroy()
+        destination_folder = await sync_to_async(get_root_folder)()
     except Exception as e:
         print("Error en destino carpeta", e)
         return render(request, "etiquetado_auto/etiquetado-auto.html")
@@ -77,9 +81,15 @@ async def prepare_destination_folder(request):
     if not destination_folder:
         return render(request, "etiquetado_auto/etiquetado-auto.html")
 
-    await sync_to_async(save_destination_folder_session)(request, destination_folder, app="etiquetado-auto")
+    await sync_to_async(save_destination_folder_session)(request, destination_folder, app="etiquetado_auto")
+    folders_details = await sync_to_async(get_subfolders_details_session)(request, app='etiquetado_auto')
 
-    return render(request, "etiquetado_auto/etiquetado-auto.html")
+    import pprint
+    pprint.pprint(folders_details)
+
+    data['folders_details'] = folders_details
+
+    return render(request, "etiquetado_auto/etiquetado-auto.html", data)
 
 
 async def process_folders(request):
@@ -101,15 +111,8 @@ async def process_folders(request):
     if not selected_folders:
         return render(request, "etiquetado_auto/etiquetado-auto.html", data)
 
-    await sync_to_async(save_selected_subfolders_session)(request, selected_folders,  app='etiquetado-auto')
-    destination_folder = await sync_to_async(get_destination_folder_session)(request, app='etiquetado-auto')
-
-    # all_files = []
-    # all_files_basename = []
-    # for folder in selected_folders:
-    #     files, files_basename = get_files_in_folder(folder)
-    #     all_files.extend(files)
-    #     all_files_basename.extend(files_basename)
+    await sync_to_async(save_selected_subfolders_session)(request, selected_folders,  app='etiquetado_auto')
+    destination_folder = await sync_to_async(get_destination_folder_session)(request, app='etiquetado_auto')
 
     all_files, all_files_basename = get_all_files_in_all_folders(
         selected_folders)
@@ -138,7 +141,7 @@ async def process_folders(request):
 async def show_table(request):
     data = {}
     csv_xlsx = await sync_to_async(get_csv_path_session)(
-        request, app='etiquetado-auto')
+        request)
 
     df = pd.read_excel(csv_xlsx)
     data['df'] = df

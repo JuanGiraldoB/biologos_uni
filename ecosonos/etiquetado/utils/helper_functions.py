@@ -1,7 +1,6 @@
 from django.shortcuts import render
 import json
 import os
-import pathlib
 
 from ecosonos.utils.session_utils import (
     save_root_folder_session,
@@ -9,11 +8,9 @@ from ecosonos.utils.session_utils import (
     save_csv_path_session,
     get_csv_path_session,
     save_csv_path_session,
-    get_csv_path_session
-)
-
-from ecosonos.utils.carpeta_utils import (
-    selecciono_carpeta,
+    get_csv_path_session,
+    get_files_session,
+    save_files_session
 )
 
 from .spectograma import (
@@ -21,92 +18,116 @@ from .spectograma import (
 )
 
 from ecosonos.utils.archivos_utils import (
-    obtener_detalle_archivos_wav,
-    reemplazar_caracter,
-    agregar_fila_csv,
-    crear_csv,
-    agregar_fila_csv,
-    obtener_archivos_carpetas
+    replace_char,
+    add_row_csv,
+    create_csv,
+    add_row_csv,
 )
 
-from tkinter.filedialog import askdirectory
-from ecosonos.utils.tkinter_utils import show_tkinter_windown_top
+from ecosonos.utils.carpeta_utils import (
+    get_files_in_folder
+)
+
+from ecosonos.utils.tkinter_utils import get_root_folder
 
 
-def cargar_carpeta(request):
-    data = {}
-
+def load_folder(request):
     try:
-        root = show_tkinter_windown_top()
-        carpeta_raiz = askdirectory(title='Seleccionar carpeta raiz')
-        carpeta_raiz = str(pathlib.Path(carpeta_raiz))
-        root.destroy()
+        root_folder = get_root_folder()
     except Exception as e:
         print("Error en cargar carpeta")
         return render(request, 'etiquetado/etiquetado.html')
 
-    if selecciono_carpeta(carpeta_raiz):
+    if not root_folder:
         return render(request, 'etiquetado/etiquetado.html')
 
     save_root_folder_session(
-        request, carpeta_raiz, app="etiquetado")
+        request, root_folder, app="etiquetado")
 
-    nombre_carpeta = os.path.basename(carpeta_raiz).split(".")[0]
+    files_paths, files_basenames = get_files_in_folder(root_folder)
 
-    csv_ruta = crear_csv(carpeta_raiz, nombre_carpeta)
-    save_csv_path_session(request, csv_ruta)
+    files_paths = replace_char(files_paths, caracter=os.sep, reemplazo='-')
 
-    archivos, nombres_base, = obtener_archivos_carpetas([
-        carpeta_raiz])
+    files_details = []
+    for path, basename in zip(files_paths, files_basenames):
+        file_details = {
+            'path': path,
+            'basename': basename
+        }
 
-    # Reemplazar los '/' por '-' para poder ser usados en la peticion get
-    reemplazar_caracter(archivos, caracter=os.sep, reemplazo='-')
+        files_details.append(file_details)
 
-    data['archivos'] = zip(archivos, nombres_base)
+    save_files_session(request, files_details, app='etiquetado')
+
+    # data['archivos'] = zip(files_paths, files_basenames)
+
+    return render(request, 'etiquetado/etiquetado.html')
+
+
+def prepare_destination_folder(request):
+    data = {}
+
+    try:
+        destination_folder = get_root_folder()
+    except Exception as e:
+        print("Error en cargar carpeta", e)
+        return render(request, 'etiquetado/etiquetado.html')
+
+    if not destination_folder:
+        return render(request, 'etiquetado/etiquetado.html')
+
+    folder_basename = os.path.basename(destination_folder).split(".")[0]
+
+    csv_path = create_csv(destination_folder, folder_basename)
+    save_csv_path_session(request, csv_path)
+
+    files_details = get_files_session(request, app='etiquetado')
+    data['files_details'] = files_details
 
     return render(request, 'etiquetado/etiquetado.html', data)
 
 
-def preparar_datos_etiquetado(request, ruta):
-    carpeta_raiz = get_root_folder_session(request, app='etiquetado')
-    archivos, nombres_base = obtener_archivos_carpetas([carpeta_raiz])
-    reemplazar_caracter(archivos, caracter=os.sep, reemplazo='-')
+def prepare_label_data(request, path):
+    files_details = get_files_session(request, app='etiquetado')
+    files_paths = [file_path['path'] for file_path in files_details]
+
+    replace_char(files_paths, caracter=os.sep, reemplazo='-')
 
     data = {}
-    data['ruta'] = ruta
-    ruta = ruta.replace('-', os.sep)
+    data['ruta'] = path
+    path = path.replace('-', os.sep)
 
-    f, t, s = calcular_espectrograma(ruta)
+    f, t, s = calcular_espectrograma(path)
 
     data['frequencies'] = f.tolist()
     data['times'] = t.tolist()
     data['spectrogram'] = s.tolist()
-    data['nombre'] = os.path.basename(ruta)
-    data['archivos'] = zip(archivos, nombres_base)
+    data['nombre'] = os.path.basename(path)
+    data['files_details'] = files_details
 
     return data
 
 
-def mostrar_pagina_etiquetado(request, ruta):
-    data = preparar_datos_etiquetado(request, ruta)
+def label_data(request, path):
+    data = prepare_label_data(request, path)
     return render(request, 'etiquetado/etiquetado.html', data)
 
 
-def etiquetar(request, ruta, data_segmento):
-    nombre_grabacion = os.path.basename(ruta)
-    csv_ruta = get_csv_path_session(request)
-    agregar_fila_csv(csv_ruta, nombre_grabacion,
-                     data_segmento['etiqueta'],
-                     data_segmento['x0'],
-                     data_segmento['x1'],
-                     data_segmento['y0'],
-                     data_segmento['y1']
-                     )
+def add_label(request, path, segement_data):
+    file_name = os.path.basename(path)
+    csv_path = get_csv_path_session(request)
+    add_row_csv(csv_path, file_name,
+                segement_data['etiqueta'],
+                segement_data['x0'],
+                segement_data['x1'],
+                segement_data['y0'],
+                segement_data['y1']
+                )
 
 
-def obtener_data_segmento(request):
+def get_segment_data(request):
     data = json.loads(request.body)
-    etiqueta = data.get('etiqueta')
+    label = data.get('etiqueta')
 
     # Tiempos
     x0 = data.get('x0')
@@ -116,12 +137,12 @@ def obtener_data_segmento(request):
     y0 = data.get('y0')
     y1 = data.get('y1')
 
-    data_segmento = {
+    segment_data = {
         'x0': x0,
         'x1': x1,
         'y0': y0,
         'y1': y1,
-        'etiqueta': etiqueta
+        'etiqueta': label
     }
 
-    return data_segmento
+    return segment_data

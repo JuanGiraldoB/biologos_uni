@@ -3,19 +3,23 @@ import pandas as pd
 from tkinter.filedialog import askdirectory, askopenfilename
 from asgiref.sync import sync_to_async
 import asyncio
-import pathlib
 
-from .session_utils import save_indices_session, get_indices_session
+from .session_utils import (
+    save_indices_session,
+    get_indices_session
+)
 
 from ecosonos.utils.session_utils import (
     save_selected_subfolders_session,
     save_root_folder_session,
     get_root_folder_session,
     save_destination_folder_session,
-    get_destination_folder_session
+    get_destination_folder_session,
+    save_subfolders_details_session,
+    get_subfolders_details_session
 )
 
-from ecosonos.utils.tkinter_utils import show_tkinter_windown_top
+from ecosonos.utils.tkinter_utils import get_root_folder, get_file
 from procesamiento.models import Progreso
 from .funciones_indices_progress import polar_plot
 from .funciones_indices import run_calcular_indice
@@ -31,10 +35,7 @@ async def load_folder(request):
     data = {}
 
     try:
-        root = show_tkinter_windown_top()
-        root_folder = askdirectory(title='Seleccionar carpeta raiz')
-        root_folder = str(pathlib.Path(root_folder))
-        root.destroy()
+        root_folder = await sync_to_async(get_root_folder)()
     except Exception as e:
         print("Error en cargar carpeta en indices", e)
         return render(request, 'indices/indices.html')
@@ -47,25 +48,34 @@ async def load_folder(request):
     if not selected_indices:
         return render(request, 'indices/indices.html')
 
-    await sync_to_async(save_root_folder_session)(request, root_folder, app='indices')
-    await sync_to_async(save_indices_session)(request, selected_indices)
     await sync_to_async(Progreso.objects.all().delete)()
 
     folders_wav_path, folders_wav_basename = get_folders_with_wav(
         root_folder)
 
-    data['folders'] = zip(folders_wav_path, folders_wav_basename)
+    folders_details = []
+    for path, basename in zip(folders_wav_path, folders_wav_basename):
+        folder_detail = {
+            'folders_path': path,
+            'folders_basename': basename,
+        }
+        folders_details.append(folder_detail)
+
+    await sync_to_async(save_subfolders_details_session)(request, folders_details, app='indices')
+    await sync_to_async(save_root_folder_session)(request, root_folder, app='indices')
+    await sync_to_async(save_indices_session)(request, selected_indices)
+
+    # data['folders'] = zip(folders_wav_path, folders_wav_basename)
     data['indices'] = selected_indices
 
     return render(request, 'indices/indices.html', data)
 
 
 async def prepare_destination_folder(request):
+    data = {}
+
     try:
-        root = show_tkinter_windown_top()
-        destination_folder = askdirectory(title='Seleccionar carpeta destino')
-        destination_folder = str(pathlib.Path(destination_folder))
-        root.destroy()
+        destination_folder = await sync_to_async(get_root_folder)()
     except Exception as e:
         print("Error en destino carpeta", e)
         return render(request, 'indices/indices.html')
@@ -74,8 +84,12 @@ async def prepare_destination_folder(request):
         return render(request, 'indices/indices.html')
 
     await sync_to_async(save_destination_folder_session)(request, destination_folder, app="indices")
+    folder_details = await sync_to_async(get_subfolders_details_session)(request, app='indices')
+    indices = await sync_to_async(get_indices_session)(request)
 
-    return render(request, 'indices/indices.html')
+    data['folders_details'] = folder_details
+    data['indices'] = indices
+    return render(request, 'indices/indices.html', data)
 
 
 async def process_folders(request):
@@ -147,10 +161,7 @@ async def show_plot(request):
 
 async def load_csv(request):
     try:
-        root = show_tkinter_windown_top()
-        file = askopenfilename(
-            title='Seleccionar archivo csv')
-        root.destroy()
+        file = await sync_to_async(get_file)()
     except Exception as e:
         print("Error cargar csv", e)
         return render(request, 'indices/indices.html')

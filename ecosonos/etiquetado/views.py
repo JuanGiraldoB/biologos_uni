@@ -3,33 +3,37 @@ import os
 
 
 from .utils.spectograma import (
-    reproducir_segmento,
+    play_segment,
 )
 
 from .utils.helper_functions import (
-    cargar_carpeta,
-    mostrar_pagina_etiquetado,
-    etiquetar,
-    obtener_data_segmento
+    load_folder,
+    label_data,
+    add_label,
+    get_segment_data,
+    prepare_destination_folder
 )
 
 
-def etiquetado(request):
+def label_view(request):
     if request.method == 'POST':
-        return cargar_carpeta(request)
+        if 'cargar' in request.POST:
+            return load_folder(request)
+        elif 'destino' in request.POST:
+            return prepare_destination_folder(request)
 
     return render(request, 'etiquetado/etiquetado.html')
 
 
-def espectrograma(request, ruta):
-    return mostrar_pagina_etiquetado(request, ruta)
+def spectrogram_view(request, path):
+    return label_data(request, path)
 
 
-def reproducir_sonido_archivo(request, ruta):
-    ruta = ruta.replace('-', os.sep)
+def play_segment_view(request, path):
+    path = path.replace('-', os.sep)
 
-    data_segemento = obtener_data_segmento(request)
-    etiquetar(request, ruta, data_segemento)
-    reproducir_segmento(ruta, data_segemento['x0'], data_segemento['x1'])
+    segment_data = get_segment_data(request)
+    add_label(request, path, segment_data)
+    play_segment(path, segment_data['x0'], segment_data['x1'])
 
     return render(request, 'etiquetado/etiquetado.html')

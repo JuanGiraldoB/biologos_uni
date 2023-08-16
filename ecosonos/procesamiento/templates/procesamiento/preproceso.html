@@ -97,8 +97,10 @@
 							</form>
 
 							<form class="carpetaprincipal" method="POST">
-								{% if folders_details %}
+								{% if destino %}
 								{% csrf_token %}
+
+								{% if statistics %}
 								<div>
 									{% for folder_detail in folders_details %}
 									<div class="carpetas-cargadas">
@@ -113,16 +115,17 @@
 									<input type="submit" value="Procesar" id="procesar_carpetas"
 										name="procesar_carpetas"></input>
 								</div>
-								{% elif folders %}
-								{% for path, basename in folders %}
+								{% else %}
+								{% for folder_detail in folders_details %}
 								<div class="carpetas-cargadas">
-									<input type="checkbox" name="carpetas" value="{{ path }}" checked>
-									<label for="carpetas">{{ basename }}</label>
+									<input type="checkbox" name="carpetas" value="{{ folder_detail.folders_path }}"
+										checked>
+									<label for="carpetas">{{ folder_detail.folders_basename }}</label>
 								</div>
 								{% endfor %}
-
 								<input type="submit" value="Procesar" id="procesar_carpetas"
 									name="procesar_carpetas"></input>
+								{% endif %}
 								{% endif %}
 							</form>
 

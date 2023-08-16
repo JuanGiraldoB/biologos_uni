@@ -152,9 +152,13 @@ def obtener_detalle_archivos_wav(carpetas):
     return archivos, nombres_base, cantidad_archivos_carpeta, rango_duracion_archivos_carpetas, rango_fechas_archivos_carpetas
 
 
-def reemplazar_caracter(archivos, caracter, reemplazo):
+def replace_char(archivos, caracter, reemplazo):
     for i in range(len(archivos)):
+        print(archivos[i])
         archivos[i] = archivos[i].replace(caracter, reemplazo)
+        print(archivos[i])
+
+    return archivos
 
 
 def get_date_range_from_filenames(files):
@@ -193,7 +197,7 @@ def get_date_from_filename(file):
     return date
 
 
-def crear_csv(carpeta_raiz, nombre_carpeta):
+def create_csv(carpeta_raiz, nombre_carpeta):
     nombre_csv = f'etiquetas_{nombre_carpeta}.csv'
     csv_ruta = os.path.join(carpeta_raiz, nombre_csv)
 
@@ -206,7 +210,7 @@ def crear_csv(carpeta_raiz, nombre_carpeta):
     return csv_ruta
 
 
-def agregar_fila_csv(csv_ruta, nombre_grabacion, etiqueta, x0, x1, y0, y1):
+def add_row_csv(csv_ruta, nombre_grabacion, etiqueta, x0, x1, y0, y1):
     with open(csv_ruta, "a", newline='') as file:
         writer = csv.writer(file)
 

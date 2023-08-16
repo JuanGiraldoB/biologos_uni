@@ -27,16 +27,17 @@
         <div id="header">
 
             <!-- Logo -->
-            <div class="logoup"><a href="{% url 'index' %}"><img src="{% static 'ecosonos/images/logo_econosonos.png' %}"></a></div>
+            <div class="logoup"><a href="{% url 'index' %}"><img
+                        src="{% static 'ecosonos/images/logo_econosonos.png' %}"></a></div>
 
             <!-- Nav -->
             <nav id="nav">
                 <ul>
                     <li> <a href="{% url 'preproceso' %}">Preprocesamiento</a></li>
-					<li><a href="{% url 'indices' %}">Índices</a></li>
-					<li class="current"><a href="{% url 'etiquetado' %}">Etiquetado manual</a></li>
-					<li><a href="{% url 'etiquetado-auto' %}">Sonotipos</a></li>
-					<li><a href="{% url 'conectividad' %}">Heterogeneidad acústica</a></li>
+                    <li><a href="{% url 'indices' %}">Índices</a></li>
+                    <li class="current"><a href="{% url 'etiquetado' %}">Etiquetado manual</a></li>
+                    <li><a href="{% url 'etiquetado-auto' %}">Sonotipos</a></li>
+                    <li><a href="{% url 'conectividad' %}">Heterogeneidad acústica</a></li>
                 </ul>
             </nav>
 
@@ -51,17 +52,19 @@
         </section>
 
         <!-- Descripción Módulo -->
-		<section class="wrapper style2">
-			<div class="container">
-				<header class="major">
-					<h2
-						style="font-family: hocus_regularregular; letter-spacing: 0.1em; font-size: 4em; line-height: 0.2em; color: #19a173;">
-						ETIQUETADO MANUAL</h2>
-					<p>Este módulo permite visualizar el espectrograma del audio que se elija y marcar los segmentos que el experto asocie a una especie.  Queda registrado la frecuencia máxima, frecuencia mínima, el tiempo de inicio y el tiempo de finalización de cada segmento que selecciona el usuario.
+        <section class="wrapper style2">
+            <div class="container">
+                <header class="major">
+                    <h2
+                        style="font-family: hocus_regularregular; letter-spacing: 0.1em; font-size: 4em; line-height: 0.2em; color: #19a173;">
+                        ETIQUETADO MANUAL</h2>
+                    <p>Este módulo permite visualizar el espectrograma del audio que se elija y marcar los segmentos que
+                        el experto asocie a una especie. Queda registrado la frecuencia máxima, frecuencia mínima, el
+                        tiempo de inicio y el tiempo de finalización de cada segmento que selecciona el usuario.
                     </p>
-				</header>
-			</div>
-		</section>
+                </header>
+            </div>
+        </section>
 
         <!-- Posts -->
         <section class="wrapper style1 wrappeados">
@@ -69,15 +72,6 @@
                 <div class="row">
                     <section class="col-12 col-12-narrower">
                         <div class="contenidos">
-                            <!-- Error messages -->
-                            {% if messages %}
-                            <ul class="messages">
-                                {% for message in messages %}
-                                <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
-                                    {% endfor %}
-                            </ul>
-                            {% endif %}
-
                             <!-- Formulario seleccionar carpeta raiz -->
                             <form method="POST" action="{% url 'etiquetado' %}" enctype="multipart/form-data">
                                 {% csrf_token %}
@@ -86,15 +80,22 @@
                                     name="cargar"></input>
                             </form>
 
+                            <form method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <input type="submit" value="Seleccionar Carpeta Destino" id="destino"
+                                    name="destino"></input>
+                            </form>
+
                             <!-- Formulario con lista de audios de carpeta raiz -->
-                            {% if archivos %}
+                            {% if files_details %}
                             <form class="carpetaprincipal" method="POST">
                                 {% csrf_token %}
 
                                 <div>
                                     <ul>
-                                        {% for completo, base in archivos %}
-                                        <li><a href="{% url 'espectrograma' ruta=completo%} ">{{base}}</a></li>
+                                        {% for file in files_details %}
+                                        <li><a href="{% url 'espectrograma' path=file.path %} ">{{file.basename}}</a>
+                                        </li>
                                         {% endfor %}
                                     </ul>
                                 </div>
@@ -124,42 +125,42 @@
             </div>
         </section>
 
-<!-- Footer -->
-<div id="footer">
-    <div class="container">
-        <!-- Creditos -->
-    <section id="cta2" class="wrapper2 style3">
-        <div class="container">
-            <div class="logos participantes">
-                <img src="{% static 'ecosonos/images/u_antioquia.png' %}">
+        <!-- Footer -->
+        <div id="footer">
+            <div class="container">
+                <!-- Creditos -->
+                <section id="cta2" class="wrapper2 style3">
+                    <div class="container">
+                        <div class="logos participantes">
+                            <img src="{% static 'ecosonos/images/u_antioquia.png' %}">
+                        </div>
+                        <div class="logos participantes">
+                            <img src="{% static 'ecosonos/images/ITM.png' %}">
+                        </div>
+                        <div class="logos participantes">
+                            <img src="{% static 'ecosonos/images/humboldt_v1.png' %}">
+                        </div>
+                        <div class="logos texto">
+                            <p>Apoya:</p>
+                        </div>
+                        <div class="logos participantes">
+                            <img src="{% static 'ecosonos/images/Ciencias.png' %}">
+                        </div>
+                    </div>
+                </section>
             </div>
-            <div class="logos participantes">
-                <img src="{% static 'ecosonos/images/ITM.png' %}">
+
+
+
+            <!-- Copyright -->
+            <div class="copyright">
+                <ul class="menu">
+                    <li>&copy; Todos los derechos reservados</li>
+                    <li>Diseño: <a href="#">Grupo Investigación</a></li>
+                </ul>
             </div>
-            <div class="logos participantes">
-                <img src="{% static 'ecosonos/images/humboldt_v1.png' %}">
-            </div>
-            <div class="logos texto">
-                <p>Apoya:</p>
-            </div>
-            <div class="logos participantes">
-                <img src="{% static 'ecosonos/images/Ciencias.png' %}">
-            </div>
+
         </div>
-    </section>
-    </div>
-
-    
-
-    <!-- Copyright -->
-    <div class="copyright">
-        <ul class="menu">
-            <li>&copy; Todos los derechos reservados</li>
-            <li>Diseño: <a href="#">Grupo Investigación</a></li>
-        </ul>
-    </div>
-
-</div>
 
     </div>
 
