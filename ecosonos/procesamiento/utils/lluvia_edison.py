@@ -206,7 +206,6 @@ def calculo_PSD_and_Espectro_promedio(df_ll, pbar=None):
                 info_grab_aux = np.zeros(shape=(1, 257))
                 return ruta_archivo, {}, 0, 'NO_ALTO_PSD', grupo, info_grab_aux[0], Duracon_Gra
             else:
-                # print(f'***************************:{indice}')
                 return ruta_archivo, dict(zip_iterator), PSD_medio, 'NO', grupo, meanspectro, Duracon_Gra
 
         else:
@@ -413,7 +412,6 @@ def algoritmo_lluvia_edison(carpetas, raiz, destino, progreso):
                             os.path.join(carpeta, archivo))
 
                         # Obtener la duración del audio
-                        print("*********", file_name)
                         audio_file = AudioSegment.from_file(file_name)
                         # Duración en segundos
                         duration = len(audio_file) / 1000

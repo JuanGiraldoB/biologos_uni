@@ -28,7 +28,8 @@ async def lluvia(request):
         elif 'mover_archivos' in request.POST:
             return await move_files(request)
 
-        elif 'mostrar-grafica' in request.POST:
+        elif 'mostrar_grafica' in request.POST:
+            print(request.POST)
             return await show_plot(request)
 
     else:

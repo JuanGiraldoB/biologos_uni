@@ -1,13 +1,5 @@
 let intervalId = null;
 
-document.addEventListener("DOMContentLoaded", function () {
-	let button = document.getElementById("procesar_carpetas");
-
-	if (button) {
-		intervalId = setInterval(updateProgressBar, 500);
-	}
-});
-
 function updateProgressBar() {
 	let xhr = new XMLHttpRequest();
 
@@ -26,6 +18,7 @@ function updateProgressBar() {
 			barElement.style.setProperty("--percentage", spanValue.textContent);
 
 			if (porcentaje_completado == 100) {
+				console.log("completado");
 				clearInterval(intervalId);
 			}
 		}

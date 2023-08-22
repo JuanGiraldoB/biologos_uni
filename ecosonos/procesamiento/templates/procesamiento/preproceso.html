@@ -13,6 +13,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 	<link rel="stylesheet" href="{% static 'ecosonos/assets/css/main.css' %}" />
 	<style>
@@ -75,30 +76,34 @@
 				<div class="row">
 					<section class="col-12 col-12-narrower">
 						<div class="contenidos">
-							<form method="POST" enctype="multipart/form-data">
+							<form id="cargar_carpeta" method="POST" enctype="multipart/form-data">
 								{% csrf_token %}
 								<p>Seleccionar la carpeta raiz que contiene los archivos (.wav)</p>
 								<input type="submit" value="Seleccionar Carpeta Principal" id="cargar"
 									name="cargar"></input>
 								<div class="checks">
 									{% if statistics %}
-									<input type="checkbox" name="estadisticas" value="estadisticas" checked></input>
+									<input type="checkbox" id="estadisticas" name="estadisticas" value="estadisticas"
+										checked></input>
 									{% else %}
-									<input type="checkbox" name="estadisticas" value="estadisticas"></input>
+									<input type="checkbox" id="estadisticas" name="estadisticas"
+										value="estadisticas"></input>
 									{% endif %}
 									<label for="RMS">Estadisticas</label>
 								</div>
 							</form>
 
-							<form method="POST" enctype="multipart/form-data">
+							<form id="carpeta_destino" method="POST" enctype="multipart/form-data">
 								{% csrf_token %}
 								<input type="submit" value="Seleccionar Carpeta Destino" id="destino"
 									name="destino"></input>
 							</form>
 
-							<form class="carpetaprincipal" method="POST">
-								{% if destino %}
+							<form id="seleccionar_carpetas" class="carpetaprincipal" method="POST">
 								{% csrf_token %}
+
+								<!-- No borrar -->
+								<!-- {% if destino %}
 
 								{% if statistics %}
 								<div>
@@ -126,11 +131,14 @@
 								<input type="submit" value="Procesar" id="procesar_carpetas"
 									name="procesar_carpetas"></input>
 								{% endif %}
-								{% endif %}
+								{% endif %} -->
 							</form>
 
-							{% if carpetas_procesando %}
+							<!-- {% if carpetas_procesando %}
 
+							<div>
+								
+							</div>
 							Procesando
 							{% for procesando in carpetas_procesando %}
 
@@ -144,7 +152,7 @@
 							<input type="submit" value="Procesar Carpetas con Lluvia" id="procesar_carpetas"
 								name="procesar_carpetas"></input>
 
-							{% endif %}
+							{% endif %} -->
 						</div>
 					</section>
 					<section>
@@ -157,20 +165,27 @@
 						<div class="contenidos">
 							<p class="warningtext"><span>¡Importante!</span> Si pulsa cualquiera de las opciones de
 								mover el sistema desplazará sus archivos a una nueva ubicación.</p>
-							<form method="POST" enctype="multipart/form-data">
+							<form id="mover_lluvia_form" method="POST" enctype="multipart/form-data">
 								{% csrf_token %}
 								<input type="submit" value="Mover Archivos con Lluvia" id="mover_archivos"
 									name="mover_archivos"></input>
+							</form>
+							<form id="mover_danado_form" method="POST" enctype="multipart/form-data">
+								{% csrf_token %}
 								<input type="submit" class="botmalos" value="Mover Archivos Dañados" id="mover_malos"
 									name="mover_archivos"></input>
 							</form>
 						</div>
 					</section>
-					<form method="POST" enctype="multipart/form-data">
+					<form id="grafica_form" method="POST" enctype="multipart/form-data">
 						{% csrf_token %}
-						<input type="submit" value="Mostrar gráfica" id="mostrar-grafica"
-							name="mostrar-grafica"></input>
+						<input type="submit" value="Mostrar gráfica" id="mostrar_grafica"
+							name="mostrar_grafica"></input>
 					</form>
+
+					<div id="grafica_div">
+
+					</div>
 					{% if plot %}
 					{{ plot|safe }}
 					{% endif %}
@@ -225,6 +240,10 @@
 	<script src="{% static 'ecosonos/assets/js/util.js' %}"></script>
 	<script src="{% static 'ecosonos/assets/js/main.js' %}"></script>
 
+	<script src="{% static 'procesamiento/submitCargarForm.js' %}"></script>
+	<script src="{% static 'procesamiento/destinoUtils.js' %}"></script>
+	<script src="{% static 'procesamiento/submitMoverLluviaForm.js' %}"></script>
+	<script src="{% static 'procesamiento/submitMoverDanadoForm.js' %}"></script>
 	<script src="{% static 'procesamiento/progressBar.js' %}"></script>
 
 </body>
