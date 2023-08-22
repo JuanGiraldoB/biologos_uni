@@ -27,6 +27,7 @@ function updateProgressBar() {
 			console.log(porcentaje_completado);
 
 			if (porcentaje_completado == 100) {
+				spanValue.innerHTML = "Completado";
 				clearInterval(intervalId);
 			}
 		}

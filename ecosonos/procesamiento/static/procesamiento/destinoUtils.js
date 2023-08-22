@@ -12,7 +12,6 @@ document.addEventListener("DOMContentLoaded", function () {
 		let xhr = new XMLHttpRequest();
 		xhr.open("POST", "", true); // URL to your view
 		xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-		xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
 
 		xhr.onreadystatechange = function () {
 			if (xhr.readyState === XMLHttpRequest.DONE) {
@@ -63,7 +62,6 @@ document.addEventListener("DOMContentLoaded", function () {
 						let xhr = new XMLHttpRequest();
 						xhr.open("POST", "", true);
 						xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-						xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
 
 						xhr.onreadystatechange = function () {
 							if (xhr.readyState === XMLHttpRequest.DONE) {

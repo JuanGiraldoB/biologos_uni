@@ -12,7 +12,6 @@ function updateProgressBar() {
 	let xhr = new XMLHttpRequest();
 	xhr.open("POST", "/indices/barra_progreso", true);
 	xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-	xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
 
 	xhr.onreadystatechange = function () {
 		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
@@ -27,6 +26,7 @@ function updateProgressBar() {
 			console.log(porcentaje_completado);
 
 			if (porcentaje_completado == 100) {
+				spanValue.innerHTML = "Completado";
 				clearInterval(intervalId);
 			}
 		}
