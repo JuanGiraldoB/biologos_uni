@@ -18,9 +18,21 @@ document.addEventListener("DOMContentLoaded", function () {
 				if (xhr.status === 200) {
 					let response = JSON.parse(xhr.responseText);
 					let graficaDiv = document.getElementById("grafica_div");
-					// Plotly.newPlot(graficaDiv, parsedFig);
-					graficaDiv.innerHTML = response.plot;
-					console.log(response.plot);
+					let iframe = document.createElement("iframe");
+
+					// Fetch the HTML content from the URL
+					fetch(response.fig_url)
+						.then((response) => response.text())
+						.then((htmlContent) => {
+							iframe.srcdoc = htmlContent;
+							iframe.style.width = "100%";
+							iframe.style.height = "400px";
+						})
+						.catch((error) => {
+							console.error("Error fetching HTML content:", error);
+						});
+
+					graficaDiv.appendChild(iframe);
 				} else {
 					let response = JSON.parse(xhr.responseText);
 					console.error(response.error + " " + xhr.status);

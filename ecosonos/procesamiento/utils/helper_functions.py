@@ -6,7 +6,7 @@ import asyncio
 from procesamiento.models import Progreso
 
 from .lluvia_edison import run_algoritmo_lluvia_edison
-from .plot import get_plot
+from .plot import get_plot_url
 
 from ecosonos.utils.tkinter_utils import (
     get_root_folder
@@ -166,8 +166,8 @@ async def show_plot(request):
     data = {}
     try:
         csv_folder = await sync_to_async(get_destination_folder_session)(request)
-        plot = get_plot(csv_folder)
-        data['plot'] = plot
+        fig_url = get_plot_url(csv_folder)
+        data['fig_url'] = fig_url
     except Exception as e:
         print(e)
         return JsonResponse({'error': 'Must select a folder'}, status=500)

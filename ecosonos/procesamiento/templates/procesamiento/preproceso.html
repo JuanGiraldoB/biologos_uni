@@ -183,12 +183,12 @@
 							name="mostrar_grafica"></input>
 					</form>
 
-					<div id="grafica_div">
+					<div id="grafica_div" style="height: 100%; width: 100%;">
 
 					</div>
-					{% if plot %}
+					<!-- {% if plot %}
 					{{ plot|safe }}
-					{% endif %}
+					{% endif %} -->
 				</div>
 			</div>
 		</section>
@@ -244,6 +244,7 @@
 	<script src="{% static 'procesamiento/destinoUtils.js' %}"></script>
 	<script src="{% static 'procesamiento/submitMoverLluviaForm.js' %}"></script>
 	<script src="{% static 'procesamiento/submitMoverDanadoForm.js' %}"></script>
+	<script src="{% static 'procesamiento/submitGraficaForm.js' %}"></script>
 	<script src="{% static 'procesamiento/progressBar.js' %}"></script>
 
 </body>
