@@ -79,24 +79,26 @@
 							<form id="cargar_carpeta" method="POST" enctype="multipart/form-data">
 								{% csrf_token %}
 								<p>Seleccionar la carpeta raiz que contiene los archivos (.wav)</p>
+								<div class="thebuttons">
 								<input type="submit" value="Seleccionar Carpeta Principal" id="cargar"
 									name="cargar"></input>
-								<div class="checks">
+								</div>
+								<div class="checks especialchecks">
 									{% if statistics %}
-									<input type="checkbox" id="estadisticas" name="estadisticas" value="estadisticas"
-										checked></input>
+									<input type="checkbox" id="estadisticas" name="estadisticas" value="estadisticas" checked></input>
 									{% else %}
-									<input type="checkbox" id="estadisticas" name="estadisticas"
-										value="estadisticas"></input>
+									<input type="checkbox" id="estadisticas" name="estadisticas" value="estadisticas"></input>
 									{% endif %}
-									<label for="RMS">Estadisticas</label>
+									<label for="estadisticas">Estadísticas</label>	
 								</div>
 							</form>
 
 							<form id="carpeta_destino" method="POST" enctype="multipart/form-data">
+								<div class="thebuttons">
 								{% csrf_token %}
 								<input type="submit" value="Seleccionar Carpeta Destino" id="destino"
 									name="destino"></input>
+								</div>	
 							</form>
 
 							<form id="seleccionar_carpetas" class="carpetaprincipal" method="POST">
@@ -167,24 +169,28 @@
 								mover el sistema desplazará sus archivos a una nueva ubicación.</p>
 							<form id="mover_lluvia_form" method="POST" enctype="multipart/form-data">
 								{% csrf_token %}
-								<input type="submit" value="Mover Archivos con Lluvia" id="mover_archivos"
-									name="mover_archivos"></input>
+								<div class="thebuttons">
+								<input type="submit" value="Mover Archivos con Lluvia" id="mover_archivos" name="mover_archivos"></input>
+								</div>	
 							</form>
 							<form id="mover_danado_form" method="POST" enctype="multipart/form-data">
 								{% csrf_token %}
-								<input type="submit" class="botmalos" value="Mover Archivos Dañados" id="mover_malos"
-									name="mover_archivos"></input>
+								<div class="thebuttons">
+								<input type="submit" class="botmalos" value="Mover Archivos Dañados" id="mover_malos" name="mover_archivos"></input>
+								</div>
 							</form>
 						</div>
 					</section>
+					<section class="col-12 col-12-narrower">
 					<form id="grafica_form" method="POST" enctype="multipart/form-data">
 						{% csrf_token %}
 						<input type="submit" value="Mostrar gráfica" id="mostrar_grafica"
 							name="mostrar_grafica"></input>
 					</form>
-
-					<div id="grafica_div" style="height: 100%; width: 100%;">
-
+					</section>
+					<section class="col-12 col-12-narrower">
+						<div id="grafica_div" style="height: 100%; width: 100%;">
+					</section>
 					</div>
 					<!-- {% if plot %}
 					{{ plot|safe }}

@@ -76,14 +76,16 @@
                             <form method="POST" action="{% url 'etiquetado' %}" enctype="multipart/form-data">
                                 {% csrf_token %}
                                 <p>Seleccionar la carpeta raiz que contiene los archivos (.wav)</p>
-                                <input type="submit" value="Seleccionar Carpeta Principal" id="cargar"
-                                    name="cargar"></input>
+                                <div class="thebuttons">
+                                <input type="submit" value="Seleccionar Carpeta Principal" id="cargar" name="cargar"></input>
+                                </div>
                             </form>
 
                             <form method="POST" enctype="multipart/form-data">
                                 {% csrf_token %}
-                                <input type="submit" value="Seleccionar Carpeta Destino" id="destino"
-                                    name="destino"></input>
+                                <div class="thebuttons">
+                                <input type="submit" value="Seleccionar Carpeta Destino" id="destino" name="destino"></input>
+                                </div>
                             </form>
 
                             <!-- Formulario con lista de audios de carpeta raiz -->

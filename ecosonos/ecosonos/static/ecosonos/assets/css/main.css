@@ -2424,7 +2424,7 @@ input, select, textarea {
 		display: inline-block;
 		padding: 0 1.5em;
 		line-height: 2.75em;
-		min-width: 9em;
+		min-width: 16em;
 		text-align: center;
 		text-decoration: none;
 		font-weight: 600;
@@ -3427,12 +3427,14 @@ input, select, textarea {
 		transform: scale(0);
 		transition: 120ms transform ease-in-out;
 		box-shadow: inset 1em 1em var(--form-control-color);
+
 	  }
 
 	input[type="checkbox"] {
 		/* ...existing styles */
 		display: grid;
 		place-content: center;
+
 	  }
 	  
 	  input[type="checkbox"]::before {
@@ -3442,6 +3444,7 @@ input, select, textarea {
 		transform: scale(0);
 		transition: 120ms transform ease-in-out;
 		box-shadow: inset 1em 1em var(--form-control-color);
+
 	  }
 	  
 	  input[type="checkbox"]:checked::before {
@@ -3454,16 +3457,21 @@ input, select, textarea {
 		/* Windows High Contrast Mode */
 		background-color: CanvasText;
 	  }
-
+ 
 	  .checks{
 		display: flexbox;
 		float: left;
 		padding-right: 30px;
 	  }
-
+	
 	  .checks label{
 		display: block;
-		width: 45px;
+		width: 80px;
+	  }
+
+	  .thebuttons{
+		margin-bottom: 0.65em;
+		clear: left;
 	  }
 
 	  .fila2, .fila3, .fila4{
@@ -3741,10 +3749,6 @@ input, select, textarea {
 	.botonprocesar{
 		margin-top: 2em !important;
 		
-	}
-
-	.botmalos{
-		margin-left: 1em !important;
 	}
 
 	.warningtext p{
