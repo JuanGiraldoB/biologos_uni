@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
 
 from ecosonos.utils.helper_functions import (
     get_percentage_advance
@@ -10,6 +11,10 @@ from .utils.helper_functions import (
     process_folders,
     show_table,
     prepare_destination_folder
+)
+
+from ecosonos.utils.session_utils import (
+    get_files_session
 )
 
 
@@ -27,6 +32,17 @@ async def etiquetado_auto(request):
         elif 'mostrar-tabla' in request.POST:
             return await show_table(request)
 
+    return render(request, "etiquetado_auto/etiquetado-auto.html")
+
+
+@csrf_exempt
+def files_list_view(request):
+    if request.method == 'POST':
+        data = {}
+        files_details = get_files_session(request, app='etiquetado_auto')
+        data['files_details'] = files_details
+
+        return JsonResponse(data)
     return render(request, "etiquetado_auto/etiquetado-auto.html")
 
 

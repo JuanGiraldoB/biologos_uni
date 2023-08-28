@@ -29,6 +29,7 @@ function updateProgressBar() {
 			if (porcentaje_completado == 100) {
 				spanValue.innerHTML = "Completado";
 				clearInterval(intervalId);
+				show_files();
 			}
 		}
 	};

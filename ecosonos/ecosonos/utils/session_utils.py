@@ -67,6 +67,8 @@ def get_files_session(request, app='preproceso'):
         return request.session['archivos_indices']
     elif app == 'etiquetado':
         return request.session['archivos_etiquetado']
+    elif app == 'etiquetado_auto':
+        return request.session['archivos_etiquetado_auto']
     else:
         return request.session['archivos_preproceso']
 
@@ -76,6 +78,8 @@ def save_files_session(request, files, app='preproceso'):
         request.session['archivos_indices'] = files
     elif app == 'etiquetado':
         request.session['archivos_etiquetado'] = files
+    elif app == 'etiquetado_auto':
+        request.session['archivos_etiquetado_auto'] = files
     else:
         request.session['archivos_preproceso'] = files
 

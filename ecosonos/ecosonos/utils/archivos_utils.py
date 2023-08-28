@@ -154,9 +154,7 @@ def obtener_detalle_archivos_wav(carpetas):
 
 def replace_char(archivos, caracter, reemplazo):
     for i in range(len(archivos)):
-        print(archivos[i])
         archivos[i] = archivos[i].replace(caracter, reemplazo)
-        print(archivos[i])
 
     return archivos
 

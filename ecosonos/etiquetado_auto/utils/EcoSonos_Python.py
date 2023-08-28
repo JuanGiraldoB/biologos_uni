@@ -2,17 +2,12 @@ import os
 from scipy.signal import savgol_filter
 from scipy.signal import medfilt2d
 import numpy as np
-import scipy.io as sio
 import skfuzzy as fuzz
-import matplotlib.pyplot as plt
 import cv2
-from scipy.io import wavfile
 import numpy.matlib
 from scipy import signal
 import scipy
 import soundfile as sf
-import asyncio
-import pandas as pd
 import statistics as stat
 from scipy.stats import zscore
 
@@ -225,7 +220,7 @@ def seg_xie(intensityi, specgram_time, specgram_frecuency):
     return segm_xie, segmentos_nor
 
 
-def time_and_date(archivos_full_dir, archivos_nombre_base):
+def time_and_date(dir):
     """
     Regresa una lista con las direcciones de cada audio en la carpeta seleccionada asi mismo la fecha
     y hora en la que fue tomado el audio y los devuelve como lista o como diccionario. 
@@ -242,7 +237,7 @@ def time_and_date(archivos_full_dir, archivos_nombre_base):
         audios (array): Devuelve la direccion de cada audio encontrado en la carpeta seleccionada.
 
     """
-    # nombres = os.listdir(archivos_full_dir)
+    nombres = os.listdir(dir)
     cronologia = {"nombre_archivo": [],
                   "Año": [], "Mes": [], "Dia": [],
                   "Hora": [], "Minuto": [], "Segundo": []}
@@ -250,28 +245,33 @@ def time_and_date(archivos_full_dir, archivos_nombre_base):
     audios = []
     fechas = []
 
-    for direccion, nombre in zip(archivos_full_dir, archivos_nombre_base):
-        audios.append(direccion)
-        datos = nombre.split("_")
-
-        if len(datos) > 2:
-            cronologia["nombre_archivo"].append(nombre)
-            cronologia["Año"].append(datos[1][0:4])
-            cronologia["Mes"].append(datos[1][4:6])
-            cronologia["Dia"].append(datos[1][6:8])
-            cronologia["Hora"].append(datos[2][0:2])
-            cronologia["Minuto"].append(datos[2][2:4])
-            cronologia["Segundo"].append(datos[2][4:6])
+    for name in nombres:
+        # direccion=dir.replace(r'\U',"\\U")
+        direccion = dir+"/" + name
+        identify_1 = name.find("wav")
+        identify_2 = name.find("mp3")
+        if identify_1 != -1 or identify_2 != -1:
+            audios.append(direccion)
+            datos = name.split("_")
+            if len(datos) > 2:
+                cronologia["nombre_archivo"].append(name)
+                cronologia["Año"].append(datos[1][0:4])
+                cronologia["Mes"].append(datos[1][4:6])
+                cronologia["Dia"].append(datos[1][6:8])
+                cronologia["Hora"].append(datos[2][0:2])
+                cronologia["Minuto"].append(datos[2][2:4])
+                cronologia["Segundo"].append(datos[2][4:6])
+            else:
+                cronologia["nombre_archivo"].append(name)
+                cronologia["Año"].append("nan")
+                cronologia["Mes"].append("nan")
+                cronologia["Dia"].append("nan")
+                cronologia["Hora"].append("nan")
+                cronologia["Minuto"].append("nan")
+                cronologia["Segundo"].append("nan")
 
         else:
-            cronologia["nombre_archivo"].append(nombre)
-            cronologia["Año"].append("nan")
-            cronologia["Mes"].append("nan")
-            cronologia["Dia"].append("nan")
-            cronologia["Hora"].append("nan")
-            cronologia["Minuto"].append("nan")
-            cronologia["Segundo"].append("nan")
-
+            0
     fechas.append(cronologia["nombre_archivo"])
     fechas.append(cronologia["Año"])
     fechas.append(cronologia["Mes"])
@@ -303,7 +303,7 @@ def ZscoreMV(datos_carac, zscore_min, rel_zscore):
     return out_zscore
 
 
-def segmentacion(archivos_full_dir, archivos_nombre_base, banda, canal, progreso):
+def segmentacion(ruta, banda, canal):
     """Extrae los segmentos significativos en un rango de frecuencia presentes
     en los espectrogramas analizados de la carpeta seleccionada obteniendo 
     sus nombres y frecuencia de muestreo.
@@ -325,8 +325,7 @@ def segmentacion(archivos_full_dir, archivos_nombre_base, banda, canal, progreso
         fs (int): frecuencia de muestreo
     """
 
-    fechas, cronologia, audios = time_and_date(
-        archivos_full_dir, archivos_nombre_base)
+    fechas, cronologia, audios = time_and_date(ruta)
 
     ##### Funcion segmentacion########
     # esta se programa dentro de primer for con i = 1
@@ -343,13 +342,13 @@ def segmentacion(archivos_full_dir, archivos_nombre_base, banda, canal, progreso
 
     for archivo in audios:
         contador_archivos = contador_archivos+1
-
+# leemos el audio
         try:
             x, fs = sf.read(archivo)
         except RuntimeError:
-            print(
-                "error en grabacion: ******************************************************", archivo)
+            print("error en grabacion: ", archivo)
 
+# Dependiendo del numero de canales lo promediamos
         if len(x.shape) == 1:
             senal_audio = x
         else:
@@ -364,6 +363,7 @@ def segmentacion(archivos_full_dir, archivos_nombre_base, banda, canal, progreso
             # senial = np.squeeze(senial)#Se promedian las 2 bandas para tener una sola, antes simplemente elegia 1 de ellas.
             # frecuency,time,intensity=signal.spectrogram(senial,fs=fs,nfft=2048,nperseg=569,noverlap=71)
         #    frecuency,time,intensity=signal.spectrogram(senial[:,1],fs=fs,nfft=2048,nperseg=569,noverlap=0)
+# Calculamos el Espectrograma
         frecuency, time, intensity = signal.spectrogram(
             senal_audio, fs=fs, nfft=2048, nperseg=569, noverlap=0)
         segm_xie_band = np.empty((0, 4), float)
@@ -384,12 +384,10 @@ def segmentacion(archivos_full_dir, archivos_nombre_base, banda, canal, progreso
             banda_aux = np.array([0, frecuency.max()])
         else:
             0
-        try:
-            segm_xie, segmentos_nor = seg_xie(intensity, time, frecuency)
-        except Exception as e:
-            print("***************************************  segmentacion")
-            print(e)
-            return
+
+        # No pasa de esta linea - dentro de la funcion de segmentacion
+        segm_xie, segmentos_nor = seg_xie(intensity, time, frecuency)
+
         for k in range(len(segm_xie[:, 1])):
             try:
                 ti = np.array(segm_xie[k, 0])  # tiempo inicial (X)
@@ -477,10 +475,6 @@ def segmentacion(archivos_full_dir, archivos_nombre_base, banda, canal, progreso
                     0
             except:
                 0
-
-        progreso.archivos_completados += 1
-        progreso.save()
-
     segment_data = np.array(segment_data)
     nombre_archivo = np.array(nombre_archivo)
     nombre_archivo = np.expand_dims(nombre_archivo, axis=1)
@@ -765,11 +759,7 @@ def seleccion_features(it_num, dat_norma):
     return feat, gadso, recon, mean_clas, std_class
 
 
-async def run_metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, visualize, progreso, nombre_xlsx):
-    await asyncio.to_thread(Metodologia, archivos_full_dir, archivos_nombre_base, banda, canal, autosel, visualize, progreso, nombre_xlsx)
-
-
-def Metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, visualize, progreso, nombre_xlsx):
+def Metodologia(ruta, banda, canal, autosel, visualize):
     """Esta funcion genera la tabla con toda la informacion recopilada de los audios asi
     como una etiqueta para los audios con cierta similitud
 
@@ -802,11 +792,9 @@ def Metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, 
     dispersion = []
 
     if type(banda[0]) == str and type(banda[1]) == str:
-        datos, nombre_archivo, fs = segmentacion(
-            archivos_full_dir, archivos_nombre_base, ["min", "max"], canal, progreso)
+        datos, nombre_archivo, fs = segmentacion(ruta, ["min", "max"], canal)
     else:
-        datos, nombre_archivo, fs = segmentacion(
-            archivos_full_dir, archivos_nombre_base, banda, canal, progreso)
+        datos, nombre_archivo, fs = segmentacion(ruta, banda, canal)
 
     if visualize == 1:
         0
@@ -862,7 +850,7 @@ def Metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, 
             [dummy, indm] = np.min(euc), np.argmax(euc)
             # indm siempe (o eso parece) siempre ser 1 tanto en python como en matlab, esto elige un indice
             # que de dejarse asi seria un error en python porque las listas comienzan en 0 y no en uno.
-            repre.append(ind_class[indm-1])
+            repre.append(ind_class[indm-1]-1)
         mediafrecuencia = []
         stdfrecuencia = []
 
@@ -904,7 +892,7 @@ def Metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, 
             [dummy, indm] = np.min(euc), np.argmax(euc)
             # indm siempe (o eso parece) siempre ser 1 tanto en python como en matlab, esto elige un indice
             # que de dejarse asi seria un error en python porque las listas comienzan en 0 y no en uno.
-            repre.append(ind_class[indm-1])
+            repre.append(ind_class[indm]-1)
         mediafrecuencia = []
         stdfrecuencia = []
 
@@ -917,21 +905,13 @@ def Metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, 
     salida = np.array(np.concatenate(
         [datos[:, 0:10], (fs/2)*(datos[:, 10:12])], axis=1))
     tarr = np.concatenate([salida, np.transpose(recon)], axis=1)
-
     table = np.concatenate([nombre_archivo, tarr], axis=1, dtype="object")
 
     for i in range(0, np.max(recon)):
         dispersion.append(
             np.sum(np.std(datos_clasifi[(recon[0, :] == i), :], axis=1)))
     dispersion = np.expand_dims(np.array(dispersion), axis=0)
-
-    Tabla_NewSpecies = pd.DataFrame(table)
-    Tabla_NewSpecies.to_excel(
-        nombre_xlsx, index=False)
-
-    # request.session['table'] = table
-    # print(request.session['table'])
-    # return table, datos_clasifi, mean_class, infoZC, gadso, repre, dispersion, frecuencia
+    return table, datos_clasifi, mean_class, infoZC, gadso, repre, dispersion, frecuencia
 
 
 def mlamda_fuzzy_3pi_apract(it_num, dat_norma, mean_class, flag):

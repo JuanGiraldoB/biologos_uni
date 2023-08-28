@@ -11,13 +11,13 @@ from .utils import prepare_xlsx_table_name
 from ecosonos.utils.session_utils import (
     save_selected_subfolders_session,
     save_root_folder_session,
-    get_root_folder_session,
     save_csv_path_session,
     get_csv_path_session,
     save_destination_folder_session,
     get_destination_folder_session,
     save_subfolders_details_session,
-    get_subfolders_details_session
+    get_subfolders_details_session,
+    save_files_session,
 )
 
 from ecosonos.utils.carpeta_utils import (
@@ -61,9 +61,6 @@ async def load_folder(request):
         }
         folders_details.append(folder_detail)
 
-    import pprint
-    pprint.pprint(folders_details)
-
     await sync_to_async(save_subfolders_details_session)(request, folders_details, app='etiquetado_auto')
 
     return render(request, "etiquetado_auto/etiquetado-auto.html")
@@ -83,9 +80,6 @@ async def prepare_destination_folder(request):
 
     await sync_to_async(save_destination_folder_session)(request, destination_folder, app="etiquetado_auto")
     folders_details = await sync_to_async(get_subfolders_details_session)(request, app='etiquetado_auto')
-
-    import pprint
-    pprint.pprint(folders_details)
 
     data['folders_details'] = folders_details
 
@@ -114,10 +108,21 @@ async def process_folders(request):
     await sync_to_async(save_selected_subfolders_session)(request, selected_folders,  app='etiquetado_auto')
     destination_folder = await sync_to_async(get_destination_folder_session)(request, app='etiquetado_auto')
 
-    all_files, all_files_basename = get_all_files_in_all_folders(
+    files_paths, files_basenames = get_all_files_in_all_folders(
         selected_folders)
 
-    progreso = await sync_to_async(Progreso.objects.create)(cantidad_archivos=len(all_files))
+    files_details = []
+    for path, basename in zip(files_paths, files_basenames):
+        file_details = {
+            'path': path,
+            'basename': basename
+        }
+
+        files_details.append(file_details)
+
+    save_files_session(request, files_details, app='etiquetado_auto')
+
+    progreso = await sync_to_async(Progreso.objects.create)(cantidad_archivos=len(files_paths))
     selected_folders_basenames = get_subfolders_basename(
         selected_folders)
 
@@ -132,9 +137,10 @@ async def process_folders(request):
         request, xlsx_name)
 
     asyncio.create_task(run_metodologia(
-        all_files, all_files_basename, banda, canal, autosel, visualize, progreso, xlsx_name))
+        files_paths, files_basenames, banda, canal, autosel, visualize, progreso, xlsx_name))
 
     data['carpetas_procesando'] = selected_folders_basenames
+    # data['files_details'] = files_details
     return render(request, "etiquetado_auto/etiquetado-auto.html", data)
 
 

@@ -125,6 +125,30 @@
                         </form>
                         {% endif %}
 
+                        <form class="carpetaprincipal" , method="POST">
+                            {% csrf_token %}
+                            <div>
+                                <ul id="lista_audios">
+
+                                </ul>
+                            </div>
+                        </form>
+
+                        {% if files_details %}
+                        <form class="carpetaprincipal" method="POST">
+                            {% csrf_token %}
+
+                            <div>
+                                <ul>
+                                    {% for file in files_details %}
+                                    <li><a href="{% url 'espectrograma' path=file.path %} ">{{file.basename}}</a>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </form>
+                        {% endif %}
+
                         {% if carpetas_procesando %}
 
                         Procesando
@@ -234,6 +258,7 @@
     <script src="{% static 'ecosonos/assets/js/breakpoints.min.js' %}"></script>
     <script src="{% static 'ecosonos/assets/js/util.js' %}"></script>
     <script src="{% static 'ecosonos/assets/js/main.js' %}"></script>
+    <script src="{% static 'etiquetado_auto/show_files.js' %}"></script>
     <script src="{% static 'etiquetado_auto/progressBar.js' %}"></script>
 </body>
 
