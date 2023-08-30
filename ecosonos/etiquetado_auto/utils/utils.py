@@ -1,11 +1,11 @@
 import os
 
 
-def prepare_xlsx_table_name(selected_folders_basenames, destination_folder):
-    xlsx_name = 'Tabla_Nuevas_especies'
+def prepare_csv_table_name(selected_folders_basenames, destination_folder):
+    csv_name = 'Tabla_Nuevas_especies'
     for nombre in selected_folders_basenames:
-        xlsx_name += f'_{nombre}'
+        csv_name += f'_{nombre}'
 
-    xlsx_name = os.path.join(destination_folder, f'{xlsx_name}.xlsx')
+    csv_name = os.path.join(destination_folder, f'{csv_name}.csv')
 
-    return xlsx_name
+    return csv_name

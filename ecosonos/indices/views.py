@@ -10,7 +10,7 @@ from .utils.helper_functions import (
 )
 
 from ecosonos.utils.helper_functions import (
-    get_percentage_advance
+    get_advance_percentage
 )
 
 # from .utils.new_indices import (
@@ -111,4 +111,4 @@ async def indices_vista(request):
 
 @csrf_exempt
 def barra_progreso_vista(request):
-    return get_percentage_advance()
+    return get_advance_percentage()

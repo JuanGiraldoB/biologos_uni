@@ -1,12 +1,11 @@
 from django.shortcuts import render
-from ..models import TableData
-import pathlib
+from django.http import JsonResponse
 
 from .Bioacustica_Completo import (
     run_metodologia
 )
 
-from .utils import prepare_xlsx_table_name
+from .utils import prepare_csv_table_name
 
 from ecosonos.utils.session_utils import (
     save_selected_subfolders_session,
@@ -18,6 +17,7 @@ from ecosonos.utils.session_utils import (
     save_subfolders_details_session,
     get_subfolders_details_session,
     save_files_session,
+    get_files_session
 )
 
 from ecosonos.utils.carpeta_utils import (
@@ -25,6 +25,8 @@ from ecosonos.utils.carpeta_utils import (
     get_folders_with_wav,
     get_all_files_in_all_folders
 )
+
+from .spectrogram_clusters import get_plot_url
 
 from procesamiento.models import Progreso
 import pandas as pd
@@ -35,16 +37,24 @@ from asgiref.sync import sync_to_async
 
 
 async def load_folder(request):
+    data = {}
+
+    div_type = request.POST.get("div")
+    if div_type == "div_sonotipo":
+        data['div_sonotipo'] = "block"
+        data['div_reconocer'] = "none"
+    else:
+        data['div_sonotipo'] = "none"
+        data['div_reconocer'] = "block"
+
     try:
         root_folder = await sync_to_async(get_root_folder)()
     except Exception as e:
         print(e)
-        return render(request, "etiquetado_auto/etiquetado-auto.html")
-
-    await sync_to_async(TableData.objects.all().delete)()
+        return render(request, "etiquetado_auto/etiquetado-auto.html", data)
 
     if not root_folder:
-        return render(request, "etiquetado_auto/etiquetado-auto.html")
+        return render(request, "etiquetado_auto/etiquetado-auto.html", data)
 
     await sync_to_async(save_root_folder_session)(request, root_folder, app='etiquetado_auto')
 
@@ -63,11 +73,19 @@ async def load_folder(request):
 
     await sync_to_async(save_subfolders_details_session)(request, folders_details, app='etiquetado_auto')
 
-    return render(request, "etiquetado_auto/etiquetado-auto.html")
+    return render(request, "etiquetado_auto/etiquetado-auto.html", data)
 
 
 async def prepare_destination_folder(request):
     data = {}
+
+    div_type = request.POST.get("div")
+    if div_type == "div_sonotipo":
+        data['div_sonotipo'] = "block"
+        data['div_reconocer'] = "none"
+    else:
+        data['div_sonotipo'] = "none"
+        data['div_reconocer'] = "block"
 
     try:
         destination_folder = await sync_to_async(get_root_folder)()
@@ -88,9 +106,18 @@ async def prepare_destination_folder(request):
 
 async def process_folders(request):
     data = {}
+
     selected_folders = request.POST.getlist('carpetas')
     minimum_frequency = request.POST.get('frecuenciaminima')
     maximum_frequency = request.POST.get('frecuenciamaxima')
+
+    div_type = request.POST.get("div")
+    if div_type == "div_sonotipo":
+        data['div_sonotipo'] = "block"
+        data['div_reconocer'] = "none"
+    else:
+        data['div_sonotipo'] = "none"
+        data['div_reconocer'] = "block"
 
     if minimum_frequency:
         minimum_frequency = int(minimum_frequency)
@@ -131,25 +158,42 @@ async def process_folders(request):
     visualize = 0
     banda = [minimum_frequency, maximum_frequency]
 
-    xlsx_name = prepare_xlsx_table_name(
+    csv_name = prepare_csv_table_name(
         selected_folders_basenames, destination_folder)
     await sync_to_async(save_csv_path_session)(
-        request, xlsx_name)
+        request, csv_name)
 
     asyncio.create_task(run_metodologia(
-        files_paths, files_basenames, banda, canal, autosel, visualize, progreso, xlsx_name))
+        files_paths, files_basenames, banda, canal, autosel, visualize, progreso, csv_name))
 
     data['carpetas_procesando'] = selected_folders_basenames
     # data['files_details'] = files_details
     return render(request, "etiquetado_auto/etiquetado-auto.html", data)
 
 
-async def show_table(request):
+def spectrogram_plot(request):
     data = {}
-    csv_xlsx = await sync_to_async(get_csv_path_session)(
-        request)
+    csv_path = get_csv_path_session(request)
+    selected_clusters = request.POST.getlist('selected_clusters')
+    selected_clusters = [int(cluster) for cluster in selected_clusters]
+    file_path = request.POST.get('path')
 
-    df = pd.read_excel(csv_xlsx)
-    data['df'] = df
+    df = pd.read_csv(csv_path)
+    plot_url = get_plot_url(file_path, selected_clusters, df)
 
-    return render(request, "etiquetado_auto/etiquetado-auto.html", data)
+    return JsonResponse({'plot_url': plot_url})
+
+
+def get_spectrogram_data(request):
+    data = {}
+    files_details = get_files_session(request, app='etiquetado_auto')
+
+    csv_path = get_csv_path_session(request)
+    df = pd.read_csv(csv_path)
+
+    clusters = df.iloc[:, -1].unique().tolist()
+
+    data['clusters'] = sorted(clusters)
+    data['files_details'] = files_details
+
+    return JsonResponse(data)

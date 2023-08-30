@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from procesamiento.models import Progreso
 
 
-def get_percentage_advance():
+def get_advance_percentage():
     data = {}
     progreso = Progreso.objects.first()
 

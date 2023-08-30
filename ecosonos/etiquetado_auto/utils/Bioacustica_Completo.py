@@ -926,7 +926,7 @@ def Metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, 
     dispersion = np.expand_dims(np.array(dispersion), axis=0)
 
     Tabla_NewSpecies = pd.DataFrame(table)
-    Tabla_NewSpecies.to_excel(
+    Tabla_NewSpecies.to_csv(
         nombre_xlsx, index=False)
 
     # request.session['table'] = table

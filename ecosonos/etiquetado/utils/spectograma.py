@@ -95,216 +95,216 @@ def play_segment(ruta, t_ini, t_fin):
     sd.play(data[ini:fin], fs)
     # status = sd.wait()
 
-# # como enviar la información de el tamaño de los vectores de tiempo y frecuencia
-# # además de la frecuencia de muestreo de la señal
-# # además del archivo que desea crear en csv?
+# # # como enviar la información de el tamaño de los vectores de tiempo y frecuencia
+# # # además de la frecuencia de muestreo de la señal
+# # # además del archivo que desea crear en csv?
 
 
-def click_event(event, x, y, flags, params):
-    img = params['img']
-    csv_archivo = params['file']
-    if event == cv2.EVENT_LBUTTONDOWN:
-        print(x, ' ', y)
+# def click_event(event, x, y, flags, params):
+#     img = params['img']
+#     csv_archivo = params['file']
+#     if event == cv2.EVENT_LBUTTONDOWN:
+#         print(x, ' ', y)
 
-        font = cv2.FONT_HERSHEY_SIMPLEX
+#         font = cv2.FONT_HERSHEY_SIMPLEX
 
-        cv2.putText(img, "{:.2f}".format((x/938)*60) + ' , ' +
-                    "{:.2f}".format(24000-((y/513)*24000)), (x, y), font,
-                    0.5, (255, 255, 255), 2)
-        cv2.imshow('image', img)
+#         cv2.putText(img, "{:.2f}".format((x/938)*60) + ' , ' +
+#                     "{:.2f}".format(24000-((y/513)*24000)), (x, y), font,
+#                     0.5, (255, 255, 255), 2)
+#         cv2.imshow('image', img)
 
-        save_coordinates(csv_archivo, x, y)
+#         save_coordinates(csv_archivo, x, y)
 
-    if event == cv2.EVENT_RBUTTONDOWN:
-        print(x, ' ', y)
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(img, "{:.2f}".format((x / 938) * 60) + ' , ' +
-                    "{:.2f}".format(24000 - ((y / 513) * 24000)), (x, y), font,
-                    0.8, (0, 0, 0), 2)
+#     if event == cv2.EVENT_RBUTTONDOWN:
+#         print(x, ' ', y)
+#         font = cv2.FONT_HERSHEY_SIMPLEX
+#         cv2.putText(img, "{:.2f}".format((x / 938) * 60) + ' , ' +
+#                     "{:.2f}".format(24000 - ((y / 513) * 24000)), (x, y), font,
+#                     0.8, (0, 0, 0), 2)
 
-        cv2.imshow('image', img)
-        save_coordinates(x, y)
-
-
-def create_box(ruta, x1, y1, x2, y2):
-    img = cv2.imread(ruta, 1)
-
-    print(x1)
-    pt1 = (int(x1), int(y1))
-    pt2 = (int(x1), int(y2))
-    pt3 = (int(x2), int(y1))
-    pt4 = (int(x2), int(y2))
-    color = (255, 255, 255)
-    thickness = 1
-    cv2.line(img, pt1, pt2, color, thickness)
-    cv2.line(img, pt2, pt4, color, thickness)
-    cv2.line(img, pt4, pt3, color, thickness)
-    cv2.line(img, pt3, pt1, color, thickness)
-
-    cv2.imwrite(ruta, img)
+#         cv2.imshow('image', img)
+#         save_coordinates(x, y)
 
 
-def coordinate_box(file, row1, row2):
-    rows = []
-    file = open(file)
-    csvreader = csv.reader(file)
-    for row in csvreader:
-        rows.append(row)
+# def create_box(ruta, x1, y1, x2, y2):
+#     img = cv2.imread(ruta, 1)
 
-    print(rows)
+#     print(x1)
+#     pt1 = (int(x1), int(y1))
+#     pt2 = (int(x1), int(y2))
+#     pt3 = (int(x2), int(y1))
+#     pt4 = (int(x2), int(y2))
+#     color = (255, 255, 255)
+#     thickness = 1
+#     cv2.line(img, pt1, pt2, color, thickness)
+#     cv2.line(img, pt2, pt4, color, thickness)
+#     cv2.line(img, pt4, pt3, color, thickness)
+#     cv2.line(img, pt3, pt1, color, thickness)
 
-    x1, y1 = rows[row1]
-    x2, y2 = rows[row2]
-    file.close()
-    # remove_csvfile('CSVFILE.csv')
-    return int(x1), int(y1), int(x2), int(y2)
-
-
-def save_coordinates(filename, x, y):
-
-    # The data assigned to the list
-    data = [x, y]
-    with open(filename, 'a', newline='') as f_object:
-        writer_object = writer(f_object)
-        writer_object.writerow(data)
-        f_object.close()
+#     cv2.imwrite(ruta, img)
 
 
-def remove_csvfile(ruta):
-    if os.path.isfile(ruta):
-        os.remove(ruta)
-        print("File has been deleted")
-    else:
-        print("File does not exist")
+# def coordinate_box(file, row1, row2):
+#     rows = []
+#     file = open(file)
+#     csvreader = csv.reader(file)
+#     for row in csvreader:
+#         rows.append(row)
+
+#     print(rows)
+
+#     x1, y1 = rows[row1]
+#     x2, y2 = rows[row2]
+#     file.close()
+#     # remove_csvfile('CSVFILE.csv')
+#     return int(x1), int(y1), int(x2), int(y2)
 
 
-def create_csv(tempfile, filename):
-    rows = []
-    file = open(tempfile)
-    csvreader = csv.reader(file)
+# def save_coordinates(filename, x, y):
 
-    data = []
-    for row in csvreader:
-
-        x, y = row
-        time = round((int(x) / 938) * 60, 2)
-        frequency = round(24000 - ((int(y) / 513) * 24000), 2)
-
-        # The data assigned to the list
-        data.append([time, frequency])
-
-    data_org = []
-
-    for i in range(0, len(data)-1, 2):
-        x1, y1 = data[i]
-        x2, y2 = data[i+1]
-
-        tmin = min(x1, x2)
-        tmax = max(x1, x2)
-
-        fmin = min(y1, y2)
-        fmax = max(y1, y2)
-
-        data_org.append([tmin, tmax, fmin, fmax])
-
-    data_org = [["t_min", "t_max", "f_min", "f_max"]] + data_org
-
-    with open(filename, 'w', newline='') as file:
-        writer = csv.writer(file, quoting=csv.QUOTE_ALL, delimiter=';')
-        writer.writerows(data_org)
-        file.close()
+#     # The data assigned to the list
+#     data = [x, y]
+#     with open(filename, 'a', newline='') as f_object:
+#         writer_object = writer(f_object)
+#         writer_object.writerow(data)
+#         f_object.close()
 
 
-async def run_calcular_spectrogram(ruta, carpeta_raiz):
-    await asyncio.to_thread(spectrogram, ruta, carpeta_raiz)
+# def remove_csvfile(ruta):
+#     if os.path.isfile(ruta):
+#         os.remove(ruta)
+#         print("File has been deleted")
+#     else:
+#         print("File does not exist")
 
 
-def spectrogram(ruta, carpeta_raiz):
+# def create_csv(tempfile, filename):
+#     rows = []
+#     file = open(tempfile)
+#     csvreader = csv.reader(file)
 
-    ruta = ruta
+#     data = []
+#     for row in csvreader:
 
-    f, t, s, audio, Fs = calcular_espectrograma(
-        ruta
-    )
-# PENDIENTE######
-    # Para reducir el tamaño de la imágen almacenada
-    # como hacerlo automaticamente y que sirva con todo
-    # tipo de señales
-    s = s[:, ::3]
-    # s = np.flipud(s)
-    t = t[::3]
-    print("shape", s.shape)
-    # for senal_audio in calcular_espectrograma(ruta):
-    #    for Fs in calcular_espectrograma(ruta):
-    # plt.specgram(senal_audio, Fs=fs, cmap='rainbow')
-    plt.pcolormesh(s, shading='auto', cmap='cividis')
-    # plt.xticks([])
-    # plt.yticks([])
-    # plt.ylabel('Frequency [Hz]')
-    # plt.xlabel('Time [sec]')
-    # plt.imsave('Spectrogram.png',s)
-    # plt.show()
-    # time.sleep(2)
+#         x, y = row
+#         time = round((int(x) / 938) * 60, 2)
+#         frequency = round(24000 - ((int(y) / 513) * 24000), 2)
 
-    # s = s[:, ::3]
-    # t = t[::3]
+#         # The data assigned to the list
+#         data.append([time, frequency])
 
-    # escoger los colormaps
-    # plt.specgram(senal_audio, Fs=fs, cmap='rainbow')
-    ruta_img = f'{carpeta_raiz}/Spectrogram.png'
-    plt.pcolormesh(s, shading='auto', cmap='cividis')
-    plt.imsave(ruta_img, s, origin='lower', cmap='cividis')
+#     data_org = []
 
-    # plt.savefig('Spectrogram.png')
+#     for i in range(0, len(data)-1, 2):
+#         x1, y1 = data[i]
+#         x2, y2 = data[i+1]
 
-    # Que el biologo escoja la cantidad de eventos automaticamente
-    max_event = 4
-    row1 = 0
-    row2 = 1
-    ruta_csv = f'{carpeta_raiz}/CSV_file.csv'
+#         tmin = min(x1, x2)
+#         tmax = max(x1, x2)
 
-    print('carpeta raiz:', carpeta_raiz)
+#         fmin = min(y1, y2)
+#         fmax = max(y1, y2)
 
-    for i in range(max_event):
-        img = cv2.imread(ruta_img, 1)
-        params = {
-            'img': img,
-            'file': ruta_csv
-        }
-        cv2.imshow('image', img)
-        # que sean solamente dos eventos y no esperar la waitkey para dibujar las boxes
-        cv2.setMouseCallback('image', click_event, params)
-        cv2.waitKey(0)
-        cv2.imwrite(ruta_img, img)
-        x1, y1, x2, y2 = coordinate_box(ruta_csv, row1, row2)
-        create_box(ruta_img, x1, y1, x2, y2)
-        play_segment(ruta, t[x1], t[x2])
-        print("Coordenadas en tiempo: ["+"{:.2f}".format((t[int(x1)])) +
-              " , "+"{:.2f}".format(t[int(x2)])+"]")
-        print("Coordenadas en frecuencia: [" + "{:.2f}".format(24000-f[int(y1)]) +
-              " , " + "{:.2f}".format(24000-f[int(y2)]) + "]")
-        row1 = row1 + 2
-        row2 = row2 + 2
+#         data_org.append([tmin, tmax, fmin, fmax])
 
-    img = cv2.imread(ruta_img, 1)
-    cv2.imshow('image', img)
-    cv2.waitKey(0)
-    time.sleep(2)
-    # file.close(c)
-    create_csv(ruta_csv, f'{carpeta_raiz}/InfoSpectrogram.csv')
-    remove_csvfile(ruta_csv)
-    cv2.destroyAllWindows()
+#     data_org = [["t_min", "t_max", "f_min", "f_max"]] + data_org
 
-#     # play_sound(ruta, t[int(x1)], t[int(x2)])
-#     # print("Coordenadas en tiempo: ["+"{:.2f}".format((t[int(x1)]))+" , "+"{:.2f}".format(t[int(x2)])+"]")
-#     # print("Coordenadas en frecuencia: [" + "{:.2f}".format(24000-f[int(y1)]) + " , " + "{:.2f}".format(24000-f[int(y2)]) + "]")
-#     # create_box('Spectrogram.png', x1, y1, x2, y2)
+#     with open(filename, 'w', newline='') as file:
+#         writer = csv.writer(file, quoting=csv.QUOTE_ALL, delimiter=';')
+#         writer.writerows(data_org)
+#         file.close()
+
+
+# async def run_calcular_spectrogram(ruta, carpeta_raiz):
+#     await asyncio.to_thread(spectrogram, ruta, carpeta_raiz)
+
+
+# def spectrogram(ruta, carpeta_raiz):
+
+#     ruta = ruta
+
+#     f, t, s, audio, Fs = calcular_espectrograma(
+#         ruta
+#     )
+# # PENDIENTE######
+#     # Para reducir el tamaño de la imágen almacenada
+#     # como hacerlo automaticamente y que sirva con todo
+#     # tipo de señales
+#     s = s[:, ::3]
+#     # s = np.flipud(s)
+#     t = t[::3]
+#     print("shape", s.shape)
+#     # for senal_audio in calcular_espectrograma(ruta):
+#     #    for Fs in calcular_espectrograma(ruta):
+#     # plt.specgram(senal_audio, Fs=fs, cmap='rainbow')
+#     plt.pcolormesh(s, shading='auto', cmap='cividis')
+#     # plt.xticks([])
+#     # plt.yticks([])
+#     # plt.ylabel('Frequency [Hz]')
+#     # plt.xlabel('Time [sec]')
+#     # plt.imsave('Spectrogram.png',s)
+#     # plt.show()
 #     # time.sleep(2)
 
-#     # convertir el csv final en tiempo frecuencia, no en par coordenado
-#     # Incluír ruta de la imagen para guardar
-#     # cambiar nombre del csv para que vean si se "etiquetan" dos quedan dos csv?
+#     # s = s[:, ::3]
+#     # t = t[::3]
+
+#     # escoger los colormaps
+#     # plt.specgram(senal_audio, Fs=fs, cmap='rainbow')
+#     ruta_img = f'{carpeta_raiz}/Spectrogram.png'
+#     plt.pcolormesh(s, shading='auto', cmap='cividis')
+#     plt.imsave(ruta_img, s, origin='lower', cmap='cividis')
+
+#     # plt.savefig('Spectrogram.png')
+
+#     # Que el biologo escoja la cantidad de eventos automaticamente
+#     max_event = 4
+#     row1 = 0
+#     row2 = 1
+#     ruta_csv = f'{carpeta_raiz}/CSV_file.csv'
+
+#     print('carpeta raiz:', carpeta_raiz)
+
+#     for i in range(max_event):
+#         img = cv2.imread(ruta_img, 1)
+#         params = {
+#             'img': img,
+#             'file': ruta_csv
+#         }
+#         cv2.imshow('image', img)
+#         # que sean solamente dos eventos y no esperar la waitkey para dibujar las boxes
+#         cv2.setMouseCallback('image', click_event, params)
+#         cv2.waitKey(0)
+#         cv2.imwrite(ruta_img, img)
+#         x1, y1, x2, y2 = coordinate_box(ruta_csv, row1, row2)
+#         create_box(ruta_img, x1, y1, x2, y2)
+#         play_segment(ruta, t[x1], t[x2])
+#         print("Coordenadas en tiempo: ["+"{:.2f}".format((t[int(x1)])) +
+#               " , "+"{:.2f}".format(t[int(x2)])+"]")
+#         print("Coordenadas en frecuencia: [" + "{:.2f}".format(24000-f[int(y1)]) +
+#               " , " + "{:.2f}".format(24000-f[int(y2)]) + "]")
+#         row1 = row1 + 2
+#         row2 = row2 + 2
+
+#     img = cv2.imread(ruta_img, 1)
+#     cv2.imshow('image', img)
+#     cv2.waitKey(0)
+#     time.sleep(2)
+#     # file.close(c)
+#     create_csv(ruta_csv, f'{carpeta_raiz}/InfoSpectrogram.csv')
+#     remove_csvfile(ruta_csv)
+#     cv2.destroyAllWindows()
+
+# #     # play_sound(ruta, t[int(x1)], t[int(x2)])
+# #     # print("Coordenadas en tiempo: ["+"{:.2f}".format((t[int(x1)]))+" , "+"{:.2f}".format(t[int(x2)])+"]")
+# #     # print("Coordenadas en frecuencia: [" + "{:.2f}".format(24000-f[int(y1)]) + " , " + "{:.2f}".format(24000-f[int(y2)]) + "]")
+# #     # create_box('Spectrogram.png', x1, y1, x2, y2)
+# #     # time.sleep(2)
+
+# #     # convertir el csv final en tiempo frecuencia, no en par coordenado
+# #     # Incluír ruta de la imagen para guardar
+# #     # cambiar nombre del csv para que vean si se "etiquetan" dos quedan dos csv?
 
 
-# # if __name__ == "__main__":
-# #    app.run(debug=True, port=8000)
+# # # if __name__ == "__main__":
+# # #    app.run(debug=True, port=8000)

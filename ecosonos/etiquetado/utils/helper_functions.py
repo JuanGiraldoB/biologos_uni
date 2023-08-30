@@ -4,7 +4,6 @@ import os
 
 from ecosonos.utils.session_utils import (
     save_root_folder_session,
-    get_root_folder_session,
     save_csv_path_session,
     get_csv_path_session,
     save_csv_path_session,

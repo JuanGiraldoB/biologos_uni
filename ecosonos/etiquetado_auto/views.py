@@ -1,25 +1,22 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
 
 from ecosonos.utils.helper_functions import (
-    get_percentage_advance
+    get_advance_percentage
 )
 
 from .utils.helper_functions import (
     load_folder,
     process_folders,
-    show_table,
-    prepare_destination_folder
-)
-
-from ecosonos.utils.session_utils import (
-    get_files_session
+    spectrogram_plot,
+    prepare_destination_folder,
+    get_spectrogram_data
 )
 
 
-async def etiquetado_auto(request):
+async def etiquetado_auto_view(request):
     if request.method == 'POST':
+        print(request.POST)
         if 'cargar' in request.POST:
             return await load_folder(request)
 
@@ -29,23 +26,24 @@ async def etiquetado_auto(request):
         elif 'procesar_carpetas' in request.POST:
             return await process_folders(request)
 
-        elif 'mostrar-tabla' in request.POST:
-            return await show_table(request)
+        # elif 'mostrar-tabla' in request.POST:
+        #     return await spectrogram_plot(request)
 
     return render(request, "etiquetado_auto/etiquetado-auto.html")
 
 
 @csrf_exempt
-def files_list_view(request):
+def spectrogram_view(request):
+    print(request.POST)
     if request.method == 'POST':
-        data = {}
-        files_details = get_files_session(request, app='etiquetado_auto')
-        data['files_details'] = files_details
+        if 'informacion' in request.POST:
+            return get_spectrogram_data(request)
+        elif 'path' in request.POST:
+            return spectrogram_plot(request)
 
-        return JsonResponse(data)
-    return render(request, "etiquetado_auto/etiquetado-auto.html")
+    return redirect('etiquetado-auto')
 
 
 @csrf_exempt
 def barra_progreso(request):
-    return get_percentage_advance()
+    return get_advance_percentage()
