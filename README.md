@@ -5,7 +5,7 @@ Siga estos pasos para configurar y ejecutar el proyecto localmente.
 
 ### Prerrequisitos
 
-- Python 3.10
+- Python 3.10 (https://www.python.org/downloads/release/python-3100/)
 - OPCIONAL: Git (para clonar el repositorio)
 
 ### Installation
