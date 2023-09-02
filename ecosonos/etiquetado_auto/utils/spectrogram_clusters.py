@@ -42,11 +42,7 @@ def get_plot_url(file_path, selected_clusters, df):
 
     # Filter rows where the file name is in column index 0
     filtered_rows = df[df.iloc[:, 0] == file_name]
-    print(filtered_rows)
-
     filtered_df = filtered_rows.iloc[:, [0, 5, 6, 9, 10, 13]]
-
-    print(filtered_df)
 
     try:
         x, fs = sf.read(file_path)
@@ -82,8 +78,9 @@ def get_plot_url(file_path, selected_clusters, df):
         axis=-1,
         mode="magnitude",
     )
-    fig = px.imshow(s, x=t, y=np.flip(f), aspect='auto',
-                    color_continuous_scale='Rainbow')
+
+    fig = px.imshow(s, x=t, y=f, aspect='auto',
+                    color_continuous_scale='Rainbow', origin='lower')
 
     config = {
         'toImageButtonOptions': {
