@@ -6,7 +6,7 @@ Siga estos pasos para configurar y ejecutar el proyecto localmente.
 ### Prerrequisitos
 
 - Python 3.10
-- OPCIONAL: Git (for cloning the repository)
+- OPCIONAL: Git (para clonar el repositorio)
 
 ### Installation
 
@@ -16,7 +16,8 @@ Siga estos pasos para configurar y ejecutar el proyecto localmente.
    git clone https://github.com/JuanGiraldoB/biologos_uni.git
 
    o descárguelo como un archivo ZIP.
-   ![Imagen descargar ZIP](static/github.png)
+   ![Imagen_descargar_ZIP](github.png)
+
 
 
 2. Cambie al directorio del proyecto:
