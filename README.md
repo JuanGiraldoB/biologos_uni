@@ -16,7 +16,7 @@ Siga estos pasos para configurar y ejecutar el proyecto localmente.
    git clone https://github.com/JuanGiraldoB/biologos_uni.git
 
    o descárguelo como un archivo ZIP.
-   ![Imagen_descargar_ZIP](github.png)
+![Imagen_descargar_ZIP](static/github.png)
 
 
 
