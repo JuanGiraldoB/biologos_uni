@@ -8,7 +8,7 @@ Siga estos pasos para configurar y ejecutar el proyecto localmente.
 - Python 3.10 (https://www.python.org/downloads/release/python-3100/)
 - OPCIONAL: Git (para clonar el repositorio)
 
-### Installation
+### Instalación
 
 1. Clone el repositorio en su máquina local:
 
@@ -18,19 +18,19 @@ Siga estos pasos para configurar y ejecutar el proyecto localmente.
    o descárguelo como un archivo ZIP.
 ![Imagen_descargar_ZIP](static/github.png)
 
+2. Ingrese a la consola en la ubicación donde se encuentra el proyecto
 
-
-2. Cambie al directorio del proyecto:
+3. Cambie al directorio del proyecto:
 
    ```bash
    cd biologos_uni
 
-3. Cree un entorno virtual de Python:
+4. Cree un entorno virtual de Python:
 
     ```bash
    python -m venv venv
 
-4. Active el entorno virtual:
+5. Active el entorno virtual:
 
     * En Windows:
         ```bash
@@ -40,7 +40,7 @@ Siga estos pasos para configurar y ejecutar el proyecto localmente.
         ```bash
         source venv/bin/activate
 
-5. Instale las dependencias del proyecto desde requirements.txt:
+6. Instale las dependencias del proyecto desde requirements.txt:
 
     ```bash
     pip install -r requirements.txt
