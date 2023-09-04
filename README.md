@@ -31,11 +31,11 @@ Siga estos pasos para configurar y ejecutar el proyecto localmente.
         ```bash
         venv\Scripts\activate
 
-    * En macOS and Linux
+    * En macOS y Linux
         ```bash
         source venv/bin/activate
 
-5. Instale las dependencias del proyecto desde requirements.txt:
+5. Instale las dependencias del proyecto:
 
     ```bash
     pip install -r requirements.txt
@@ -50,6 +50,6 @@ Siga estos pasos para configurar y ejecutar el proyecto localmente.
     ```bash
     python manage.py runserver
 
-3. Abra un navegador web y vaya a:
+3. Abra un navegador web e ingrese a:
     ```
     http://localhost:8000\
