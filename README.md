@@ -20,17 +20,12 @@ Siga estos pasos para configurar y ejecutar el proyecto localmente.
 
 2. Ingrese a la consola en la ubicación donde se encuentra el proyecto
 
-3. Cambie al directorio del proyecto:
-
-   ```bash
-   cd biologos_uni
-
-4. Cree un entorno virtual de Python:
+3. Cree un entorno virtual de Python:
 
     ```bash
    python -m venv venv
 
-5. Active el entorno virtual:
+4. Active el entorno virtual:
 
     * En Windows:
         ```bash
@@ -40,7 +35,7 @@ Siga estos pasos para configurar y ejecutar el proyecto localmente.
         ```bash
         source venv/bin/activate
 
-6. Instale las dependencias del proyecto desde requirements.txt:
+5. Instale las dependencias del proyecto desde requirements.txt:
 
     ```bash
     pip install -r requirements.txt
