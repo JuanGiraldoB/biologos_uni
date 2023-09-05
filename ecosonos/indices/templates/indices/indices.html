@@ -257,7 +257,7 @@
 						</div>
 					</section>
 
-					<section class="col-12 col-12-narrower">
+					<section class="col-12 col-12-narrower colfullwidth">
 						<form class="mosgrafica" method="POST" action="">
 							{% csrf_token %}
 							<div class="contenidos">
@@ -274,12 +274,18 @@
 							</div>
 						</form>
 
+						<br>
+
 						{% if graficas %}
 
 						{% for grafica, indice in zipped %}
-						<ul>
-							<h2>{{indice}}</h2>
-							<li>{{ grafica|safe }}</li>
+						<ul class="lista-graficas">
+							<h2 class="titulo-graficas">Gráfica para el índice {{indice}}</h2>
+							<li class="item-graficas">{{ grafica|safe }}</li>
+							<!--colocar aqui para desaparecer/mostrar grafica-->
+							<button id="swapFire" class="btn btn-primary showFire">
+								<span class="glyphicon glyphicon-eye-close"></span> Ocultar Gráfica
+							</button>
 						</ul>
 						{% endfor %}
 
@@ -336,7 +342,7 @@
 	<script src="{% static 'ecosonos/assets/js/breakpoints.min.js' %}"></script>
 	<script src="{% static 'ecosonos/assets/js/util.js' %}"></script>
 	<script src="{% static 'ecosonos/assets/js/main.js' %}"></script>
-
+	<script src="{% static 'ecosonos/assets/js/button-show-hide.js' %}"></script>
 	<script src="{% static 'indices/indicesProgressBar.js' %}"></script>
 	<script src="{% static 'indices/selectAll.js' %}"></script>
 

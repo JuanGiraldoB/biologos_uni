@@ -116,7 +116,7 @@
                                     {% csrf_token %}
                                     <div>
                                         {% for folder_details in folders_details %}
-                                        <div class="carpetas-cargadas">
+                                        <div class="carpetas-clusters">
                                             <input type="checkbox" name="carpetas"
                                                 value="{{ folder_details.folders_path }}" checked>
                                             <label for="carpetas">{{ folder_details.folders_basename }}</label>
@@ -142,23 +142,15 @@
                                 </form>
                                 {% endif %}
 
-                                <form class="carpetaprincipal" method="POST">
-                                    {% csrf_token %}
-                                    <div id="checkbox_clusters">
-
-                                    </div>
-                                    <div>
-                                        <ul id="lista_audios">
-
-                                        </ul>
-                                    </div>
-                                </form>
+                                
 
                                 {% if carpetas_procesando %}
+                                <input type="submit" value="Procesar Carpetas" id="procesar_carpetas"
+                                    name="procesar_carpetas"></input>
 
                                 Procesando carpetas:
                                 {% for procesando in carpetas_procesando %}
-
+                                <br>
                                 <ul>
                                     <li>
                                         <label>{{procesando}}</label>
@@ -166,11 +158,9 @@
                                 </ul>
 
                                 {% endfor %}
-                                <input type="submit" value="Procesar Carpetas" id="procesar_carpetas"
-                                    name="procesar_carpetas"></input>
                                 {% endif %}
                             </section>
-
+                            <br>
                             <section class="col-12 col-12-narrower">
                                 <div class="chart">
                                     <div class="bar"></div>
@@ -178,14 +168,26 @@
                                 </div>
                             </section>
 
+                            <form class="carpetaprincipal" method="POST">
+                                {% csrf_token %}
+                                <div id="checkbox_clusters">
+
+                                </div>
+                                <div>
+                                    <ul id="lista_audios">
+
+                                    </ul>
+                                </div>
+                            </form>
+
                             <section class="col-12 col-12-narrower">
-                                <div id="grafica_div" style="height: 100%; width: 100%;">
+                                <div id="grafica_div">
                             </section>
                         </div>
 
                         <!-- Contenido reconocer -->
                         <div id="reconocer_div" style="display: {{ div_reconocer|default:'none' }};">
-                            <h1>Reconcoer</h1>
+                            <h1>Reconocer</h1>
                             <section class="col-12 col-12-narrower">
                                 <form class="filtros" method="POST" action="">
                                     {% csrf_token %}
@@ -232,7 +234,7 @@
                                                 placeholder="Ingrese frecuencia máxima" />
                                         </div>
                                     </div>
-                                    </br>
+                                    <br>
                                     <input type="submit" value="Procesar Carpetas" id="procesar_carpetas"
                                         name="procesar_carpetas"></input>
                                     <br>
@@ -252,7 +254,7 @@
 
                                 Procesando carpetas:
                                 {% for procesando in carpetas_procesando %}
-
+                                <br>    
                                 <ul>
                                     <li>
                                         <label>{{procesando}}</label>

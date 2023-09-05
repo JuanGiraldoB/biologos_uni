@@ -138,7 +138,7 @@ function createCheckBoxLabel(folderDetail, statistics) {
 
 function createCheckboxDiv() {
 	let divCarpetasCargadas = document.createElement("div");
-	divCarpetasCargadas.className = "carpetas-cargadas";
+	divCarpetasCargadas.className = "carpetas-clusters";
 
 	return divCarpetasCargadas;
 }

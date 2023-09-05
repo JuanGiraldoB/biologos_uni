@@ -74,7 +74,7 @@ function createA(path, basename) {
 					.then((htmlContent) => {
 						iframe.srcdoc = htmlContent;
 						iframe.style.width = "100%";
-						iframe.style.height = "1000px";
+						iframe.style.height = "100%";
 						console.log("yey");
 					})
 					.catch((error) => {
@@ -136,7 +136,7 @@ function createCheckBoxLabel(name) {
 
 function createCheckboxDiv() {
 	let divCarpetasCargadas = document.createElement("div");
-	divCarpetasCargadas.className = "carpetas-cargadas";
+	divCarpetasCargadas.className = "carpetas-clusters";
 
 	return divCarpetasCargadas;
 }

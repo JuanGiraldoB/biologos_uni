@@ -1,10 +1,6 @@
 {% load static %}
 <!DOCTYPE HTML>
-<!--
-	Arcana by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
+
 <html lang="en">
 
 <head>
@@ -98,9 +94,10 @@
 								{% csrf_token %}
 								<input type="submit" value="Seleccionar Carpeta Destino" id="destino"
 									name="destino"></input>
-								</div>	
+								</div>
+									
 							</form>
-
+							
 							<form id="seleccionar_carpetas" class="carpetaprincipal" method="POST">
 								{% csrf_token %}
 
@@ -136,6 +133,12 @@
 								{% endif %} -->
 							</form>
 
+							<div class="thebuttons">
+								<button id="swapFire" class="btn btn-primary showFire">
+									<span class="glyphicon glyphicon-folder-close"></span> Deseleccionar Carpetas
+								</button>
+							</div>
+
 							<!-- {% if carpetas_procesando %}
 
 							<div>
@@ -157,6 +160,7 @@
 							{% endif %} -->
 						</div>
 					</section>
+
 					<section>
 						<div class="chart">
 							<div class="bar"></div>
@@ -245,7 +249,7 @@
 	<script src="{% static 'ecosonos/assets/js/breakpoints.min.js' %}"></script>
 	<script src="{% static 'ecosonos/assets/js/util.js' %}"></script>
 	<script src="{% static 'ecosonos/assets/js/main.js' %}"></script>
-
+	<script src="{% static 'ecosonos/assets/js/button-show-hide-carpetas.js' %}"></script>
 	<script src="{% static 'procesamiento/submitCargarForm.js' %}"></script>
 	<script src="{% static 'procesamiento/destinoUtils.js' %}"></script>
 	<script src="{% static 'procesamiento/submitMoverLluviaForm.js' %}"></script>
