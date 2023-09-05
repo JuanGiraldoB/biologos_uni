@@ -1053,11 +1053,11 @@ def seleccion_features(it_num, dat_norma):
     return feat, gadso, recon, mean_clas, std_class
 
 
-async def run_metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, visualize, progreso, nombre_xlsx):
-    await asyncio.to_thread(Metodologia, archivos_full_dir, archivos_nombre_base, banda, canal, autosel, visualize, progreso, nombre_xlsx)
+async def run_metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, visualize, progreso, nombre_xlsx, metodologia_output):
+    await asyncio.to_thread(Metodologia, archivos_full_dir, archivos_nombre_base, banda, canal, autosel, visualize, progreso, nombre_xlsx, metodologia_output)
 
 
-def Metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, visualize, progreso, nombre_xlsx):
+def Metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, visualize, progreso, nombre_xlsx, metodologia_output):
     """Esta funcion genera la tabla con toda la informacion recopilada de los audios asi
     como una etiqueta para los audios con cierta similitud
 
@@ -1085,7 +1085,7 @@ def Metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, 
 
     canal = 1
     visualize = 0
-    repre = []
+    representativo = []
     frecuencia = []
     dispersion = []
 
@@ -1150,7 +1150,7 @@ def Metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, 
             [dummy, indm] = np.min(euc), np.argmax(euc)
             # indm siempe (o eso parece) siempre ser 1 tanto en python como en matlab, esto elige un indice
             # que de dejarse asi seria un error en python porque las listas comienzan en 0 y no en uno.
-            repre.append(ind_class[indm-1])
+            representativo.append(ind_class[indm-1])
         mediafrecuencia = []
         stdfrecuencia = []
 
@@ -1192,7 +1192,7 @@ def Metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, 
             [dummy, indm] = np.min(euc), np.argmax(euc)
             # indm siempe (o eso parece) siempre ser 1 tanto en python como en matlab, esto elige un indice
             # que de dejarse asi seria un error en python porque las listas comienzan en 0 y no en uno.
-            repre.append(ind_class[indm-1])
+            representativo.append(ind_class[indm-1])
         mediafrecuencia = []
         stdfrecuencia = []
 
@@ -1217,9 +1217,27 @@ def Metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, 
     Tabla_NewSpecies.to_csv(
         nombre_xlsx, index=False)
 
+    print(type(datos_clasifi))
+    print(type(mean_class))
+    print(type(infoZC))
+    print(type(gadso))
+    print(type(representativo))
+    print(type(dispersion))
+    print(type(frecuencia))
+
+    metodologia_output.datos_clasifi = datos_clasifi.tolist()
+    metodologia_output.mean_class = mean_class.tolist()
+    metodologia_output.infoZC = infoZC.tolist()
+    metodologia_output.gadso = gadso.tolist()
+    metodologia_output.representativo = representativo
+    metodologia_output.dispersion = dispersion.tolist()
+    metodologia_output.frecuencia = frecuencia.tolist()
+
+    metodologia_output.save()
+
     # request.session['table'] = table
     # print(request.session['table'])
-    # return table, datos_clasifi, mean_class, infoZC, gadso, repre, dispersion, frecuencia
+    # return table, datos_clasifi, mean_class, infoZC, gadso, representativo, dispersion, frecuencia
 
 
 def mlamda_fuzzy_3pi_apract(it_num, dat_norma, mean_class, flag):

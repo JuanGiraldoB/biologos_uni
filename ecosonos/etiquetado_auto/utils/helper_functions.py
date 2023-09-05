@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 
+from ..models import MetodologiaResult
+
 from .Bioacustica_Completo import (
     run_metodologia
 )
@@ -30,7 +32,6 @@ from .spectrogram_clusters import get_plot_url
 
 from procesamiento.models import Progreso
 import pandas as pd
-from tkinter.filedialog import askdirectory
 from ecosonos.utils.tkinter_utils import get_root_folder
 import asyncio
 from asgiref.sync import sync_to_async
@@ -59,6 +60,10 @@ async def load_folder(request):
     await sync_to_async(save_root_folder_session)(request, root_folder, app='etiquetado_auto')
 
     await sync_to_async(Progreso.objects.all().delete)()
+    metodologia = await sync_to_async(MetodologiaResult.objects.first)()
+    print(metodologia.representativo)
+    print(metodologia)
+    # await sync_to_async(MetodologiaResult.objects.all().delete)()
 
     folders_wav_path, folders_wav_basename = get_folders_with_wav(
         root_folder)
@@ -150,6 +155,8 @@ async def process_folders(request):
     save_files_session(request, files_details, app='etiquetado_auto')
 
     progreso = await sync_to_async(Progreso.objects.create)(cantidad_archivos=len(files_paths))
+    metodologia_output = await sync_to_async(MetodologiaResult.objects.create)()
+
     selected_folders_basenames = get_subfolders_basename(
         selected_folders)
 
@@ -164,7 +171,7 @@ async def process_folders(request):
         request, csv_name)
 
     asyncio.create_task(run_metodologia(
-        files_paths, files_basenames, banda, canal, autosel, visualize, progreso, csv_name))
+        files_paths, files_basenames, banda, canal, autosel, visualize, progreso, csv_name, metodologia_output))
 
     data['carpetas_procesando'] = selected_folders_basenames
     # data['files_details'] = files_details
@@ -172,7 +179,6 @@ async def process_folders(request):
 
 
 def spectrogram_plot(request):
-    data = {}
     csv_path = get_csv_path_session(request)
     selected_clusters = request.POST.getlist('selected_clusters')
     selected_clusters = [int(cluster) for cluster in selected_clusters]
@@ -192,6 +198,10 @@ def get_spectrogram_data(request):
     df = pd.read_csv(csv_path)
 
     clusters = df.iloc[:, -1].unique().tolist()
+
+    metodologia_output = MetodologiaResult.objects.first()
+    print(metodologia_output)
+    print(metodologia_output.representativo)
 
     data['clusters'] = sorted(clusters)
     data['files_details'] = files_details

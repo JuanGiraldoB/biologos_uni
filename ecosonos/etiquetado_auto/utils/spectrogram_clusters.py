@@ -137,3 +137,52 @@ def get_plot_url(file_path, selected_clusters, df):
     fig_url = static(relative_path)
 
     return fig_url
+
+
+# def plot_representative_element(metodologia_output):
+#     table = metodologia_output['table']
+#     representativo = metodologia_output['representativo']
+#     sel = 0  # selección de un cluster numero minimo y maximo dado por la tabla puede cambiar este numero según los clusters que haya
+
+#     # representativo es una salida de metodología
+#     audio = table[representativo[sel]][0]
+
+#     audio_sel = ruta+"/"+audio
+#     x, fs = sf.read(audio_sel)
+
+#     if len(x.shape) == 1:
+#         senal_audio = x
+#     else:
+#         x = x.mean(axis=1)
+#         x = np.squeeze(x)
+#         senal_audio = x
+
+#     wn = "hamming"
+#     size_wn = 1024
+#     noverlap = size_wn / 2
+#     nfft = size_wn * 2
+#     nmin = round(len(senal_audio) / (60 * fs))
+#     nperseg = nmin * size_wn
+
+#     frecuency, time, intensity = signal.spectrogram(senal_audio, fs=fs, window=wn, nfft=nfft, nperseg=1024,
+#                                                     noverlap=512)
+
+#     frecuency = np.flip(frecuency)
+
+#     img = np.int_((cv2.flip(20*(np.log10(np.abs(intensity))), 0)))
+
+#     fig, ax = plt.subplots(figsize=(20, 5))
+
+#     start = table[representativo[sel], 5]
+#     end = table[representativo[sel], 6]
+#     fv_min = table[representativo[sel], 9]  # frecuencia vocal minima
+#     fv_max = table[representativo[sel], 10]  # frecuencia vocal maxima
+#     # Mostrar la imagen
+#     im = ax.imshow(img, extent=[time.min(), time.max(), frecuency.min(
+#     ), frecuency.max()], aspect='auto', cmap='viridis', vmin=img.min(), vmax=img.max())
+
+#     rect = patches.Rectangle((start, fv_min-150), end-start, fv_max -
+#                              fv_min+150, linewidth=2, edgecolor='white', facecolor='none')
+#     ax.add_patch(rect)
+#     plt.xlim(start-2, end+2)
+#     plt.ylim(fv_min-200, fv_max+200)
