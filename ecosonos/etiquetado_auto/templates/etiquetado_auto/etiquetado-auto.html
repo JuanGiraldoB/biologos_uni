@@ -188,14 +188,16 @@
                                 </ul>
 
                                 {% endfor %}
+
+                                <br>
+                                <section class="col-12 col-12-narrower">
+                                    <div class="chart">
+                                        <div class="bar"></div>
+                                        <span id="value1">0%</span>
+                                    </div>
+                                </section>
+
                                 {% endif %}
-                            </section>
-                            <br>
-                            <section class="col-12 col-12-narrower">
-                                <div class="chart">
-                                    <div class="bar"></div>
-                                    <span id="value1">0%</span>
-                                </div>
                             </section>
 
                             <form class="carpetaprincipal" method="POST">
@@ -211,21 +213,26 @@
                             </form>
 
                             <div class="ropcionesradio">
-                                <form method="POST">
+                                <form method="POST" id="radio_clusters">
                                     {% csrf_token %}
-                                    <label class="content-input">
+                                    <!-- <label class="content-input">
                                         <input type="radio" name="representativo" value="0">Uno
                                         <i></i>
                                     </label>
                                     <label class="content-input">
                                         <input type="radio" name="representativo" value="0">Dos
                                         <i></i>
-                                    </label>
+                                    </label> -->
                                 </form>
                             </div>
 
                             <section class="col-12 col-12-narrower">
                                 <div id="grafica_div" style="width: 1024px !important; height: 700px !important;">
+                            </section>
+
+                            <section class="col-12 col-12-narrower">
+                                <div id="representativo_div"
+                                    style="width: 1024px !important; height: 700px !important;">
                             </section>
                         </div>
 

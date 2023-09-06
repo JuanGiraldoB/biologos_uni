@@ -10,7 +10,8 @@ from .utils.helper_functions import (
     process_folders,
     spectrogram_plot,
     prepare_destination_folder,
-    get_spectrogram_data
+    get_spectrogram_data,
+    representative_element_plot
 )
 
 
@@ -39,6 +40,8 @@ def spectrogram_view(request):
             return get_spectrogram_data(request)
         elif 'path' in request.POST:
             return spectrogram_plot(request)
+        elif 'representativo' in request.POST:
+            return representative_element_plot(request)
 
     return redirect('etiquetado-auto')
 

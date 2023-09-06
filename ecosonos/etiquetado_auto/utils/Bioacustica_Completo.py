@@ -256,7 +256,7 @@ def time_and_date(archivos_full_dir, archivos_nombre_base):
         datos = nombre.split("_")
 
         if len(datos) > 2:
-            cronologia["nombre_archivo"].append(nombre)
+            cronologia["nombre_archivo"].append(direccion)
             cronologia["Año"].append(datos[1][0:4])
             cronologia["Mes"].append(datos[1][4:6])
             cronologia["Dia"].append(datos[1][6:8])
@@ -265,7 +265,7 @@ def time_and_date(archivos_full_dir, archivos_nombre_base):
             cronologia["Segundo"].append(datos[2][4:6])
 
         else:
-            cronologia["nombre_archivo"].append(nombre)
+            cronologia["nombre_archivo"].append(direccion)
             cronologia["Año"].append("nan")
             cronologia["Mes"].append("nan")
             cronologia["Dia"].append("nan")
@@ -328,6 +328,8 @@ def segmentacion(archivos_full_dir, archivos_nombre_base, banda, canal, progreso
 
     fechas, cronologia, audios = time_and_date(
         archivos_full_dir, archivos_nombre_base)
+
+    print('************************ fechas: ', audios)
 
     ##### Funcion segmentacion########
     # esta se programa dentro de primer for con i = 1
@@ -812,6 +814,8 @@ def Metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, 
     else:
         datos, nombre_archivo, fs = segmentacion(
             archivos_full_dir, archivos_nombre_base, banda, canal, progreso)
+
+    print("*****************", nombre_archivo)
 
     if visualize == 1:
         0

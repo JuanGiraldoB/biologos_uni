@@ -192,18 +192,27 @@ async def process_folders(request):
 
 def spectrogram_plot(request):
     csv_path = get_csv_path_session(request)
-    print(csv_path)
-    print(csv_path.replace('\\', '/'))
     selected_clusters = request.POST.getlist('selected_clusters')
     selected_clusters = [int(cluster) for cluster in selected_clusters]
     file_path = request.POST.get('path')
 
-    df = pd.read_csv(csv_path.replace('\\', '/'))
+    df = pd.read_csv(csv_path)
     plot_url = generate_spectrogram_with_clusters_plot(
         file_path, selected_clusters, df)
 
+    return JsonResponse({'plot_url': plot_url})
+
+
+def representative_element_plot(request):
+    representativo_index = request.POST.getlist('representativo')
+    csv_path = get_csv_path_session(request)
+
+    df = pd.read_csv(csv_path)
     metodologia_output = MetodologiaResult.objects.first()
-    generate_representative_element_plot(file_path, metodologia_output, df)
+    print(metodologia_output.representativo)
+    print(int(representativo_index[0]))
+    plot_url = generate_representative_element_plot(
+        metodologia_output, df, int(representativo_index[0]) - 1)
 
     return JsonResponse({'plot_url': plot_url})
 

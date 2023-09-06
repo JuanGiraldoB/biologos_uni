@@ -140,17 +140,18 @@ def generate_spectrogram_with_clusters_plot(file_path, selected_clusters, df):
     return fig_url
 
 
-def generate_representative_element_plot(file_path, metodologia_output, df):
+def generate_representative_element_plot(metodologia_output, df, representativo_index):
     table = df
     representativo = metodologia_output.representativo
-    print(representativo)
-    sel = 2  # selección de un cluster numero minimo y maximo dado por la tabla puede cambiar este numero según los clusters que haya
+    # selección de un cluster numero minimo y maximo dado por la tabla puede cambiar este numero según los clusters que haya
+    representativo_row = representativo[representativo_index]
 
-    # representativo es una salida de metodología
     # audio = table[representativo[sel]][0]
+    audio = table.iloc[representativo_row, 0]
+    print(audio)
 
     # audio_sel = ruta+"/"+audio
-    x, fs = sf.read(file_path)
+    x, fs = sf.read(audio)
 
     if len(x.shape) == 1:
         senal_audio = x
@@ -177,10 +178,10 @@ def generate_representative_element_plot(file_path, metodologia_output, df):
                     labels=dict(x="Time", y="Frequency", color="Intensity"),
                     title="Spectrogram")
 
-    start = table.iloc[representativo[sel], 5]
-    end = table.iloc[representativo[sel], 6]
-    fv_min = table.iloc[representativo[sel], 9]  # frecuencia vocal minima
-    fv_max = table.iloc[representativo[sel], 10]  # frecuencia vocal maxima
+    start = table.iloc[representativo_row, 5]
+    end = table.iloc[representativo_row, 6]
+    fv_min = table.iloc[representativo_row, 9]  # frecuencia vocal minima
+    fv_max = table.iloc[representativo_row, 10]  # frecuencia vocal maxima
 
     # Add a rectangle to highlight the region
     fig.add_shape(
@@ -196,5 +197,15 @@ def generate_representative_element_plot(file_path, metodologia_output, df):
     fig.update_yaxes(title_text="Frequency")
     fig.update_layout(title_text="Spectrogram with Highlighted Region")
 
-    # You can save the figure as an HTML file or return it as a URL
-    fig.write_html("spectrogram_plot.html")
+    relative_path = os.path.join(
+        'etiquetado_auto', 'plot', 'representative_plot.html')
+
+    static_folder = os.path.join(
+        settings.BASE_DIR, 'etiquetado_auto', 'static')
+    fig_path = os.path.join(static_folder, relative_path)
+
+    fig.write_html(fig_path)
+
+    fig_url = static(relative_path)
+
+    return fig_url

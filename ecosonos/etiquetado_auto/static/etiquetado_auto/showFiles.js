@@ -16,8 +16,8 @@ function show_files() {
 			let checkboxClusterDiv = document.getElementById("checkbox_clusters");
 			setupDivCheckbox(checkboxClusterDiv, clusters);
 
-			let radioClusterDiv = document.getElementById("radio_clusters");
-			// setupDivRadio(radioClusterDiv, clusters);
+			let radioClusterForm = document.getElementById("radio_clusters");
+			setupFormRadio(radioClusterForm, clusters);
 
 			let ulElement = document.getElementById("lista_audios");
 			for (let i = 0; i < size; i++) {
@@ -103,7 +103,7 @@ function setupDivCheckbox(clustersDiv, clusters) {
 	for (let i = 0; i < clusters.length; i++) {
 		const cluster = clusters[i];
 		let checkbox = createCheckBox(cluster);
-		let label = createLabel(cluster);
+		let label = createLabel(cluster, false);
 		let div = createCheckboxDiv();
 
 		div.appendChild(checkbox);
@@ -113,20 +113,22 @@ function setupDivCheckbox(clustersDiv, clusters) {
 	}
 }
 
-function setupDivRadio(representativoDiv, clusters) {
+function setupFormRadio(representativoDiv, clusters) {
 	let clusterHeader = createHeader("Seleccione elemento representativo");
 	representativoDiv.appendChild(clusterHeader);
 
 	for (let i = 0; i < clusters.length; i++) {
 		const cluster = clusters[i];
+		let label = createLabel(cluster, true);
 		let radio = createRadio(cluster);
-		let label = createLabel(cluster);
-		let div = createRadioDiv();
+		let iTag = createI();
 
-		div.append(radio);
-		div.append(label);
+		// label.innerHTML = radio;
+		// label.innerText = cluster;
+		label.appendChild(radio);
+		label.appendChild(iTag);
 
-		representativoDiv.appendChild(div);
+		representativoDiv.appendChild(label);
 	}
 }
 
@@ -153,16 +155,27 @@ function createRadio(value) {
 	radio.type = "radio";
 	radio.name = "representativo";
 	radio.value = value;
+	radio.onclick = () => {
+		submitForm(value);
+	};
 
 	return radio;
 }
 
-function createLabel(name) {
+function createLabel(name, isRadio) {
 	let label = document.createElement("label");
 	label.for = name;
 	label.textContent = name;
 
+	if (isRadio) {
+		label.className = "content-input";
+	}
+
 	return label;
+}
+
+function createI() {
+	return document.createElement("i");
 }
 
 function createCheckboxDiv() {
@@ -177,4 +190,43 @@ function createRadioDiv() {
 	// divCarpetasCargadas.className = "carpetas-clusters";
 
 	return divCarpetasCargadas;
+}
+
+function submitForm(selectedValue) {
+	var form = document.getElementById("radio_clusters");
+	var formData = new FormData(form);
+
+	// Add the selected radio value to the form data
+	formData.append("representativo", selectedValue);
+
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST", "/etiquetado-auto/espectrograma", true);
+	xhr.onreadystatechange = function () {
+		if (xhr.readyState === 4) {
+			if (xhr.status === 200) {
+				let response = JSON.parse(xhr.responseText);
+				let representativoDiv = document.getElementById("representativo_div");
+				representativoDiv.innerHTML = "";
+				let iframe = document.createElement("iframe");
+
+				// Fetch the HTML content from the URL
+				fetch(response.plot_url)
+					.then((response) => response.text())
+					.then((htmlContent) => {
+						iframe.srcdoc = htmlContent;
+						iframe.style.width = "100%";
+						iframe.style.height = "100%";
+						console.log("yey");
+					})
+					.catch((error) => {
+						console.error("Error fetching HTML content:", error);
+					});
+				representativoDiv.appendChild(iframe);
+			} else {
+				// Handle error
+				console.error("XHR request failed.");
+			}
+		}
+	};
+	xhr.send(formData);
 }
