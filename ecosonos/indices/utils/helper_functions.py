@@ -62,8 +62,8 @@ async def load_folder(request):
         }
         folders_details.append(folder_detail)
 
-    await sync_to_async(save_subfolders_details_session)(request, folders_details, app='indices')
     await sync_to_async(save_root_folder_session)(request, root_folder, app='indices')
+    await sync_to_async(save_subfolders_details_session)(request, folders_details, app='indices')
     await sync_to_async(save_indices_session)(request, selected_indices)
 
     data['folders_details'] = folders_details
@@ -79,7 +79,6 @@ async def prepare_destination_folder(request):
 
     selected_subdfolders_base_name = get_subfolders_basename(
         selected_subdfolders)
-    data['carpetas_procesando'] = selected_subdfolders_base_name
 
     if not selected_subdfolders:
         return render(request, 'indices/indices.html')
@@ -94,21 +93,21 @@ async def prepare_destination_folder(request):
         return render(request, 'indices/indices.html')
 
     await sync_to_async(save_destination_folder_session)(request, destination_folder, app="indices")
-    # folder_details = await sync_to_async(get_subfolders_details_session)(request, app='indices')
+    folder_details = await sync_to_async(get_subfolders_details_session)(request, app='indices')
     indices = await sync_to_async(get_indices_session)(request)
 
-    folder_details = await sync_to_async(get_subfolders_details_session)(request, 'indices')
-
+    data['carpetas_procesando'] = selected_subdfolders_base_name
     data['folders_details'] = folder_details
     data['indices'] = indices
     data['seleccionadas'] = 'seleccionadas'
+
     return render(request, 'indices/indices.html', data)
 
 
 async def process_folders(request):
     data = {}
 
-    selected_subdfolders = await sync_to_async(get_selected_subfolders_session)(request)
+    selected_subdfolders = await sync_to_async(get_selected_subfolders_session)(request, app='indices')
 
     # if not selected_subdfolders:
     #     return render(request, 'indices/indices.html', data)

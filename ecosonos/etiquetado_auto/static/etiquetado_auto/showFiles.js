@@ -17,7 +17,7 @@ function show_files() {
 			setupDivCheckbox(checkboxClusterDiv, clusters);
 
 			let radioClusterDiv = document.getElementById("radio_clusters");
-			setupDivRadio(radioClusterDiv, clusters);
+			// setupDivRadio(radioClusterDiv, clusters);
 
 			let ulElement = document.getElementById("lista_audios");
 			for (let i = 0; i < size; i++) {

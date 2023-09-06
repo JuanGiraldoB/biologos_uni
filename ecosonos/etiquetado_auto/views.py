@@ -34,7 +34,6 @@ async def etiquetado_auto_view(request):
 
 @csrf_exempt
 def spectrogram_view(request):
-    print(request.POST)
     if request.method == 'POST':
         if 'informacion' in request.POST:
             return get_spectrogram_data(request)

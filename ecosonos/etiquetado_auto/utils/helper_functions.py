@@ -19,7 +19,8 @@ from ecosonos.utils.session_utils import (
     save_subfolders_details_session,
     get_subfolders_details_session,
     save_files_session,
-    get_files_session
+    get_files_session,
+    get_selected_subfolders_session,
 )
 
 from ecosonos.utils.carpeta_utils import (
@@ -57,8 +58,6 @@ async def load_folder(request):
     if not root_folder:
         return render(request, "etiquetado_auto/etiquetado-auto.html", data)
 
-    await sync_to_async(save_root_folder_session)(request, root_folder, app='etiquetado_auto')
-
     await sync_to_async(Progreso.objects.all().delete)()
     await sync_to_async(MetodologiaResult.objects.all().delete)()
 
@@ -73,13 +72,24 @@ async def load_folder(request):
         }
         folders_details.append(folder_detail)
 
+    await sync_to_async(save_root_folder_session)(request, root_folder, app='etiquetado_auto')
     await sync_to_async(save_subfolders_details_session)(request, folders_details, app='etiquetado_auto')
 
+    data['folders_details'] = folders_details
     return render(request, "etiquetado_auto/etiquetado-auto.html", data)
 
 
 async def prepare_destination_folder(request):
     data = {}
+
+    selected_subdfolders = request.POST.getlist('carpetas')
+    print(selected_subdfolders)
+
+    selected_subdfolders_base_name = get_subfolders_basename(
+        selected_subdfolders)
+
+    if not selected_subdfolders:
+        return render(request, "etiquetado_auto/etiquetado-auto.html")
 
     div_type = request.POST.get("div")
     if div_type == "div_sonotipo":
@@ -99,9 +109,12 @@ async def prepare_destination_folder(request):
         return render(request, "etiquetado_auto/etiquetado-auto.html")
 
     await sync_to_async(save_destination_folder_session)(request, destination_folder, app="etiquetado_auto")
+    await sync_to_async(save_selected_subfolders_session)(request, selected_subdfolders,  app='etiquetado_auto')
     folders_details = await sync_to_async(get_subfolders_details_session)(request, app='etiquetado_auto')
 
+    data['carpetas_procesando'] = selected_subdfolders_base_name
     data['folders_details'] = folders_details
+    data['seleccionadas'] = 'seleccionadas'
 
     return render(request, "etiquetado_auto/etiquetado-auto.html", data)
 
@@ -109,7 +122,8 @@ async def prepare_destination_folder(request):
 async def process_folders(request):
     data = {}
 
-    selected_folders = request.POST.getlist('carpetas')
+    # selected_folders = request.POST.getlist('carpetas')
+    selected_subdfolders = await sync_to_async(get_selected_subfolders_session)(request, app='etiquetado_auto')
     minimum_frequency = request.POST.get('frecuenciaminima')
     maximum_frequency = request.POST.get('frecuenciamaxima')
 
@@ -131,14 +145,13 @@ async def process_folders(request):
     else:
         maximum_frequency = 'max'
 
-    if not selected_folders:
+    if not selected_subdfolders:
         return render(request, "etiquetado_auto/etiquetado-auto.html", data)
 
-    await sync_to_async(save_selected_subfolders_session)(request, selected_folders,  app='etiquetado_auto')
     destination_folder = await sync_to_async(get_destination_folder_session)(request, app='etiquetado_auto')
 
     files_paths, files_basenames = get_all_files_in_all_folders(
-        selected_folders)
+        selected_subdfolders)
 
     files_details = []
     for path, basename in zip(files_paths, files_basenames):
@@ -155,7 +168,7 @@ async def process_folders(request):
     metodologia_output = await sync_to_async(MetodologiaResult.objects.create)()
 
     selected_folders_basenames = get_subfolders_basename(
-        selected_folders)
+        selected_subdfolders)
 
     canal = 1
     autosel = 0
@@ -170,6 +183,8 @@ async def process_folders(request):
     asyncio.create_task(run_metodologia(
         files_paths, files_basenames, banda, canal, autosel, visualize, progreso, csv_name, metodologia_output))
 
+    print(selected_subdfolders)
+    print(selected_folders_basenames)
     data['carpetas_procesando'] = selected_folders_basenames
 
     return render(request, "etiquetado_auto/etiquetado-auto.html", data)
@@ -177,11 +192,13 @@ async def process_folders(request):
 
 def spectrogram_plot(request):
     csv_path = get_csv_path_session(request)
+    print(csv_path)
+    print(csv_path.replace('\\', '/'))
     selected_clusters = request.POST.getlist('selected_clusters')
     selected_clusters = [int(cluster) for cluster in selected_clusters]
     file_path = request.POST.get('path')
 
-    df = pd.read_csv(csv_path)
+    df = pd.read_csv(csv_path.replace('\\', '/'))
     plot_url = generate_spectrogram_with_clusters_plot(
         file_path, selected_clusters, df)
 

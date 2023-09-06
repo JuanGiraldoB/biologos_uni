@@ -32,6 +32,8 @@ def save_selected_subfolders_session(request, subfolders, app='preproceso'):
 def get_selected_subfolders_session(request, app='preproceso'):
     if app == 'indices':
         return request.session['carpetas_indices']
+    elif app == 'etiquetado_auto':
+        return request.session['carpetas_etiquetado_auto']
 
     return request.session['carpetas_preproceso']
 

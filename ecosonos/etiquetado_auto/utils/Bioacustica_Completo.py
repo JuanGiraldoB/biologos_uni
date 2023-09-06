@@ -770,11 +770,11 @@ def seleccion_features(it_num, dat_norma):
     return feat, gadso, recon, mean_clas, std_class
 
 
-async def run_metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, visualize, progreso, nombre_xlsx, metodologia_output):
-    await asyncio.to_thread(Metodologia, archivos_full_dir, archivos_nombre_base, banda, canal, autosel, visualize, progreso, nombre_xlsx, metodologia_output)
+async def run_metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, visualize, progreso, csv_name, metodologia_output):
+    await asyncio.to_thread(Metodologia, archivos_full_dir, archivos_nombre_base, banda, canal, autosel, visualize, progreso, csv_name, metodologia_output)
 
 
-def Metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, visualize, progreso, nombre_xlsx, metodologia_output):
+def Metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, visualize, progreso, csv_name, metodologia_output):
     """Esta funcion genera la tabla con toda la informacion recopilada de los audios asi
     como una etiqueta para los audios con cierta similitud
 
@@ -932,7 +932,7 @@ def Metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, 
 
     Tabla_NewSpecies = pd.DataFrame(table)
     Tabla_NewSpecies.to_csv(
-        nombre_xlsx, index=False)
+        csv_name, index=False)
 
     try:
         print(1)

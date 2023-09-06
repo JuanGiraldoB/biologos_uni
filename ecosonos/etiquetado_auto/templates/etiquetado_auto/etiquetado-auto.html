@@ -103,14 +103,34 @@
 
                                 <br>
 
-                                <form method="POST" enctype="multipart/form-data">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="div" value="div_sonotipo" />
-                                    <input type="submit" value="Seleccionar Carpeta Destino" id="destino"
-                                        name="destino"></input>
-                                </form>
+                                {% if not carpetas_procesando %}
 
                                 {% if folders_details %}
+                                <form method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="div" value="div_sonotipo" />
+                                    {% for folder_detail in folders_details %}
+                                    <div class="carpetas-cargadas">
+                                        <input type="checkbox" name="carpetas" value="{{ folder_detail.folders_path }}"
+                                            checked>
+                                        <label for="carpetas">{{ folder_detail.folders_basename }}</label>
+                                    </div>
+                                    {% endfor %}
+                                    <div class="thebuttons">
+                                        <button type="button" id="swapFire" class="btn btn-primary showFire"
+                                            name="false">
+                                            <span class="glyphicon glyphicon-folder-close"></span> Deseleccionar
+                                            Carpetas
+                                        </button>
+                                    </div>
+                                    <input type="submit" value="Seleccionar Carpeta Destino" id="destino"
+                                        name="destino"></input>
+
+                                </form>
+                                {% endif %}
+                                {% endif %}
+
+                                <!-- {% if folders_details %}
                                 <form method="POST">
                                     <input type="hidden" name="div" value="div_sonotipo" />
                                     {% csrf_token %}
@@ -140,17 +160,27 @@
                                         name="procesar_carpetas"></input>
                                     <br>
                                 </form>
-                                {% endif %}
+                                {% endif %} -->
 
 
 
                                 {% if carpetas_procesando %}
-                                <input type="submit" value="Procesar Carpetas" id="procesar_carpetas"
-                                    name="procesar_carpetas"></input>
 
-                                Procesando carpetas:
+                                <form method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="div" value="div_sonotipo" />
+                                    <input type="submit" value="Procesar Carpetas" id="procesar_carpetas"
+                                        name="procesar_carpetas"></input>
+                                </form>
+
+
+                                {% if seleccionadas %}
+                                Carpetas seleccionadas
+                                {% else %}
+                                Procesando
+                                {% endif %}
                                 {% for procesando in carpetas_procesando %}
-                                <br>
+
                                 <ul>
                                     <li>
                                         <label>{{procesando}}</label>
@@ -223,6 +253,8 @@
                                         name="destino"></input>
                                 </form>
 
+
+                                {% if not carpetas_procesando %}
                                 {% if folders_details %}
                                 <form method="POST">
                                     <input type="hidden" name="div" value="div_reconocer" />
@@ -254,6 +286,7 @@
                                     <br>
                                 </form>
                                 {% endif %}
+                                {% endif %}
 
                                 <!-- <form class="carpetaprincipal" , method="POST">
                                     {% csrf_token %}
@@ -266,9 +299,13 @@
 
                                 {% if carpetas_procesando %}
 
-                                Procesando carpetas:
+                                {% if seleccionadas %}
+                                Carpetas seleccionadas
+                                {% else %}
+                                Procesando
+                                {% endif %}
                                 {% for procesando in carpetas_procesando %}
-                                <br>
+
                                 <ul>
                                     <li>
                                         <label>{{procesando}}</label>
@@ -276,13 +313,17 @@
                                 </ul>
 
                                 {% endfor %}
-                                <input type="submit" value="Procesar Carpetas" id="procesar_carpetas"
-                                    name="procesar_carpetas"></input>
+                                <form method="POST">
+                                    {% csrf_token %}
+                                    <input type="submit" value="Procesar Carpetas con Lluvia" id="procesar_carpetas"
+                                        name="procesar_carpetas"></input>
+                                </form>
 
-                                <br>
                                 {% endif %}
                             </section>
+
                             <br>
+
                             <section class="col-12 col-12-narrower">
                                 <div class="chart">
                                     <div class="bar"></div>
@@ -342,6 +383,7 @@
     <script src="{% static 'ecosonos/assets/js/breakpoints.min.js' %}"></script>
     <script src="{% static 'ecosonos/assets/js/util.js' %}"></script>
     <script src="{% static 'ecosonos/assets/js/main.js' %}"></script>
+    <script src="{% static 'ecosonos/assets/js/button-show-hide-carpetas.js' %}"></script>
     <script src="{% static 'etiquetado_auto/showFiles.js' %}"></script>
     <script src="{% static 'etiquetado_auto/progressBar.js' %}"></script>
     <script src="{% static 'etiquetado_auto/showOptions.js' %}"></script>
