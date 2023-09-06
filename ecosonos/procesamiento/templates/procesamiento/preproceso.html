@@ -76,33 +76,24 @@
 								{% csrf_token %}
 								<p>Seleccionar la carpeta raiz que contiene los archivos (.wav)</p>
 								<div class="thebuttons">
-								<input type="submit" value="Seleccionar Carpeta Principal" id="cargar"
-									name="cargar"></input>
+									<input type="submit" value="Seleccionar Carpeta Principal" id="cargar"
+										name="cargar"></input>
 								</div>
 								<div class="checks especialchecks">
 									{% if statistics %}
-									<input type="checkbox" id="estadisticas" name="estadisticas" value="estadisticas" checked></input>
+									<input type="checkbox" id="estadisticas" name="estadisticas" value="estadisticas"
+										checked></input>
 									{% else %}
-									<input type="checkbox" id="estadisticas" name="estadisticas" value="estadisticas"></input>
+									<input type="checkbox" id="estadisticas" name="estadisticas"
+										value="estadisticas"></input>
 									{% endif %}
-									<label for="estadisticas">Estadísticas</label>	
+									<label for="estadisticas">Estadísticas</label>
 								</div>
 							</form>
 
-							<form id="carpeta_destino" method="POST" enctype="multipart/form-data">
-								<div class="thebuttons">
-								{% csrf_token %}
-								<input type="submit" value="Seleccionar Carpeta Destino" id="destino"
-									name="destino"></input>
-								</div>
-									
-							</form>
-							
-							<form id="seleccionar_carpetas" class="carpetaprincipal" method="POST">
+							<!-- <form id="seleccionar_carpetas" class="carpetaprincipal" method="POST">
 								{% csrf_token %}
 
-								<!-- No borrar -->
-								<!-- {% if destino %}
 
 								{% if statistics %}
 								<div>
@@ -116,35 +107,70 @@
 											Rango de fechas: {{folder_detail.range_of_dates}}</label>
 									</div>
 									{% endfor %}
-									<input type="submit" value="Procesar" id="procesar_carpetas"
-										name="procesar_carpetas"></input>
 								</div>
 								{% else %}
 								{% for folder_detail in folders_details %}
 								<div class="carpetas-cargadas">
-									<input type="checkbox" name="carpetas" value="{{ folder_detail.folders_path }}"
+									<input type="checkbox" name="carpetas" value="{{ folder_detail.folder_path }}"
 										checked>
-									<label for="carpetas">{{ folder_detail.folders_basename }}</label>
+									<label for="carpetas">{{ folder_detail.folder_name }}</label>
 								</div>
 								{% endfor %}
-								<input type="submit" value="Procesar" id="procesar_carpetas"
-									name="procesar_carpetas"></input>
 								{% endif %}
-								{% endif %} -->
+							</form> -->
+
+							<form id="carpeta_destino" method="POST" enctype="multipart/form-data">
+
+								{% if not carpetas_procesando %}
+								{% if statistics %}
+								<div>
+
+									{% for folder_detail in folders_details %}
+									<div class="carpetas-cargadas">
+										<input type="checkbox" name="carpetas" value="{{ folder_detail.folder_path }}"
+											checked>
+										<label for="carpetas">{{ folder_detail.folder_name }} - Numero de Archivos:
+											{{folder_detail.number_of_files}} -
+											Rango de duracion: {{folder_detail.range_of_lengths}} -
+											Rango de fechas: {{folder_detail.range_of_dates}}</label>
+									</div>
+									{% endfor %}
+								</div>
+								{% else %}
+
+								{% for folder_detail in folders_details %}
+								<div class="carpetas-cargadas">
+									<input type="checkbox" name="carpetas" value="{{ folder_detail.folder_path }}"
+										checked>
+									<label for="carpetas">{{ folder_detail.folder_name }}</label>
+								</div>
+								{% endfor %}
+								{% endif %}
+
+								{% if folders_details%}
+								<div class="thebuttons">
+									<button type="button" id="swapFire" class="btn btn-primary showFire" name="false">
+										<span class="glyphicon glyphicon-folder-close"></span> Deseleccionar Carpetas
+									</button>
+								</div>
+								{% endif %}
+
+								{% endif %}
+								<div class="thebuttons">
+									{% csrf_token %}
+									<input type="submit" value="Seleccionar Carpeta Destino" id="destino"
+										name="destino"></input>
+								</div>
+
 							</form>
 
-							<div class="thebuttons">
-								<button id="swapFire" class="btn btn-primary showFire">
-									<span class="glyphicon glyphicon-folder-close"></span> Deseleccionar Carpetas
-								</button>
-							</div>
+							{% if carpetas_procesando %}
 
-							<!-- {% if carpetas_procesando %}
-
-							<div>
-								
-							</div>
+							{% if seleccionadas %}
+							Carpetas seleccionadas
+							{% else %}
 							Procesando
+							{% endif %}
 							{% for procesando in carpetas_procesando %}
 
 							<ul>
@@ -154,10 +180,13 @@
 							</ul>
 
 							{% endfor %}
-							<input type="submit" value="Procesar Carpetas con Lluvia" id="procesar_carpetas"
-								name="procesar_carpetas"></input>
+							<form method="POST">
+								{% csrf_token %}
+								<input type="submit" value="Procesar Carpetas con Lluvia" id="procesar_carpetas"
+									name="procesar_carpetas"></input>
+							</form>
 
-							{% endif %} -->
+							{% endif %}
 						</div>
 					</section>
 
@@ -174,71 +203,73 @@
 							<form id="mover_lluvia_form" method="POST" enctype="multipart/form-data">
 								{% csrf_token %}
 								<div class="thebuttons">
-								<input type="submit" value="Mover Archivos con Lluvia" id="mover_archivos" name="mover_archivos"></input>
-								</div>	
+									<input type="submit" value="Mover Archivos con Lluvia" id="mover_archivos"
+										name="mover_archivos"></input>
+								</div>
 							</form>
 							<form id="mover_danado_form" method="POST" enctype="multipart/form-data">
 								{% csrf_token %}
 								<div class="thebuttons">
-								<input type="submit" class="botmalos" value="Mover Archivos Dañados" id="mover_malos" name="mover_archivos"></input>
+									<input type="submit" class="botmalos" value="Mover Archivos Dañados"
+										id="mover_malos" name="mover_archivos"></input>
 								</div>
 							</form>
 						</div>
 					</section>
 					<section class="col-12 col-12-narrower">
-					<form id="grafica_form" method="POST" enctype="multipart/form-data">
-						{% csrf_token %}
-						<input type="submit" value="Mostrar gráfica" id="mostrar_grafica"
-							name="mostrar_grafica"></input>
-					</form>
+						<form id="grafica_form" method="POST" enctype="multipart/form-data">
+							{% csrf_token %}
+							<input type="submit" value="Mostrar gráfica" id="mostrar_grafica"
+								name="mostrar_grafica"></input>
+						</form>
 					</section>
 					<section class="col-12 col-12-narrower">
 						<div id="grafica_div" style="height: 100%; width: 100%;">
 					</section>
-					</div>
-					<!-- {% if plot %}
+				</div>
+				<!-- {% if plot %}
 					{{ plot|safe }}
 					{% endif %} -->
-				</div>
 			</div>
-		</section>
+	</div>
+	</section>
 
-		<!-- Footer -->
-		<div id="footer">
-			<div class="container">
-				<!-- Creditos -->
-				<section id="cta2" class="wrapper2 style3">
-					<div class="container">
-						<div class="logos participantes">
-							<img src="{% static 'ecosonos/images/u_antioquia.png' %}">
-						</div>
-						<div class="logos participantes">
-							<img src="{% static 'ecosonos/images/ITM.png' %}">
-						</div>
-						<div class="logos participantes">
-							<img src="{% static 'ecosonos/images/humboldt_v1.png' %}">
-						</div>
-						<div class="logos texto">
-							<p>Apoya:</p>
-						</div>
-						<div class="logos participantes">
-							<img src="{% static 'ecosonos/images/Ciencias.png' %}">
-						</div>
+	<!-- Footer -->
+	<div id="footer">
+		<div class="container">
+			<!-- Creditos -->
+			<section id="cta2" class="wrapper2 style3">
+				<div class="container">
+					<div class="logos participantes">
+						<img src="{% static 'ecosonos/images/u_antioquia.png' %}">
 					</div>
-				</section>
-			</div>
-
-
-
-			<!-- Copyright -->
-			<div class="copyright">
-				<ul class="menu">
-					<li>&copy; Todos los derechos reservados</li>
-					<li>Diseño: <a href="#">Grupo Investigación</a></li>
-				</ul>
-			</div>
-
+					<div class="logos participantes">
+						<img src="{% static 'ecosonos/images/ITM.png' %}">
+					</div>
+					<div class="logos participantes">
+						<img src="{% static 'ecosonos/images/humboldt_v1.png' %}">
+					</div>
+					<div class="logos texto">
+						<p>Apoya:</p>
+					</div>
+					<div class="logos participantes">
+						<img src="{% static 'ecosonos/images/Ciencias.png' %}">
+					</div>
+				</div>
+			</section>
 		</div>
+
+
+
+		<!-- Copyright -->
+		<div class="copyright">
+			<ul class="menu">
+				<li>&copy; Todos los derechos reservados</li>
+				<li>Diseño: <a href="#">Grupo Investigación</a></li>
+			</ul>
+		</div>
+
+	</div>
 
 	</div>
 
@@ -250,8 +281,8 @@
 	<script src="{% static 'ecosonos/assets/js/util.js' %}"></script>
 	<script src="{% static 'ecosonos/assets/js/main.js' %}"></script>
 	<script src="{% static 'ecosonos/assets/js/button-show-hide-carpetas.js' %}"></script>
-	<script src="{% static 'procesamiento/submitCargarForm.js' %}"></script>
-	<script src="{% static 'procesamiento/destinoUtils.js' %}"></script>
+	<!-- <script src="{% static 'procesamiento/submitCargarForm.js' %}"></script>
+	<script src="{% static 'procesamiento/destinoUtils.js' %}"></script>-->
 	<script src="{% static 'procesamiento/submitMoverLluviaForm.js' %}"></script>
 	<script src="{% static 'procesamiento/submitMoverDanadoForm.js' %}"></script>
 	<script src="{% static 'procesamiento/submitGraficaForm.js' %}"></script>

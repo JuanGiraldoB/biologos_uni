@@ -7,6 +7,7 @@ import colorsys
 from django.templatetags.static import static
 from django.conf import settings
 import os
+import cv2
 
 
 def generate_distinct_colors(num_colors):
@@ -21,7 +22,7 @@ def generate_distinct_colors(num_colors):
     return colors
 
 
-def get_plot_url(file_path, selected_clusters, df):
+def generate_spectrogram_with_clusters_plot(file_path, selected_clusters, df):
     """Calcula el espectrograma del audio ubicado en la ruta
     y retorna valores de interes para el calculo de indices acusticos
 
@@ -139,50 +140,61 @@ def get_plot_url(file_path, selected_clusters, df):
     return fig_url
 
 
-# def plot_representative_element(metodologia_output):
-#     table = metodologia_output['table']
-#     representativo = metodologia_output['representativo']
-#     sel = 0  # selección de un cluster numero minimo y maximo dado por la tabla puede cambiar este numero según los clusters que haya
+def generate_representative_element_plot(file_path, metodologia_output, df):
+    table = df
+    representativo = metodologia_output.representativo
+    print(representativo)
+    sel = 2  # selección de un cluster numero minimo y maximo dado por la tabla puede cambiar este numero según los clusters que haya
 
-#     # representativo es una salida de metodología
-#     audio = table[representativo[sel]][0]
+    # representativo es una salida de metodología
+    # audio = table[representativo[sel]][0]
 
-#     audio_sel = ruta+"/"+audio
-#     x, fs = sf.read(audio_sel)
+    # audio_sel = ruta+"/"+audio
+    x, fs = sf.read(file_path)
 
-#     if len(x.shape) == 1:
-#         senal_audio = x
-#     else:
-#         x = x.mean(axis=1)
-#         x = np.squeeze(x)
-#         senal_audio = x
+    if len(x.shape) == 1:
+        senal_audio = x
+    else:
+        x = x.mean(axis=1)
+        x = np.squeeze(x)
+        senal_audio = x
 
-#     wn = "hamming"
-#     size_wn = 1024
-#     noverlap = size_wn / 2
-#     nfft = size_wn * 2
-#     nmin = round(len(senal_audio) / (60 * fs))
-#     nperseg = nmin * size_wn
+    wn = "hamming"
+    size_wn = 1024
+    noverlap = size_wn / 2
+    nfft = size_wn * 2
+    nmin = round(len(senal_audio) / (60 * fs))
+    nperseg = nmin * size_wn
 
-#     frecuency, time, intensity = signal.spectrogram(senal_audio, fs=fs, window=wn, nfft=nfft, nperseg=1024,
-#                                                     noverlap=512)
+    frecuency, time, intensity = signal.spectrogram(senal_audio, fs=fs, window=wn, nfft=nfft, nperseg=1024,
+                                                    noverlap=512)
 
-#     frecuency = np.flip(frecuency)
+    frecuency = np.flip(frecuency)
 
-#     img = np.int_((cv2.flip(20*(np.log10(np.abs(intensity))), 0)))
+    img = np.int_((cv2.flip(20*(np.log10(np.abs(intensity))), 0)))
 
-#     fig, ax = plt.subplots(figsize=(20, 5))
+    fig = px.imshow(img, x=time, y=frecuency, aspect='auto',
+                    labels=dict(x="Time", y="Frequency", color="Intensity"),
+                    title="Spectrogram")
 
-#     start = table[representativo[sel], 5]
-#     end = table[representativo[sel], 6]
-#     fv_min = table[representativo[sel], 9]  # frecuencia vocal minima
-#     fv_max = table[representativo[sel], 10]  # frecuencia vocal maxima
-#     # Mostrar la imagen
-#     im = ax.imshow(img, extent=[time.min(), time.max(), frecuency.min(
-#     ), frecuency.max()], aspect='auto', cmap='viridis', vmin=img.min(), vmax=img.max())
+    start = table.iloc[representativo[sel], 5]
+    end = table.iloc[representativo[sel], 6]
+    fv_min = table.iloc[representativo[sel], 9]  # frecuencia vocal minima
+    fv_max = table.iloc[representativo[sel], 10]  # frecuencia vocal maxima
 
-#     rect = patches.Rectangle((start, fv_min-150), end-start, fv_max -
-#                              fv_min+150, linewidth=2, edgecolor='white', facecolor='none')
-#     ax.add_patch(rect)
-#     plt.xlim(start-2, end+2)
-#     plt.ylim(fv_min-200, fv_max+200)
+    # Add a rectangle to highlight the region
+    fig.add_shape(
+        type="rect",
+        x0=start,
+        x1=end,
+        y0=fv_min - 150,
+        y1=fv_max + 150,
+        line=dict(color="white", width=2),
+    )
+
+    fig.update_xaxes(title_text="Time")
+    fig.update_yaxes(title_text="Frequency")
+    fig.update_layout(title_text="Spectrogram with Highlighted Region")
+
+    # You can save the figure as an HTML file or return it as a URL
+    fig.write_html("spectrogram_plot.html")

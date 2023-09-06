@@ -85,6 +85,15 @@
 
 							{% endfor %}
 						</ul>
+						<form method="POST">
+							{% csrf_token %}
+							<section class="col-12 col-12-narrower">
+								<div class="contenidos">
+									<input type="submit" value="Seleccionar Carpeta Principal" id="cargar"
+										name="cargar"></input>
+								</div>
+							</section>
+						</form>
 
 						{% else %}
 						<form class="filtros" method="POST" action="">
@@ -211,11 +220,7 @@
 
 						<br>
 
-						<form method="POST" enctype="multipart/form-data">
-							{% csrf_token %}
-							<input type="submit" value="Seleccionar Carpeta Destino" id="destino"
-								name="destino"></input>
-						</form>
+						{% if not carpetas_procesando %}
 
 						{% if folders_details %}
 						<form method="POST">
@@ -226,25 +231,41 @@
 								<label for="carpetas">{{ folder_detail.folders_basename }}</label>
 							</div>
 							{% endfor %}
-							<input type="submit" value="Procesar Carpetas" id="procesar_carpetas"
-								name="procesar_carpetas"></input>
+							<div class="thebuttons">
+								<button type="button" id="swapFire" class="btn btn-primary showFire" name="false">
+									<span class="glyphicon glyphicon-folder-close"></span> Deseleccionar Carpetas
+								</button>
+							</div>
+							<input type="submit" value="Seleccionar Carpeta Destino" id="destino"
+								name="destino"></input>
+
 						</form>
 						{% endif %}
+						{% endif %}
+
 
 						{% if carpetas_procesando %}
 
+						{% if seleccionadas %}
+						Carpetas seleccionadas
+						{% else %}
 						Procesando
+						{% endif %}
+						{% for procesando in carpetas_procesando %}
+
 						<ul>
-							{% for procensando in carpetas_procesando %}
-
 							<li>
-								<label>{{procensando}}</label>
+								<label>{{procesando}}</label>
 							</li>
-
-							{% endfor %}
 						</ul>
-						<input type="submit" value="Procesar Carpetas" id="procesar_carpetas"
-							name="procesar_carpetas"></input>
+
+						{% endfor %}
+						</ul>
+						<form method="POST">
+							{% csrf_token %}
+							<input type="submit" value="Procesar Carpetas con Lluvia" id="procesar_carpetas"
+								name="procesar_carpetas"></input>
+						</form>
 
 						{% endif %}
 					</section>
@@ -343,6 +364,7 @@
 	<script src="{% static 'ecosonos/assets/js/util.js' %}"></script>
 	<script src="{% static 'ecosonos/assets/js/main.js' %}"></script>
 	<script src="{% static 'ecosonos/assets/js/button-show-hide.js' %}"></script>
+	<script src="{% static 'ecosonos/assets/js/button-show-hide-carpetas.js' %}"></script>
 	<script src="{% static 'indices/indicesProgressBar.js' %}"></script>
 	<script src="{% static 'indices/selectAll.js' %}"></script>
 

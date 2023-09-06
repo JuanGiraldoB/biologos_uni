@@ -142,7 +142,7 @@
                                 </form>
                                 {% endif %}
 
-                                
+
 
                                 {% if carpetas_procesando %}
                                 <input type="submit" value="Procesar Carpetas" id="procesar_carpetas"
@@ -180,8 +180,22 @@
                                 </div>
                             </form>
 
+                            <div class="ropcionesradio">
+                                <form method="POST">
+                                    {% csrf_token %}
+                                    <label class="content-input">
+                                        <input type="radio" name="representativo" value="0">Uno
+                                        <i></i>
+                                    </label>
+                                    <label class="content-input">
+                                        <input type="radio" name="representativo" value="0">Dos
+                                        <i></i>
+                                    </label>
+                                </form>
+                            </div>
+
                             <section class="col-12 col-12-narrower">
-                                <div id="grafica_div">
+                                <div id="grafica_div" style="width: 1024px !important; height: 700px !important;">
                             </section>
                         </div>
 
@@ -254,7 +268,7 @@
 
                                 Procesando carpetas:
                                 {% for procesando in carpetas_procesando %}
-                                <br>    
+                                <br>
                                 <ul>
                                     <li>
                                         <label>{{procesando}}</label>

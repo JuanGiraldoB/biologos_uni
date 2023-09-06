@@ -6,7 +6,7 @@ import asyncio
 
 from .session_utils import (
     save_indices_session,
-    get_indices_session
+    get_indices_session,
 )
 
 from ecosonos.utils.session_utils import (
@@ -16,7 +16,8 @@ from ecosonos.utils.session_utils import (
     save_destination_folder_session,
     get_destination_folder_session,
     save_subfolders_details_session,
-    get_subfolders_details_session
+    get_subfolders_details_session,
+    get_selected_subfolders_session,
 )
 
 from ecosonos.utils.tkinter_utils import get_root_folder, get_file
@@ -65,7 +66,7 @@ async def load_folder(request):
     await sync_to_async(save_root_folder_session)(request, root_folder, app='indices')
     await sync_to_async(save_indices_session)(request, selected_indices)
 
-    # data['folders'] = zip(folders_wav_path, folders_wav_basename)
+    data['folders_details'] = folders_details
     data['indices'] = selected_indices
 
     return render(request, 'indices/indices.html', data)
@@ -73,6 +74,15 @@ async def load_folder(request):
 
 async def prepare_destination_folder(request):
     data = {}
+
+    selected_subdfolders = request.POST.getlist('carpetas')
+
+    selected_subdfolders_base_name = get_subfolders_basename(
+        selected_subdfolders)
+    data['carpetas_procesando'] = selected_subdfolders_base_name
+
+    if not selected_subdfolders:
+        return render(request, 'indices/indices.html')
 
     try:
         destination_folder = await sync_to_async(get_root_folder)()
@@ -84,37 +94,41 @@ async def prepare_destination_folder(request):
         return render(request, 'indices/indices.html')
 
     await sync_to_async(save_destination_folder_session)(request, destination_folder, app="indices")
-    folder_details = await sync_to_async(get_subfolders_details_session)(request, app='indices')
+    # folder_details = await sync_to_async(get_subfolders_details_session)(request, app='indices')
     indices = await sync_to_async(get_indices_session)(request)
+
+    folder_details = await sync_to_async(get_subfolders_details_session)(request, 'indices')
 
     data['folders_details'] = folder_details
     data['indices'] = indices
+    data['seleccionadas'] = 'seleccionadas'
     return render(request, 'indices/indices.html', data)
 
 
 async def process_folders(request):
     data = {}
-    selected_folders = request.POST.getlist('carpetas')
 
-    if not selected_folders:
-        return render(request, 'indices/indices.html', data)
+    selected_subdfolders = await sync_to_async(get_selected_subfolders_session)(request)
 
-    await sync_to_async(save_selected_subfolders_session)(request, selected_folders,  app='indices')
+    # if not selected_subdfolders:
+    #     return render(request, 'indices/indices.html', data)
+
+    await sync_to_async(save_selected_subfolders_session)(request, selected_subdfolders,  app='indices')
     root_folder = await sync_to_async(get_root_folder_session)(request, app='indices')
     selected_indices = await sync_to_async(get_indices_session)(request)
     destination_folder = await sync_to_async(get_destination_folder_session)(request, app='indices')
 
-    all_files, _ = get_all_files_in_all_folders(selected_folders)
+    all_files, _ = get_all_files_in_all_folders(selected_subdfolders)
 
     progress = await sync_to_async(Progreso.objects.create)(cantidad_archivos=len(all_files))
 
     asyncio.create_task(run_calcular_indice(
         selected_indices, root_folder, all_files, destination_folder, progress))
 
-    selected_folders_basenames = get_subfolders_basename(
-        selected_folders)
+    selected_subdfolders_base_name = get_subfolders_basename(
+        selected_subdfolders)
 
-    data['carpetas_procesando'] = selected_folders_basenames
+    data['carpetas_procesando'] = selected_subdfolders_base_name
     data['indices'] = selected_indices
 
     return render(request, 'indices/indices.html', data)

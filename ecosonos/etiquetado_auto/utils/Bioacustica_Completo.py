@@ -1,12 +1,8 @@
-import os
 from scipy.signal import savgol_filter
 from scipy.signal import medfilt2d
 import numpy as np
-import scipy.io as sio
 import skfuzzy as fuzz
-import matplotlib.pyplot as plt
 import cv2
-from scipy.io import wavfile
 import numpy.matlib
 from scipy import signal
 import scipy
@@ -15,6 +11,7 @@ import asyncio
 import pandas as pd
 import statistics as stat
 from scipy.stats import zscore
+from django.db import transaction
 
 
 def fcc5(canto, nfiltros, nc, nframes):
@@ -227,103 +224,6 @@ def seg_xie(intensityi, specgram_time, specgram_frecuency):
     segmentos_nor = np.array(segmentos_nor)
 
     return segm_xie, segmentos_nor
-
-# def old_seg_xie(intensityi, specgram_time, specgram_frecuency):
-#     """Realiza en analisis de los elementos de mayor intensidad en el espectrograma para encontrar
-#     el tiempo y frecuencia maxima y minima de los elementos mas representativos del audio seleccionado
-
-#     Args:
-#         intensity (array): la variable spectrum, salida de la funcion specgram de matplotlib
-#         es una arreglo 2D que indica las intensidades sonoras del audio analizado.
-
-#         specgram_time (array): Es un arreglo de una dimension que indica el rango de tiempo que
-#         ocupa cada pixel en el espectrograma, es la salida "t" de la funcion specgram.
-
-#         specgram_frecuency (array): es un arreglo 1D que indica el rango de frecuencias que
-#         ocupa cada pixel en el spectrograma, es la salida "f" de la funcion specgram.
-
-
-#     Returns:
-#         segm_xie (array): Arreglo que pose el tiempo y frecuencia minima y maxima de cada
-#         elemento encontrado.
-#         Ejemplo: [tiempo_inicial,tiempo_final,frecuencia_inicial,frecuencia_final]
-
-#         segmentos_nor (array): Arreglo que pose la informacion de segm_xie, pero como
-#         posicion en el arreglo 2 otorgando el punto inicial y el ancho y alto del elemento.
-#         Ejemplo: [posicion_x,posicion_y,ancho,alto]
-#     """
-#     specgram_time = np.expand_dims(specgram_time, axis=0)
-#     specgram_frecuency = np.expand_dims(specgram_frecuency, axis=1)
-#     specgram_frecuency = np.flipud(specgram_frecuency)
-#     intensity = intensityi[1:, :]
-#     # funcion para pasar a desibelios.
-#     spectgram_intensity = 20*(np.log10(np.abs(intensity)))
-#     # se utiliza un filtro gausiano.
-#     gauss_intensity = cv2.GaussianBlur(
-#         spectgram_intensity, (13, 13), sigmaX=2, sigmaY=5)
-
-#     with_suband = without_subband_mode_intensities(gauss_intensity)
-
-#     with_suband = with_suband * (with_suband >= 0)
-
-#     # guardo la imagen ya que no se puede manipular directamente.
-#     cv2.imwrite("seg_xie.png", with_suband)
-
-#     # la abro para pocerder con el programa, debo buscar una mejor solucion.
-#     with_suband = cv2.imread("seg_xie.png", 0)
-#     # with_suband=np.abs(with_suband)
-#     _, wsub_binarized = cv2.threshold(
-#         with_suband, 0, 255, type=cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-#     # se binariza con un filtro adaptativo y se invierte
-#     wsub_binarized = np.flipud(wsub_binarized)
-
-#     # creo el kernel rectangular para la operacion de opening
-#     rectang_Kernel = cv2.getStructuringElement(cv2.MORPH_RECT, ksize=(7, 9))
-#     morf_opening = cv2.morphologyEx(
-#         wsub_binarized, cv2.MORPH_OPEN, rectang_Kernel, iterations=1)
-#     cuad_Kernel = cv2.getStructuringElement(
-#         cv2.MORPH_RECT, ksize=(6, 6))  # kernel para el Closening
-#     morf_close = cv2.morphologyEx(
-#         morf_opening, cv2.MORPH_CLOSE, cuad_Kernel, iterations=1)
-
-#     # encuentro todos los grupos de pixeles blancos unidos
-#     spectgram_contours, hierarchy = cv2.findContours(
-#         morf_close, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-#     spectgram_estructures = []
-
-#     # filtrando los contornos de acuerdo a su tamaño, area en bounding box y morfologia de la ecentricidad(si es circulo o linea)
-#     for cnt in spectgram_contours:
-#         # encontrando la bounding box del elemento
-#         x, y, w, h = cv2.boundingRect(cnt)
-#         area = cv2.contourArea(cnt)  # encontrando su area
-#         exent = area/(w*h)
-#         try:
-#             if area > 175 and area < 40000 and exent > 0.3:
-#                 # me da los elemetos que componen una elipse
-#                 ellipse = cv2.fitEllipse(cnt)
-#                 # uso una funcion que cree para encontrar la exentricidad del elemento
-#                 eccentricity = findeccentricity(ellipse)
-
-#                 if eccentricity > 0.3:
-#                     spectgram_estructures.append(cnt)
-#             else:
-#                 continue
-#         except:
-#             0
-
-#     segment = []  # Arreglo que pose el tiempo y frecuencia minima y maxima.
-#     segmentos_nor = []  # pose lo mismo que el anterior pero da la posicion en pixeles
-#     for element in spectgram_estructures:
-#         timeI, frecma, duration, magfrec = cv2.boundingRect(element)
-#         posicion = [int(timeI), int(frecma), int(duration), int(magfrec)]
-#         segment.append([float(specgram_time[:, (posicion[0]+1)]), float(specgram_time[:, (posicion[0]+posicion[2]-1)]),
-#                         float(specgram_frecuency[(posicion[1]+1), :]), float(specgram_frecuency[(posicion[1]+posicion[3]-1), :])])
-#         segmentos_nor.append(
-#             [posicion[0], posicion[1], posicion[2], posicion[3]])
-#     segm_xie = np.array(segment)
-#     segmentos_nor = np.array(segmentos_nor)
-
-#     return segm_xie, segmentos_nor
 
 
 def time_and_date(archivos_full_dir, archivos_nombre_base):
@@ -591,189 +491,6 @@ def segmentacion(archivos_full_dir, archivos_nombre_base, banda, canal, progreso
     nombre_archivo = np.expand_dims(nombre_archivo, axis=1)
 
     return segment_data, nombre_archivo, fs
-
-# def old_segmentacion(archivos_full_dir, archivos_nombre_base, banda, canal, progreso):
-#     """Extrae los segmentos significativos en un rango de frecuencia presentes
-#     en los espectrogramas analizados de la carpeta seleccionada obteniendo
-#     sus nombres y frecuencia de muestreo.
-
-#     Args:
-#         ruta (str): Ubicacion de los archivos (carpeta)
-
-#         banda (list): Limite inferior y superior de las frecuencias buscadas
-#         de esta manera banda=[lim_inf,lim_sup]
-
-#         canal (int): canal en el que se realiza la operación
-
-#     Returns:
-#         segment_data (array): Informacion relevante de todos los segmentos detectados
-#         desde su posicion en tiempo, duracion, frecuencia, fecha de adquisicion etc.
-
-#         nombre_archivo (str array): Nombres de los archivos analizados.
-
-#         fs (int): frecuencia de muestreo
-#     """
-
-#     fechas, cronologia, audios = time_and_date(
-#         archivos_full_dir, archivos_nombre_base)
-
-#     ##### Funcion segmentacion########
-#     # esta se programa dentro de primer for con i = 1
-#     # se asume que el espectrograma genera los datos para s,f,t,p, los cuales son tomados de matlab
-#     # y1 = data['y']
-#     banda = np.array(banda)
-
-#     # p=0
-#     segment_data = []
-#     contador_archivos = -1
-#     nombre_archivo = []
-
-#     # Aqui se debe llamar la funcion del espectrograma.
-
-#     for archivo in audios:
-#         contador_archivos = contador_archivos + 1
-
-#         try:
-#             x, fs = sf.read(archivo)
-#         except RuntimeError:
-#             print("error en grabacion:", archivo)
-
-#         if len(x.shape) == 1:
-#             senal_audio = x
-#         else:
-#             x = x.mean(axis=1)
-#             x = np.squeeze(x)
-#             senal_audio = x
-#         # fs, senial = wavfile.read(archivo)
-#         # if np.shape(senial.shape[:])[0] <2:
-#         #    frecuency,time,intensity=signal.spectrogram(senial,fs=fs,nfft=2048,nperseg=569,noverlap=0)
-#         # else:
-#             # senial = senial.mean(axis=1)
-#             # senial = np.squeeze(senial)#Se promedian las 2 bandas para tener una sola, antes simplemente elegia 1 de ellas.
-#             # frecuency,time,intensity=signal.spectrogram(senial,fs=fs,nfft=2048,nperseg=569,noverlap=71)
-#         #    frecuency,time,intensity=signal.spectrogram(senial[:,1],fs=fs,nfft=2048,nperseg=569,noverlap=0)
-#         frecuency, time, intensity = signal.spectrogram(
-#             senal_audio, fs=fs, nfft=2048, nperseg=569, noverlap=0)
-#         segm_xie_band = np.empty((0, 4), float)
-#         segmentos_nor_band = np.empty((0, 4), float)
-
-#         s = np.abs(intensity)
-#         u, v = np.shape(s)
-#         # resiz=len(y1[:,canal])/len(s[1,:])
-#         band_1 = 1/u      # mirar si se usa para fmin
-#         band_2 = 1
-#         # intensity,frecuency,time,d=plt.specgram(senial[:,1],Fs=fs,NFFT=2048,noverlap=1550)
-
-#         mfband = medfilt2d(s, kernel_size=(5, 5))
-#         selband = np.flip(mfband, axis=0)
-
-#         # --------------------------  Xie ----------------------------------------
-#         if type(banda[1]) == np.str_:
-#             banda_aux = np.array([0, frecuency.max()])
-#         else:
-#             0
-#         try:
-#             segm_xie, segmentos_nor = seg_xie(intensity, time, frecuency)
-#         except Exception as e:
-#             print("***************************************  segmentacion")
-#             print(e)
-#             return
-#         for k in range(len(segm_xie[:, 1])):
-#             try:
-#                 ti = np.array(segm_xie[k, 0])  # tiempo inicial (X)
-#                 tf = np.array(segm_xie[k, 1])  # tiempo final(X+W)
-#                 fi = np.array(segm_xie[k, 3])  # frecuencia inicial (Y)
-#                 fff = np.array(segm_xie[k, 2])    # frecuencia final (Y+H)
-
-#                 if fi >= banda_aux[0] and fff <= banda_aux[1]:
-#                     segm_xie_band = np.append(segm_xie_band, np.expand_dims(np.array(
-#                         [segm_xie[k, 0], segm_xie[k, 1], segm_xie[k, 2], segm_xie[k, 3]]), axis=0), axis=0)
-#                     segmentos_nor_band = np.append(segmentos_nor_band, np.expand_dims(np.array(
-#                         [segmentos_nor[k, 0], segmentos_nor[k, 1], segmentos_nor[k, 2], segmentos_nor[k, 3]]), axis=0), axis=0)
-#             except:
-#                 0
-
-#         segm_xie = segm_xie_band
-#         segmentos_nor = segmentos_nor_band
-
-#         k = 0
-#         for k in range(len(segm_xie[:, 1])):
-#             try:
-#                 ti = np.array(segm_xie[k, 0])    # tiempo inicial (X)
-#                 tf = np.array(segm_xie[k, 1])  # tiempo final(X+W)
-#                 fi = np.array(segm_xie[k, 3])  # frecuencia inicial (Y)
-#                 fff = np.array(segm_xie[k, 2])    # frecuencia final (Y+H)
-
-#                 x = np.array(segmentos_nor[k, 0])+1  # tiempo inicial (X)
-#                 xplusw = segmentos_nor[k, 0] + \
-#                     segmentos_nor[k, 2]  # Tiempo final(X+W)
-#                 y = segmentos_nor[k, 1]+1  # frecuencia inicial (Y)
-#                 # frecuencia final (Y+H)
-#                 yplush = segmentos_nor[k, 1] + segmentos_nor[k, 3]
-#                 seg = np.array(
-#                     selband[int(y-1):int(yplush), int(x-1):int(xplusw)])
-#                 nfrec = 4
-#                 div = 4
-#                 nfiltros = 14  # se cambia porque con 30 se pierden muchos cantos
-#                 # 50 caracteristicas FCCs
-#                 features = fcc5(seg, nfiltros, div, nfrec)
-
-#                 fseg, cseg = np.shape(seg)
-#                 seg = ((seg-(np.matlib.repmat((np.min(np.real(seg[:]))), fseg, cseg)))
-#                        / ((np.matlib.repmat((np.max(np.real(seg[:]))), fseg, cseg))
-#                            - (np.matlib.repmat((np.min(np.real(seg[:]))), fseg, cseg))))
-
-#                 # cambio frecuencia dominante
-#                 sum_domin = np.transpose(
-#                     np.expand_dims(np.sum(seg, 1), axis=0))
-
-#                 dummy, dom = (np.max(np.real(np.transpose(np.expand_dims(savgol_filter(np.ravel(
-#                     sum_domin), 1, 0), axis=0))))), np.argmax(savgol_filter(np.ravel(sum_domin), 1, 0))
-
-#                 dom = ((((fi*u/(fs/2))+dom)/u)*fs/2)  # frecuencia dominante
-
-#                 dfcc = np.diff(features, 1)
-#                 dfcc2 = np.diff(features, 2)
-#                 cf = np.cov(features)
-#                 ff = []
-#                 for r in range(len(features[:, 0])-1):
-#                     ff = np.append(ff, np.diag(cf), axis=0)
-
-#                 # transforma la matriz en un vector tipo columna
-#                 features = np.expand_dims(features.flatten(order='F'), axis=0)
-#                 # se agregan los resultados de dffcc y dffc2 a features
-#                 features = np.append(features, np.concatenate((np.expand_dims(np.mean(
-#                     dfcc, 1), axis=0), np.expand_dims(np.mean(dfcc2, 1), axis=0)), axis=1), axis=1)
-#                 features = np.transpose(features)
-
-#                 if tf > ti and fff > fi:
-
-#                     lista_aux1 = [np.int16(fechas.T[0, 2:6])]
-#                     lista_aux1 = np.array(lista_aux1)
-#                     lista_aux2 = np.concatenate((np.expand_dims(ti, axis=0), np.expand_dims(tf, axis=0), np.expand_dims(tf-ti, axis=0),
-#                                                  np.expand_dims(dom, axis=0), np.expand_dims(
-#                                                      fi, axis=0), np.expand_dims(fff, axis=0),
-#                                                  np.expand_dims(band_1, axis=0), np.expand_dims(band_2, axis=0)))
-#                     lista_aux2 = np.array(lista_aux2)
-#                     lista_aux3 = np.append(lista_aux1, lista_aux2)
-#                     lista_aux4 = np.append(lista_aux3, features.T)
-
-#                     segment_data.append(lista_aux4)
-#                     nombre_archivo.append(fechas[0, contador_archivos])
-
-#                 else:
-#                     0
-#             except:
-#                 0
-
-#         progreso.archivos_completados += 1
-#         progreso.save()
-
-#     segment_data = np.array(segment_data)
-#     nombre_archivo = np.array(nombre_archivo)
-#     nombre_archivo = np.expand_dims(nombre_archivo, axis=1)
-
-#     return segment_data, nombre_archivo, fs
 
 
 def mov_std(xmean, nueva_mean, n, std_p):
@@ -1217,23 +934,35 @@ def Metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, 
     Tabla_NewSpecies.to_csv(
         nombre_xlsx, index=False)
 
-    print(type(datos_clasifi))
-    print(type(mean_class))
-    print(type(infoZC))
-    print(type(gadso))
-    print(type(representativo))
-    print(type(dispersion))
-    print(type(frecuencia))
+    try:
+        print(1)
+        metodologia_output.datos_clasifi = datos_clasifi.tolist()
+        print(2)
 
-    metodologia_output.datos_clasifi = datos_clasifi.tolist()
-    metodologia_output.mean_class = mean_class.tolist()
-    metodologia_output.infoZC = infoZC.tolist()
-    metodologia_output.gadso = gadso.tolist()
-    metodologia_output.representativo = representativo
-    metodologia_output.dispersion = dispersion.tolist()
-    metodologia_output.frecuencia = frecuencia.tolist()
+        metodologia_output.mean_class = mean_class.tolist()
+        print(3)
 
-    metodologia_output.save()
+        infoZC = [arr.tolist() for arr in infoZC]
+
+        metodologia_output.infoZC = infoZC
+        print(4)
+
+        metodologia_output.gadso = gadso.tolist()
+        print(5)
+
+        representativo = [int(item) for item in representativo]
+
+        metodologia_output.representativo = representativo
+        print(6)
+
+        metodologia_output.dispersion = dispersion.tolist()
+        print(7)
+
+        metodologia_output.frecuencia = frecuencia.tolist()
+        metodologia_output.save()
+        print(8)
+    except Exception as e:
+        print(e)
 
     # request.session['table'] = table
     # print(request.session['table'])

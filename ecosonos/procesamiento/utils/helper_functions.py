@@ -20,7 +20,9 @@ from ecosonos.utils.session_utils import (
     get_destination_folder_session,
     get_subfolders_details_session,
     save_statistics_state_session,
-    get_statistics_state_session
+    get_statistics_state_session,
+    save_selected_subfolders_session,
+    get_selected_subfolders_session
 )
 
 from ecosonos.utils.carpeta_utils import (
@@ -43,29 +45,26 @@ async def load_folder(request):
         root_folder = await sync_to_async(get_root_folder)()
     except Exception as e:
         print("Error en cargar carpeta load_folder ", e)
-        return JsonResponse({'error': 'Must select a folder'}, status=500)
-        # return render(request, 'procesamiento/preproceso.html')
+        # return JsonResponse({'error': 'Must select a folder'}, status=500)
+        return render(request, 'procesamiento/preproceso.html')
 
     if not root_folder:
-        return JsonResponse({'error': 'Must select a folder'}, status=500)
-        # return render(request, 'procesamiento/preproceso.html')
+        # return JsonResponse({'error': 'Must select a folder'}, status=500)
+        return render(request, 'procesamiento/preproceso.html')
 
     await sync_to_async(save_root_folder_session)(request, root_folder)
 
     statistics_checked = request.POST.get('estadisticas')
-    statistics_checked = True if statistics_checked == "true" else False
+    statistics_checked = True if statistics_checked else False
     folders_wav_path, folders_wav_basename = get_folders_with_wav(
         root_folder)
 
     if statistics_checked:
         folders_details = get_folders_details(folders_wav_path)
         data['statistics'] = True
-        await sync_to_async(save_statistics_state_session)(request, True)
-        await sync_to_async(save_subfolders_details_session)(request, folders_details)
-        print(type(folders_details))
+        data['folders_details'] = folders_details
     else:
         data['statistics'] = False
-
         folders_details = []
         for path, basename in zip(folders_wav_path, folders_wav_basename):
             folder_detail = {
@@ -74,26 +73,39 @@ async def load_folder(request):
             }
             folders_details.append(folder_detail)
 
-        await sync_to_async(save_statistics_state_session)(request, False)
-        await sync_to_async(save_subfolders_details_session)(request, folders_details)
+        data['folders_details'] = folders_details
 
-    return JsonResponse(data)
-    # return render(request, 'procesamiento/preproceso.html', data)
+    await sync_to_async(save_statistics_state_session)(request, statistics_checked)
+    await sync_to_async(save_subfolders_details_session)(request, folders_details)
+
+    # return JsonResponse(data)
+    return render(request, 'procesamiento/preproceso.html', data)
 
 
 async def prepare_destination_folder(request):
     data = {}
+    selected_subdfolders = request.POST.getlist('carpetas')
+
+    selected_subdfolders_base_name = get_subfolders_basename(
+        selected_subdfolders)
+    data['carpetas_procesando'] = selected_subdfolders_base_name
+
+    if not selected_subdfolders:
+        # return JsonResponse({'error': 'Must select a folder'}, status=500)
+        return render(request, 'procesamiento/preproceso.html')
+
+    await sync_to_async(save_selected_subfolders_session)(request, selected_subdfolders)
 
     try:
         destination_folder = await sync_to_async(get_root_folder)()
     except Exception as e:
         print("Error en cargar carpeta destination_folder", e)
-        return JsonResponse({'error': 'Must select a folder'}, status=500)
-        # return render(request, 'procesamiento/preproceso.html')
+        # return JsonResponse({'error': 'Must select a folder'}, status=500)
+        return render(request, 'procesamiento/preproceso.html')
 
     if not destination_folder:
-        return JsonResponse({'error': 'Must select a folder'}, status=500)
-        # return render(request, 'procesamiento/preproceso.html')
+        # return JsonResponse({'error': 'Must select a folder'}, status=500)
+        return render(request, 'procesamiento/preproceso.html')
 
     await sync_to_async(save_destination_folder_session)(request, destination_folder)
 
@@ -101,19 +113,19 @@ async def prepare_destination_folder(request):
     statistics = await sync_to_async(get_statistics_state_session)(request)
     data['folders_details'] = folder_details
     data['statistics'] = statistics
-    data['destino'] = True
+    data['seleccionadas'] = 'seleccionadas'
 
-    return JsonResponse(data)
-    # return render(request, 'procesamiento/preproceso.html', data)
+    # return JsonResponse(data)
+    return render(request, 'procesamiento/preproceso.html', data)
 
 
 async def process_folders(request):
     data = {}
 
-    selected_subdfolders = request.POST.getlist('carpetas')
+    selected_subdfolders = await sync_to_async(get_selected_subfolders_session)(request)
 
-    if not selected_subdfolders:
-        return JsonResponse({'error': 'Must select a folder'}, status=500)
+    # if not selected_subdfolders:
+    #     return JsonResponse({'error': 'Must select a folder'}, status=500)
 
     progress = await sync_to_async(Progreso.objects.create)()
     root_folder = await sync_to_async(get_root_folder_session)(request)
@@ -130,8 +142,8 @@ async def process_folders(request):
     data['statistics'] = statistics
     data['carpetas_procesando'] = selected_subdfolders_base_name
 
-    return JsonResponse(data)
-    # return render(request, 'procesamiento/preproceso.html', data)
+    # return JsonResponse(data)
+    return render(request, 'procesamiento/preproceso.html', data)
 
 
 async def move_files(request):
@@ -146,6 +158,7 @@ async def move_files(request):
 
     if not destination_folder:
         return JsonResponse({'error': 'Must select a folder'}, status=500)
+        # return render(request, 'procesamiento/preproceso.html')
 
     button_type = request.POST['mover_archivos']
     type_of_files_to_move = "YES" if "Lluvia" in button_type else "ALTO PSD"
@@ -158,8 +171,9 @@ async def move_files(request):
     except Exception as e:
         print(e)
         return JsonResponse({'error': 'Must select a folder'}, status=500)
+        # return render(request, 'procesamiento/preproceso.html')
 
-    return JsonResponse({'ok': 'ok'})
+    return render(request, 'procesamiento/preproceso.html')
 
 
 async def show_plot(request):

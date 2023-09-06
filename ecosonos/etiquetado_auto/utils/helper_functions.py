@@ -28,7 +28,7 @@ from ecosonos.utils.carpeta_utils import (
     get_all_files_in_all_folders
 )
 
-from .spectrogram_clusters import get_plot_url
+from .spectrogram_clusters import generate_spectrogram_with_clusters_plot, generate_representative_element_plot
 
 from procesamiento.models import Progreso
 import pandas as pd
@@ -60,10 +60,7 @@ async def load_folder(request):
     await sync_to_async(save_root_folder_session)(request, root_folder, app='etiquetado_auto')
 
     await sync_to_async(Progreso.objects.all().delete)()
-    metodologia = await sync_to_async(MetodologiaResult.objects.first)()
-    print(metodologia.representativo)
-    print(metodologia)
-    # await sync_to_async(MetodologiaResult.objects.all().delete)()
+    await sync_to_async(MetodologiaResult.objects.all().delete)()
 
     folders_wav_path, folders_wav_basename = get_folders_with_wav(
         root_folder)
@@ -174,7 +171,7 @@ async def process_folders(request):
         files_paths, files_basenames, banda, canal, autosel, visualize, progreso, csv_name, metodologia_output))
 
     data['carpetas_procesando'] = selected_folders_basenames
-    # data['files_details'] = files_details
+
     return render(request, "etiquetado_auto/etiquetado-auto.html", data)
 
 
@@ -185,7 +182,11 @@ def spectrogram_plot(request):
     file_path = request.POST.get('path')
 
     df = pd.read_csv(csv_path)
-    plot_url = get_plot_url(file_path, selected_clusters, df)
+    plot_url = generate_spectrogram_with_clusters_plot(
+        file_path, selected_clusters, df)
+
+    metodologia_output = MetodologiaResult.objects.first()
+    generate_representative_element_plot(file_path, metodologia_output, df)
 
     return JsonResponse({'plot_url': plot_url})
 
@@ -198,10 +199,6 @@ def get_spectrogram_data(request):
     df = pd.read_csv(csv_path)
 
     clusters = df.iloc[:, -1].unique().tolist()
-
-    metodologia_output = MetodologiaResult.objects.first()
-    print(metodologia_output)
-    print(metodologia_output.representativo)
 
     data['clusters'] = sorted(clusters)
     data['files_details'] = files_details

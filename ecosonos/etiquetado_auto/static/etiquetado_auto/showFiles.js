@@ -14,7 +14,10 @@ function show_files() {
 			const size = Object.keys(fileDetails).length;
 
 			let checkboxClusterDiv = document.getElementById("checkbox_clusters");
-			setupDiv(checkboxClusterDiv, clusters);
+			setupDivCheckbox(checkboxClusterDiv, clusters);
+
+			let radioClusterDiv = document.getElementById("radio_clusters");
+			setupDivRadio(radioClusterDiv, clusters);
 
 			let ulElement = document.getElementById("lista_audios");
 			for (let i = 0; i < size; i++) {
@@ -93,25 +96,43 @@ function createA(path, basename) {
 	return aElement;
 }
 
-function setupDiv(clustersDiv, clusters) {
-	let clusterHeader = createHeader();
+function setupDivCheckbox(clustersDiv, clusters) {
+	let clusterHeader = createHeader("Seleccione Clusters");
 	clustersDiv.appendChild(clusterHeader);
 
 	for (let i = 0; i < clusters.length; i++) {
 		const cluster = clusters[i];
 		let checkbox = createCheckBox(cluster);
-		let label = createCheckBoxLabel(cluster);
+		let label = createLabel(cluster);
 		let div = createCheckboxDiv();
 
 		div.appendChild(checkbox);
 		div.appendChild(label);
+
 		clustersDiv.appendChild(div);
 	}
 }
 
-function createHeader() {
+function setupDivRadio(representativoDiv, clusters) {
+	let clusterHeader = createHeader("Seleccione elemento representativo");
+	representativoDiv.appendChild(clusterHeader);
+
+	for (let i = 0; i < clusters.length; i++) {
+		const cluster = clusters[i];
+		let radio = createRadio(cluster);
+		let label = createLabel(cluster);
+		let div = createRadioDiv();
+
+		div.append(radio);
+		div.append(label);
+
+		representativoDiv.appendChild(div);
+	}
+}
+
+function createHeader(content) {
 	let clusterHeader = document.createElement("h3");
-	clusterHeader.textContent = "Seleccione clusters";
+	clusterHeader.textContent = content;
 
 	return clusterHeader;
 }
@@ -121,12 +142,22 @@ function createCheckBox(value) {
 	checkbox.type = "checkbox";
 	checkbox.name = value;
 	checkbox.value = value;
+	checkbox.id = value;
 	checkbox.checked = true;
 
 	return checkbox;
 }
 
-function createCheckBoxLabel(name) {
+function createRadio(value) {
+	let radio = document.createElement("input");
+	radio.type = "radio";
+	radio.name = "representativo";
+	radio.value = value;
+
+	return radio;
+}
+
+function createLabel(name) {
 	let label = document.createElement("label");
 	label.for = name;
 	label.textContent = name;
@@ -137,6 +168,13 @@ function createCheckBoxLabel(name) {
 function createCheckboxDiv() {
 	let divCarpetasCargadas = document.createElement("div");
 	divCarpetasCargadas.className = "carpetas-clusters";
+
+	return divCarpetasCargadas;
+}
+
+function createRadioDiv() {
+	let divCarpetasCargadas = document.createElement("div");
+	// divCarpetasCargadas.className = "carpetas-clusters";
 
 	return divCarpetasCargadas;
 }

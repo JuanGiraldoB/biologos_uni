@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
 			if (xhr.readyState === XMLHttpRequest.DONE) {
 				if (xhr.status === 200) {
 					let response = JSON.parse(xhr.responseText);
-					console.log(response);
+					console.log("aqui", response);
 				} else {
 					let response = JSON.parse(xhr.responseText);
 					console.error(response.error + " " + xhr.status);
