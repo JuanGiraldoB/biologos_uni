@@ -35,7 +35,7 @@
                 <ul>
                     <li> <a href="{% url 'preproceso' %}">Preprocesamiento</a></li>
                     <li><a href="{% url 'indices' %}">Índices</a></li>
-                    <li class="current"><a href="{% url 'etiquetado' %}">Etiquetado manual</a></li>
+                    <li class="current"><a href="{% url 'etiquetado' %}">Segmentación Manual</a></li>
                     <li><a href="{% url 'etiquetado-auto' %}">Sonotipos</a></li>
                     <li><a href="{% url 'conectividad' %}">Heterogeneidad acústica</a></li>
                 </ul>
@@ -77,14 +77,16 @@
                                 {% csrf_token %}
                                 <p>Seleccionar la carpeta raiz que contiene los archivos (.wav)</p>
                                 <div class="thebuttons">
-                                <input type="submit" value="Seleccionar Carpeta Principal" id="cargar" name="cargar"></input>
+                                    <input type="submit" value="Seleccionar Carpeta Principal" id="cargar"
+                                        name="cargar"></input>
                                 </div>
                             </form>
 
                             <form method="POST" enctype="multipart/form-data">
                                 {% csrf_token %}
                                 <div class="thebuttons">
-                                <input type="submit" value="Seleccionar Carpeta Destino" id="destino" name="destino"></input>
+                                    <input type="submit" value="Seleccionar Carpeta Destino" id="destino"
+                                        name="destino"></input>
                                 </div>
                             </form>
 
@@ -92,7 +94,7 @@
                             {% if files_details %}
                             <form class="carpetaprincipal" method="POST">
                                 {% csrf_token %}
-                            <!-- Colocar titulo-->
+                                <!-- Colocar titulo-->
                                 <div>
                                     <ul>
                                         {% for file in files_details %}

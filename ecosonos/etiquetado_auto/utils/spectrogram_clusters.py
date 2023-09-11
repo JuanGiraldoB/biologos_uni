@@ -42,7 +42,7 @@ def generate_spectrogram_with_clusters_plot(file_path, selected_clusters, df):
     file_name = pathlib.Path(file_path).name
 
     # Filter rows where the file name is in column index 0
-    filtered_rows = df[df.iloc[:, 0] == file_name]
+    filtered_rows = df[df.iloc[:, 0] == file_path]
     filtered_df = filtered_rows.iloc[:, [0, 5, 6, 9, 10, 13]]
 
     try:
@@ -60,7 +60,7 @@ def generate_spectrogram_with_clusters_plot(file_path, selected_clusters, df):
     nmin = round(len(senal_audio) / (60 * fs))
     bio_band = (2000, 8000)
     tech_band = (200, 1500)
-    wn = "hann"
+    wn = "hamming"
     size_wn = 1024
     nmin = round(len(senal_audio) / (60 * fs))
     nperseg = nmin * size_wn
@@ -94,9 +94,9 @@ def generate_spectrogram_with_clusters_plot(file_path, selected_clusters, df):
     }
 
     fig.update_layout(
-        title='Spectrogram',
-        xaxis_title='Time (s)',
-        yaxis_title='Frequency (Hz)',
+        title='Espectrograma',
+        xaxis_title='Tiempo (s)',
+        yaxis_title='Frecuencia (Hz)',
     )
 
     # Add rectangles to the plot
@@ -175,8 +175,13 @@ def generate_representative_element_plot(metodologia_output, df, representativo_
     img = np.int_((cv2.flip(20*(np.log10(np.abs(intensity))), 0)))
 
     fig = px.imshow(img, x=time, y=frecuency, aspect='auto',
-                    labels=dict(x="Time", y="Frequency", color="Intensity"),
-                    title="Spectrogram")
+                    color_continuous_scale='Rainbow', origin='lower')
+
+    fig.update_layout(
+        title='Espectrograma',
+        xaxis_title='Tiempo (s)',
+        yaxis_title='Frecuencia (Hz)',
+    )
 
     start = table.iloc[representativo_row, 5]
     end = table.iloc[representativo_row, 6]

@@ -8,7 +8,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 	<link rel="stylesheet" href="{% static 'ecosonos/assets/css/main.css' %}" />
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
-	<link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Noto+Sans+JP&amp;display=swapps://github.com/produle/MockFlowFont/blob/master/MockFlowFont1/dist/MockFlowFont1.woff'>
+	<link rel='stylesheet'
+		href='https://fonts.googleapis.com/css2?family=Noto+Sans+JP&amp;display=swapps://github.com/produle/MockFlowFont/blob/master/MockFlowFont1/dist/MockFlowFont1.woff'>
 	<link rel='stylesheet' href='https://assets.css-tricks.ir/font/font.css'>
 </head>
 
@@ -19,14 +20,15 @@
 		<div id="header">
 
 			<!-- Logo -->
-			<div class="logoup"><a href="{% url 'index' %}"><img src="{% static 'ecosonos/images/logo_econosonos.png' %}"></a></div>
+			<div class="logoup"><a href="{% url 'index' %}"><img
+						src="{% static 'ecosonos/images/logo_econosonos.png' %}"></a></div>
 
 			<!-- Nav -->
 			<nav id="nav">
 				<ul>
 					<li> <a href="{% url 'preproceso' %}">Preprocesamiento</a></li>
 					<li><a href="{% url 'indices' %}">Índices</a></li>
-					<li><a href="{% url 'etiquetado' %}">Etiquetado Manual</a></li>
+					<li><a href="{% url 'etiquetado' %}">Segmentación Manual</a></li>
 					<li><a href="{% url 'etiquetado-auto' %}">Sonotipos</a></li>
 					<li><a href="{% url 'conectividad' %}">Heterogeneidad acústica</a></li>
 				</ul>
@@ -50,126 +52,154 @@
 				</div>
 			</header>
 		</section>
-			<!-- Descripción -->
-			<section class="wrapper style2">
-				<div class="container">
-					<header class="major">
-						<h2 style="font-family: hocus_regularregular; letter-spacing: 0.1em; font-size: 4em; line-height: 0.2em; color: #19a173;">ECOSONOS</h2>
-						<p>Herramienta computacional para hacer del escuchar un observar. La herramienta permite analizar el paisaje acústico para entender que está sucediendo en el ecosistema identificando automáticamente la presencia de cantos de animales en las diferentes frecuencias (desde 300Hz hasta 80kHhz) y reconociendo los cantos de especies para las que fue entrenado el algoritmo de inteligencia artificial. También permite analizar el paisaje acústico de una manera global, estimando índices acústicos. Con esta información el software estima similitud acústica entre los puntos geográficos que se quieren analizar a través del audio</p>
-					</header>
-				</div>
-			</section>
+		<!-- Descripción -->
+		<section class="wrapper style2">
+			<div class="container">
+				<header class="major">
+					<h2
+						style="font-family: hocus_regularregular; letter-spacing: 0.1em; font-size: 4em; line-height: 0.2em; color: #19a173;">
+						ECOSONOS</h2>
+					<p>Herramienta computacional para hacer del escuchar un observar. La herramienta permite analizar el
+						paisaje acústico para entender que está sucediendo en el ecosistema identificando
+						automáticamente la presencia de cantos de animales en las diferentes frecuencias (desde 300Hz
+						hasta 80kHhz) y reconociendo los cantos de especies para las que fue entrenado el algoritmo de
+						inteligencia artificial. También permite analizar el paisaje acústico de una manera global,
+						estimando índices acústicos. Con esta información el software estima similitud acústica entre
+						los puntos geográficos que se quieren analizar a través del audio</p>
+				</header>
+			</div>
+		</section>
 
 		<!-- Creditos -->
-			<section id="cta" class="wrapper2 style3">
-				<div class="container">
-					<div class="logos participantes">
-						<img src="{% static 'ecosonos/images/u_antioquia.png' %}">
-					</div>
-					<div class="logos participantes">
-						<img src="{% static 'ecosonos/images/ITM.png' %}">
-					</div>
-					<div class="logos participantes">
-						<img src="{% static 'ecosonos/images/humboldt_v1.png' %}">
-					</div>
-					<div class="logos texto">
-						<p>Apoya:</p>
-					</div>
-					<div class="logos participantes">
-						<img src="{% static 'ecosonos/images/Ciencias.png' %}">
-					</div>
+		<section id="cta" class="wrapper2 style3">
+			<div class="container">
+				<div class="logos participantes">
+					<img src="{% static 'ecosonos/images/u_antioquia.png' %}">
 				</div>
-			</section>
+				<div class="logos participantes">
+					<img src="{% static 'ecosonos/images/ITM.png' %}">
+				</div>
+				<div class="logos participantes">
+					<img src="{% static 'ecosonos/images/humboldt_v1.png' %}">
+				</div>
+				<div class="logos texto">
+					<p>Apoya:</p>
+				</div>
+				<div class="logos participantes">
+					<img src="{% static 'ecosonos/images/Ciencias.png' %}">
+				</div>
+			</div>
+		</section>
 
-			<!-- Procesos -->
-			<section class="wrapper">
-				<div class="container">
-					<!-- opciones:index.opciones.html -->
-					<ul class="cards">
-						<li>
+		<!-- Procesos -->
+		<section class="wrapper">
+			<div class="container">
+				<!-- opciones:index.opciones.html -->
+				<ul class="cards">
+					<li>
 						<a href="{% url 'preproceso' %}" class="card">
 							<img src="{% static 'ecosonos/images/muestra_01.jpg' %}" class="card__image" alt="" />
 							<div class="card__overlay">
-							<div class="card__header">
-								<svg class="card__arc" xmlns="http://www.w3.org/2000/svg"><path /></svg>                     
-								<img class="card__thumb" src="{% static 'ecosonos/images/icono_sound_wave.png' %}" alt="" />
-								<div class="card__header-text">
-								<h3 class="card__title">Preprocesamiento</h3>            
-								<span class="card__status">Ecosonos</span>
+								<div class="card__header">
+									<svg class="card__arc" xmlns="http://www.w3.org/2000/svg">
+										<path />
+									</svg>
+									<img class="card__thumb" src="{% static 'ecosonos/images/icono_sound_wave.png' %}"
+										alt="" />
+									<div class="card__header-text">
+										<h3 class="card__title">Preprocesamiento</h3>
+										<span class="card__status">Ecosonos</span>
+									</div>
 								</div>
-							</div>
-							<p class="card__description">Este módulo permite identificar los audios que presentan...</p>
-							</div>
-						</a>      
-						</li>
-						<li>
-						<a href="{% url 'indices' %}" class="card">
-							<img src="{% static 'ecosonos/images/muestra_02.jpg' %}" class="card__image" alt="" />
-							<div class="card__overlay">        
-							<div class="card__header">
-								<svg class="card__arc" xmlns="http://www.w3.org/2000/svg"><path /></svg>                 
-								<img class="card__thumb" src="{% static 'ecosonos/images/icono_sound_wave.png' %}" alt="" />
-								<div class="card__header-text">
-								<h3 class="card__title">Índices</h3>
-								<span class="card__status">Ecosonos</span>
-								</div>
-							</div>
-							<p class="card__description">Este módulo estima 54 índices acústicos de los audios usando la librería scikit-maad</p>
+								<p class="card__description">Este módulo permite identificar los audios que presentan...
+								</p>
 							</div>
 						</a>
-						</li>
-						<li>
+					</li>
+					<li>
+						<a href="{% url 'indices' %}" class="card">
+							<img src="{% static 'ecosonos/images/muestra_02.jpg' %}" class="card__image" alt="" />
+							<div class="card__overlay">
+								<div class="card__header">
+									<svg class="card__arc" xmlns="http://www.w3.org/2000/svg">
+										<path />
+									</svg>
+									<img class="card__thumb" src="{% static 'ecosonos/images/icono_sound_wave.png' %}"
+										alt="" />
+									<div class="card__header-text">
+										<h3 class="card__title">Índices</h3>
+										<span class="card__status">Ecosonos</span>
+									</div>
+								</div>
+								<p class="card__description">Este módulo estima 54 índices acústicos de los audios
+									usando la librería scikit-maad</p>
+							</div>
+						</a>
+					</li>
+					<li>
 						<a href="{% url 'etiquetado' %}" class="card">
 							<img src="{% static 'ecosonos/images/muestra_03.jpg' %}" class="card__image" alt="" />
 							<div class="card__overlay">
-							<div class="card__header">
-								<svg class="card__arc" xmlns="http://www.w3.org/2000/svg"><path /></svg>                     
-								<img class="card__thumb" src="{% static 'ecosonos/images/icono_sound_wave.png' %}" alt="" />
-								<div class="card__header-text">
-								<h3 class="card__title">Etiquetado manual</h3>          
-								<span class="card__status">Ecosonos</span>
+								<div class="card__header">
+									<svg class="card__arc" xmlns="http://www.w3.org/2000/svg">
+										<path />
+									</svg>
+									<img class="card__thumb" src="{% static 'ecosonos/images/icono_sound_wave.png' %}"
+										alt="" />
+									<div class="card__header-text">
+										<h3 class="card__title">Etiquetado manual</h3>
+										<span class="card__status">Ecosonos</span>
+									</div>
 								</div>
-							</div>
-							<p class="card__description">Este módulo permite visualizar el espectrograma del audio que se elija y marcar los...</p>
+								<p class="card__description">Este módulo permite visualizar el espectrograma del audio
+									que se elija y marcar los...</p>
 							</div>
 						</a>
-						</li>
-						<li>
+					</li>
+					<li>
 						<a href="" class="card">
 							<img src="{% static 'ecosonos/images/muestra_04.jpg' %}" class="card__image" alt="" />
 							<div class="card__overlay">
-							<div class="card__header">
-								<svg class="card__arc" xmlns="http://www.w3.org/2000/svg"><path /></svg>                 
-								<img class="card__thumb" src="{% static 'ecosonos/images/icono_sound_wave.png' %}" alt="" />
-								<div class="card__header-text">
-								<h3 class="card__title">Heterogeneidad acústica</h3>
-								<span class="card__status">Ecosonos</span>
-								</div>          
-							</div>
-							<p class="card__description">Este módulo permite representar sobre un mapa geográfico el valor de una...</p>
+								<div class="card__header">
+									<svg class="card__arc" xmlns="http://www.w3.org/2000/svg">
+										<path />
+									</svg>
+									<img class="card__thumb" src="{% static 'ecosonos/images/icono_sound_wave.png' %}"
+										alt="" />
+									<div class="card__header-text">
+										<h3 class="card__title">Heterogeneidad acústica</h3>
+										<span class="card__status">Ecosonos</span>
+									</div>
+								</div>
+								<p class="card__description">Este módulo permite representar sobre un mapa geográfico el
+									valor de una...</p>
 							</div>
 						</a>
-						</li>   
-						<li>
-							<a href="" class="card">
-								<img src="{% static 'ecosonos/images/muestra_05.jpg' %}" class="card__image" alt="" />
-								<div class="card__overlay">
+					</li>
+					<li>
+						<a href="" class="card">
+							<img src="{% static 'ecosonos/images/muestra_05.jpg' %}" class="card__image" alt="" />
+							<div class="card__overlay">
 								<div class="card__header">
-									<svg class="card__arc" xmlns="http://www.w3.org/2000/svg"><path /></svg>                 
-									<img class="card__thumb" src="{% static 'ecosonos/images/icono_sound_wave.png' %}" alt="" />
+									<svg class="card__arc" xmlns="http://www.w3.org/2000/svg">
+										<path />
+									</svg>
+									<img class="card__thumb" src="{% static 'ecosonos/images/icono_sound_wave.png' %}"
+										alt="" />
 									<div class="card__header-text">
-									<h3 class="card__title">Sonotipos</h3>
-									<span class="card__status">Ecosonos</span>
-									</div>          
+										<h3 class="card__title">Sonotipos</h3>
+										<span class="card__status">Ecosonos</span>
+									</div>
 								</div>
-								<p class="card__description">Este módulo sugiere automáticamente segmentos donde posiblemente hay...</p>
-								</div>
-							</a>
-						</li> 
-					</ul>
-					<!-- opciones -->
-				</div>
-			</section>
+								<p class="card__description">Este módulo sugiere automáticamente segmentos donde
+									posiblemente hay...</p>
+							</div>
+						</a>
+					</li>
+				</ul>
+				<!-- opciones -->
+			</div>
+		</section>
 
 
 		<!-- CTA -->

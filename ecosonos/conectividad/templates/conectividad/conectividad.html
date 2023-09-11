@@ -31,16 +31,17 @@
         <div id="header">
 
             <!-- Logo -->
-            <div class="logoup"><a href="{% url 'index' %}"><img src="{% static 'ecosonos/images/logo_econosonos.png' %}"></a></div>
+            <div class="logoup"><a href="{% url 'index' %}"><img
+                        src="{% static 'ecosonos/images/logo_econosonos.png' %}"></a></div>
 
             <!-- Nav -->
             <nav id="nav">
                 <ul>
                     <li> <a href="{% url 'preproceso' %}">Preprocesamiento</a></li>
-					<li><a href="{% url 'indices' %}">Índices</a></li>
-					<li><a href="{% url 'etiquetado' %}">Etiquetado manual</a></li>
-					<li><a href="{% url 'etiquetado-auto' %}">Sonotipos</a></li>
-					<li class="current"><a href="{% url 'conectividad' %}">Heterogeneidad acústica</a></li>
+                    <li><a href="{% url 'indices' %}">Índices</a></li>
+                    <li><a href="{% url 'etiquetado' %}">Segmentación Manual</a></li>
+                    <li><a href="{% url 'etiquetado-auto' %}">Sonotipos</a></li>
+                    <li class="current"><a href="{% url 'conectividad' %}">Heterogeneidad acústica</a></li>
                 </ul>
             </nav>
 
@@ -55,16 +56,19 @@
         </section>
 
         <!-- Descripción Módulo -->
-		<section class="wrapper style2">
-			<div class="container">
-				<header class="major">
-					<h2
-						style="font-family: hocus_regularregular; letter-spacing: 0.1em; font-size: 4em; line-height: 0.2em; color: #19a173;">
-						HETEROGENEIDAD ACÚSTICA</h2>
-					<p>Este módulo permite representar sobre un mapa geográfico el valor de una medida (entre 0-1) que se estima para cada punto de muestreo.  También realiza la interpolación entre los puntos, de tal manera que se obtiene una capa que representa la medida que se estimó en cada punto y permite comparar la heterogeneidad entre puntos de muestreo.</p>
-				</header>
-			</div>
-		</section>
+        <section class="wrapper style2">
+            <div class="container">
+                <header class="major">
+                    <h2
+                        style="font-family: hocus_regularregular; letter-spacing: 0.1em; font-size: 4em; line-height: 0.2em; color: #19a173;">
+                        HETEROGENEIDAD ACÚSTICA</h2>
+                    <p>Este módulo permite representar sobre un mapa geográfico el valor de una medida (entre 0-1) que
+                        se estima para cada punto de muestreo. También realiza la interpolación entre los puntos, de tal
+                        manera que se obtiene una capa que representa la medida que se estimó en cada punto y permite
+                        comparar la heterogeneidad entre puntos de muestreo.</p>
+                </header>
+            </div>
+        </section>
 
         <!-- Posts -->
         <section class="wrapper style1 wrappeados">
@@ -139,42 +143,42 @@
             </div>
         </section>
 
-<!-- Footer -->
-<div id="footer">
-    <div class="container">
-        <!-- Creditos -->
-    <section id="cta2" class="wrapper2 style3">
-        <div class="container">
-            <div class="logos participantes">
-                <img src="{% static 'ecosonos/images/u_antioquia.png' %}">
+        <!-- Footer -->
+        <div id="footer">
+            <div class="container">
+                <!-- Creditos -->
+                <section id="cta2" class="wrapper2 style3">
+                    <div class="container">
+                        <div class="logos participantes">
+                            <img src="{% static 'ecosonos/images/u_antioquia.png' %}">
+                        </div>
+                        <div class="logos participantes">
+                            <img src="{% static 'ecosonos/images/ITM.png' %}">
+                        </div>
+                        <div class="logos participantes">
+                            <img src="{% static 'ecosonos/images/humboldt_v1.png' %}">
+                        </div>
+                        <div class="logos texto">
+                            <p>Apoya:</p>
+                        </div>
+                        <div class="logos participantes">
+                            <img src="{% static 'ecosonos/images/Ciencias.png' %}">
+                        </div>
+                    </div>
+                </section>
             </div>
-            <div class="logos participantes">
-                <img src="{% static 'ecosonos/images/ITM.png' %}">
+
+
+
+            <!-- Copyright -->
+            <div class="copyright">
+                <ul class="menu">
+                    <li>&copy; Todos los derechos reservados</li>
+                    <li>Diseño: <a href="#">Grupo Investigación</a></li>
+                </ul>
             </div>
-            <div class="logos participantes">
-                <img src="{% static 'ecosonos/images/humboldt_v1.png' %}">
-            </div>
-            <div class="logos texto">
-                <p>Apoya:</p>
-            </div>
-            <div class="logos participantes">
-                <img src="{% static 'ecosonos/images/Ciencias.png' %}">
-            </div>
+
         </div>
-    </section>
-    </div>
-
-    
-
-    <!-- Copyright -->
-    <div class="copyright">
-        <ul class="menu">
-            <li>&copy; Todos los derechos reservados</li>
-            <li>Diseño: <a href="#">Grupo Investigación</a></li>
-        </ul>
-    </div>
-
-</div>
 
     </div>
 

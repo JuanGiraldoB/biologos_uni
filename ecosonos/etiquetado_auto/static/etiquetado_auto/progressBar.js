@@ -1,14 +1,21 @@
 let intervalId = null;
 
 document.addEventListener("DOMContentLoaded", function () {
-	let button = document.getElementById("procesar_carpetas");
+	let button_sonotipo = document.getElementById("procesar_carpetas_sonotipo");
+	let button_reconocer = document.getElementById("procesar_carpetas_reconocer");
 
-	if (button) {
-		intervalId = setInterval(updateProgressBar, 500);
+	if (button_sonotipo) {
+		intervalId = setInterval(() => {
+			updateProgressBar("sonotipo");
+		}, 500);
+	} else if (button_reconocer) {
+		intervalId = setInterval(() => {
+			updateProgressBar("reconocer");
+		}, 500);
 	}
 });
 
-function updateProgressBar() {
+function updateProgressBar(type) {
 	let xhr = new XMLHttpRequest();
 	xhr.open("POST", "/etiquetado-auto/barra_progreso", true);
 	xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
@@ -29,7 +36,7 @@ function updateProgressBar() {
 			if (porcentaje_completado == 100) {
 				spanValue.innerHTML = "Completado";
 				clearInterval(intervalId);
-				show_files();
+				show_files(type);
 			}
 		}
 	};

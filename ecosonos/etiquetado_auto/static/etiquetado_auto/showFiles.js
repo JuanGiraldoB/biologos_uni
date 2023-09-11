@@ -1,9 +1,9 @@
-function show_files() {
+function show_files(type) {
 	let xhr = new XMLHttpRequest();
 	let formData = new FormData();
 	formData.append("informacion", "informacion");
 
-	xhr.open("POST", "/etiquetado-auto/espectrograma", true); // Replace with your actual GET URL
+	xhr.open("POST", "/etiquetado-auto/espectrograma", true);
 	xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 
 	xhr.onreadystatechange = function () {
@@ -13,20 +13,35 @@ function show_files() {
 			const clusters = data.clusters;
 			const size = Object.keys(fileDetails).length;
 
-			let checkboxClusterDiv = document.getElementById("checkbox_clusters");
+			let checkboxClusterDiv;
+			let radioClusterForm;
+			let ulElement;
+
+			if (type === "sonotipo") {
+				checkboxClusterDiv = document.getElementById(
+					"checkbox_clusters_sonotipo"
+				);
+				radioClusterForm = document.getElementById("radio_clusters_sonotipo");
+				ulElement = document.getElementById("lista_audios_sonotipo");
+			} else {
+				checkboxClusterDiv = document.getElementById(
+					"checkbox_clusters_reconocer"
+				);
+				radioClusterForm = document.getElementById("radio_clusters_reconocer");
+				ulElement = document.getElementById("lista_audios_reconocer");
+			}
+
 			setupDivCheckbox(checkboxClusterDiv, clusters);
 
-			let radioClusterForm = document.getElementById("radio_clusters");
-			setupFormRadio(radioClusterForm, clusters);
+			setupFormRadio(radioClusterForm, clusters, type);
 
-			let ulElement = document.getElementById("lista_audios");
 			for (let i = 0; i < size; i++) {
 				const fileDetail = fileDetails[i];
 				const filePath = fileDetail.path;
 				const fileName = fileDetail.basename;
 
 				let liElement = document.createElement("li");
-				let aElement = createA(filePath, fileName);
+				let aElement = createA(filePath, fileName, type);
 
 				liElement.appendChild(aElement);
 				ulElement.appendChild(liElement);
@@ -36,7 +51,7 @@ function show_files() {
 	xhr.send(formData);
 }
 
-function createA(path, basename) {
+function createA(path, basename, type) {
 	let aElement = document.createElement("a");
 	aElement.href = "#"; // Set a placeholder link
 	aElement.textContent = basename;
@@ -67,8 +82,15 @@ function createA(path, basename) {
 		xhr.onload = function () {
 			if (xhr.status === 200) {
 				let response = JSON.parse(xhr.responseText);
-				let graficaDiv = document.getElementById("grafica_div");
-				graficaDiv.innerHTML = "";
+
+				let clusterDiv;
+				if (type === "sonotipo") {
+					clusterDiv = document.getElementById("cluster_sonotipo_div");
+				} else {
+					clusterDiv = document.getElementById("cluster_reconocer_div");
+				}
+
+				clusterDiv.innerHTML = "";
 				let iframe = document.createElement("iframe");
 
 				// Fetch the HTML content from the URL
@@ -78,18 +100,16 @@ function createA(path, basename) {
 						iframe.srcdoc = htmlContent;
 						iframe.style.width = "100%";
 						iframe.style.height = "100%";
-						console.log("yey");
 					})
 					.catch((error) => {
 						console.error("Error fetching HTML content:", error);
 					});
-				graficaDiv.appendChild(iframe);
+				clusterDiv.appendChild(iframe);
 			} else {
 				console.error("Request failed:", xhr.statusText);
 			}
 		};
 
-		// Send the request
 		xhr.send(formData);
 	});
 
@@ -113,18 +133,16 @@ function setupDivCheckbox(clustersDiv, clusters) {
 	}
 }
 
-function setupFormRadio(representativoDiv, clusters) {
+function setupFormRadio(representativoDiv, clusters, type) {
 	let clusterHeader = createHeader("Seleccione elemento representativo");
 	representativoDiv.appendChild(clusterHeader);
 
 	for (let i = 0; i < clusters.length; i++) {
 		const cluster = clusters[i];
 		let label = createLabel(cluster, true);
-		let radio = createRadio(cluster);
+		let radio = createRadio(cluster, type);
 		let iTag = createI();
 
-		// label.innerHTML = radio;
-		// label.innerText = cluster;
 		label.appendChild(radio);
 		label.appendChild(iTag);
 
@@ -150,13 +168,13 @@ function createCheckBox(value) {
 	return checkbox;
 }
 
-function createRadio(value) {
+function createRadio(value, type) {
 	let radio = document.createElement("input");
 	radio.type = "radio";
 	radio.name = "representativo";
 	radio.value = value;
 	radio.onclick = () => {
-		submitForm(value);
+		submitForm(value, type);
 	};
 
 	return radio;
@@ -187,25 +205,33 @@ function createCheckboxDiv() {
 
 function createRadioDiv() {
 	let divCarpetasCargadas = document.createElement("div");
-	// divCarpetasCargadas.className = "carpetas-clusters";
 
 	return divCarpetasCargadas;
 }
 
-function submitForm(selectedValue) {
-	var form = document.getElementById("radio_clusters");
-	var formData = new FormData(form);
+function submitForm(selectedValue, type) {
+	let form;
+	let representativoDiv;
+
+	if (type === "sonotipo") {
+		form = document.getElementById("radio_clusters_sonotipo");
+		representativoDiv = document.getElementById("representativo_sonotipo_div");
+	} else {
+		form = document.getElementById("radio_clusters_reconocer");
+		representativoDiv = document.getElementById("representativo_reconocer_div");
+	}
+
+	let formData = new FormData(form);
 
 	// Add the selected radio value to the form data
 	formData.append("representativo", selectedValue);
 
-	var xhr = new XMLHttpRequest();
+	let xhr = new XMLHttpRequest();
 	xhr.open("POST", "/etiquetado-auto/espectrograma", true);
 	xhr.onreadystatechange = function () {
 		if (xhr.readyState === 4) {
 			if (xhr.status === 200) {
 				let response = JSON.parse(xhr.responseText);
-				let representativoDiv = document.getElementById("representativo_div");
 				representativoDiv.innerHTML = "";
 				let iframe = document.createElement("iframe");
 
@@ -216,14 +242,12 @@ function submitForm(selectedValue) {
 						iframe.srcdoc = htmlContent;
 						iframe.style.width = "100%";
 						iframe.style.height = "100%";
-						console.log("yey");
 					})
 					.catch((error) => {
 						console.error("Error fetching HTML content:", error);
 					});
 				representativoDiv.appendChild(iframe);
 			} else {
-				// Handle error
 				console.error("XHR request failed.");
 			}
 		}

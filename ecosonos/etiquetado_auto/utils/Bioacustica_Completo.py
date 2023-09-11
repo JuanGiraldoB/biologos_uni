@@ -329,8 +329,6 @@ def segmentacion(archivos_full_dir, archivos_nombre_base, banda, canal, progreso
     fechas, cronologia, audios = time_and_date(
         archivos_full_dir, archivos_nombre_base)
 
-    print('************************ fechas: ', audios)
-
     ##### Funcion segmentacion########
     # esta se programa dentro de primer for con i = 1
     # se asume que el espectrograma genera los datos para s,f,t,p, los cuales son tomados de matlab
@@ -809,13 +807,13 @@ def Metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, 
     dispersion = []
 
     if type(banda[0]) == str and type(banda[1]) == str:
+        print(f'banda: {banda} str')
         datos, nombre_archivo, fs = segmentacion(
             archivos_full_dir, archivos_nombre_base, ["min", "max"], canal, progreso)
     else:
+        print(f'banda: {banda} int')
         datos, nombre_archivo, fs = segmentacion(
             archivos_full_dir, archivos_nombre_base, banda, canal, progreso)
-
-    print("*****************", nombre_archivo)
 
     if visualize == 1:
         0
@@ -1035,7 +1033,11 @@ def mlamda_fuzzy_3pi_apract(it_num, dat_norma, mean_class, flag):
     return gadso, recon, mean_class
 
 
-def Metodologia_Prueba(ruta, banda, canal, specs, speciesStr):
+async def run_metodologia_prueba(files_paths, files_basenames, banda, canal, specs, speciesStr, progreso, csv_path):
+    await asyncio.to_thread(Metodologia_Prueba, files_paths, files_basenames, banda, canal, specs, speciesStr, progreso, csv_path)
+
+
+def Metodologia_Prueba(files_paths, files_basenames, banda, canal, specs, speciesStr, progreso, csv_path):
     """Realiza las mismas acciones que metodologia pero esta se enfoca en buscar
     clusters ya existentes deacuerdo a los datos introducidos
 
@@ -1117,9 +1119,11 @@ def Metodologia_Prueba(ruta, banda, canal, specs, speciesStr):
     stdfrecuencia = np.array(stdfrecuencia)
 
     if type(banda[0]) == str and type(banda[1]) == str:
-        datos, nombre_archivo, fs = segmentacion(ruta, ["min", "max"], canal)
+        datos, nombre_archivo, fs = segmentacion(
+            files_paths, files_basenames, ["min", "max"], canal, progreso)
     else:
-        datos, nombre_archivo, fs = segmentacion(ruta, banda, canal)
+        datos, nombre_archivo, fs = segmentacion(
+            files_paths, files_basenames, banda, canal, progreso)
 
     try:
         # era desde 12 pero en los cambios de abril lo ponen en 13
@@ -1236,6 +1240,10 @@ def Metodologia_Prueba(ruta, banda, canal, specs, speciesStr):
             np.sum(np.std(datos_clasifi[np.where(recon == i)[0], :], axis=0)))
     Dispersion = (Dispersion - min(Dispersion)) / \
         (max(Dispersion) - min(Dispersion))
+
+    Tabla_NewSpecies = pd.DataFrame(table)
+    Tabla_NewSpecies.to_csv(
+        csv_path, index=False)
 
     return table, datos_clasifi, mean_clas2, infoZC, gadso, repre, Dispersion, frecuencia
 

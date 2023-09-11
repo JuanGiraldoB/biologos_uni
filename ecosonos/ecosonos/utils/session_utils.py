@@ -38,12 +38,18 @@ def get_selected_subfolders_session(request, app='preproceso'):
     return request.session['carpetas_preproceso']
 
 
-def save_csv_path_session(request, csv_path):
-    request.session['csv_etiquetado'] = csv_path
+def save_csv_path_session(request, csv_path, app='etiquetado'):
+    if app == 'etiquetado':
+        request.session['csv_etiquetado'] = csv_path
+    elif app == 'etiquetado_auto':
+        request.session['csv_etiquetado_auto'] = csv_path
 
 
-def get_csv_path_session(request):
-    return request.session['csv_etiquetado']
+def get_csv_path_session(request, app='etiquetado'):
+    if app == 'etiquetado':
+        return request.session['csv_etiquetado']
+    elif app == 'etiquetado_auto':
+        return request.session['csv_etiquetado_auto']
 
 
 def save_subfolders_details_session(request, subfolder_details, app='preproceso'):
