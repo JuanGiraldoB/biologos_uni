@@ -120,11 +120,16 @@ async def load_csv(request):
     table = pd.read_csv(csv_path)
     table = table.to_numpy()
     cluster_names = 'Sp'
-    metodologia = await sync_to_async(MetodologiaResult.objects.first)()
-    mean_class = np.array(metodologia.mean_class)
-    infoZC = np.array(metodologia.infoZC)
-    representativo = np.array(metodologia.representativo)
-    frecuencia = np.array(metodologia.frecuencia)
+
+    try:
+        metodologia = await sync_to_async(MetodologiaResult.objects.first)()
+        mean_class = np.array(metodologia.mean_class)
+        infoZC = np.array(metodologia.infoZC)
+        representativo = np.array(metodologia.representativo)
+        frecuencia = np.array(metodologia.frecuencia)
+    except:
+        return render(request, "etiquetado_auto/etiquetado-auto.html", data)
+
     new_specs = await sync_to_async(guardado_cluster)(cluster_names, table, mean_class,
                                                       infoZC, representativo, frecuencia)
 
@@ -238,11 +243,16 @@ async def process_folders(request):
         table = pd.read_csv(csv_path_sonotipo_table)
         table = table.to_numpy()
         cluster_names = 'Sp'
-        metodologia = await sync_to_async(MetodologiaResult.objects.first)()
-        mean_class = np.array(metodologia.mean_class)
-        infoZC = np.array(metodologia.infoZC)
-        representativo = np.array(metodologia.representativo)
-        frecuencia = np.array(metodologia.frecuencia)
+
+        try:
+            metodologia = await sync_to_async(MetodologiaResult.objects.first)()
+            mean_class = np.array(metodologia.mean_class)
+            infoZC = np.array(metodologia.infoZC)
+            representativo = np.array(metodologia.representativo)
+            frecuencia = np.array(metodologia.frecuencia)
+        except:
+            return render(request, "etiquetado_auto/etiquetado-auto.html", data)
+
         new_specs = await sync_to_async(guardado_cluster)(cluster_names, table, mean_class,
                                                           infoZC, representativo, frecuencia)
 
