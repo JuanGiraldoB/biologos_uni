@@ -35,11 +35,11 @@
 			<!-- Nav -->
 			<nav id="nav">
 				<ul>
-					<li class="current"> <a href="{% url 'preproceso' %}">Preprocesamiento</a></li>
-					<li><a href="{% url 'indices' %}">Índices</a></li>
+					<li class="current"> <a href="{% url 'preproceso' %}">Lluvia/Archivo Corrupto</a></li>
+					<li><a href="{% url 'indices' %}">Índices Acústicos</a></li>
 					<li><a href="{% url 'etiquetado' %}">Segmentación Manual</a></li>
 					<li><a href="{% url 'etiquetado-auto' %}">Sonotipos</a></li>
-					<li><a href="{% url 'conectividad' %}">Heterogeneidad acústica</a></li>
+					<li><a href="{% url 'conectividad' %}">Heterogeneidad Acústica</a></li>
 				</ul>
 			</nav>
 
@@ -58,7 +58,7 @@
 				<header class="major">
 					<h2
 						style="font-family: hocus_regularregular; letter-spacing: 0.1em; font-size: 4em; line-height: 0.2em; color: #19a173;">
-						PRE-PROCESAMIENTO</h2>
+						LLUVIA/ARCHIVO CORRUPTO</h2>
 					<p>Este módulo permite identificar los audios que presentan patrón de comportamiento en frecuencia
 						similar al que se tiene en presencia de lluvia. Además, detecta los archivos corruptos y las
 						grabaciones con duración de más de un minuto. Los resultados se visualizan en gráficas que
@@ -78,6 +78,16 @@
 								<div class="thebuttons">
 									<input type="submit" value="Seleccionar Carpeta Principal" id="cargar"
 										name="cargar"></input>
+										<a href="#popup1" class="button-help">?</a>
+										<div id="popup1" class="overlay">
+										<div class="popup">
+										<h2>Ayuda - Seleccionar carpeta principal</h2>
+										<a class="close" href="#">&times;</a>
+										<div class="content">
+										<p>Permite buscar en el equipo la carpeta de origen donde se almacenan los archivos de audio que serán procesados.</p>
+										</div>
+										</div>
+										</div>
 								</div>
 								<div class="checks especialchecks">
 									{% if statistics %}
@@ -160,6 +170,16 @@
 									{% csrf_token %}
 									<input type="submit" value="Seleccionar Carpeta Destino" id="destino"
 										name="destino"></input>
+										<a href="#popup1" class="button-help">?</a>
+										<div id="popup1" class="overlay">
+										<div class="popup">
+										<h2>Ayuda - Seleccionar carpeta principal</h2>
+										<a class="close" href="#">&times;</a>
+										<div class="content">
+										<p>Permite buscar en el equipo la carpeta de origen donde se almacenan los archivos de audio que serán procesados.</p>
+										</div>
+										</div>
+										</div>
 								</div>
 
 							</form>
@@ -184,6 +204,16 @@
 								{% csrf_token %}
 								<input type="submit" value="Procesar Carpetas con Lluvia" id="procesar_carpetas"
 									name="procesar_carpetas"></input>
+									<a href="#popup1" class="button-help">?</a>
+										<div id="popup1" class="overlay">
+										<div class="popup">
+										<h2>Ayuda - Seleccionar carpeta principal</h2>
+										<a class="close" href="#">&times;</a>
+										<div class="content">
+										<p>Permite buscar en el equipo la carpeta de origen donde se almacenan los archivos de audio que serán procesados.</p>
+										</div>
+										</div>
+										</div>
 							</form>
 
 							<br>
@@ -209,6 +239,16 @@
 								<div class="thebuttons">
 									<input type="submit" value="Mover Archivos con Lluvia" id="mover_archivos"
 										name="mover_archivos"></input>
+										<a href="#popup1" class="button-help">?</a>
+										<div id="popup1" class="overlay">
+										<div class="popup">
+										<h2>Ayuda - Seleccionar carpeta principal</h2>
+										<a class="close" href="#">&times;</a>
+										<div class="content">
+										<p>Permite buscar en el equipo la carpeta de origen donde se almacenan los archivos de audio que serán procesados.</p>
+										</div>
+										</div>
+										</div>
 								</div>
 							</form>
 							<form id="mover_danado_form" method="POST" enctype="multipart/form-data">
@@ -216,6 +256,16 @@
 								<div class="thebuttons">
 									<input type="submit" class="botmalos" value="Mover Archivos Dañados"
 										id="mover_malos" name="mover_archivos"></input>
+										<a href="#popup1" class="button-help">?</a>
+										<div id="popup1" class="overlay">
+										<div class="popup">
+										<h2>Ayuda - Seleccionar carpeta principal</h2>
+										<a class="close" href="#">&times;</a>
+										<div class="content">
+										<p>Permite buscar en el equipo la carpeta de origen donde se almacenan los archivos de audio que serán procesados.</p>
+										</div>
+										</div>
+										</div>
 								</div>
 							</form>
 						</div>
@@ -225,6 +275,16 @@
 							{% csrf_token %}
 							<input type="submit" value="Mostrar gráfica" id="mostrar_grafica"
 								name="mostrar_grafica"></input>
+								<a href="#popup1" class="button-help">?</a>
+										<div id="popup1" class="overlay">
+										<div class="popup">
+										<h2>Ayuda - Seleccionar carpeta principal</h2>
+										<a class="close" href="#">&times;</a>
+										<div class="content">
+										<p>Permite buscar en el equipo la carpeta de origen donde se almacenan los archivos de audio que serán procesados.</p>
+										</div>
+										</div>
+										</div>
 						</form>
 					</section>
 					<section class="col-12 col-12-narrower">
