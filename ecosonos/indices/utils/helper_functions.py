@@ -93,6 +93,7 @@ async def prepare_destination_folder(request):
         return render(request, 'indices/indices.html')
 
     await sync_to_async(save_destination_folder_session)(request, destination_folder, app="indices")
+    await sync_to_async(save_selected_subfolders_session)(request, selected_subdfolders, app="indices")
     folder_details = await sync_to_async(get_subfolders_details_session)(request, app='indices')
     indices = await sync_to_async(get_indices_session)(request)
 

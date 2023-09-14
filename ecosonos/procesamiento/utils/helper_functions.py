@@ -122,6 +122,8 @@ async def prepare_destination_folder(request):
 async def process_folders(request):
     data = {}
 
+    print("Wtf is going on 1")
+
     selected_subdfolders = await sync_to_async(get_selected_subfolders_session)(request)
 
     # if not selected_subdfolders:
@@ -130,6 +132,9 @@ async def process_folders(request):
     progress = await sync_to_async(Progreso.objects.create)()
     root_folder = await sync_to_async(get_root_folder_session)(request)
     destination_folder = await sync_to_async(get_destination_folder_session)(request)
+    print("root_folder", root_folder)
+    print("destination_folder", destination_folder)
+    print("selected_subdfolders", selected_subdfolders)
 
     asyncio.create_task(run_algoritmo_lluvia_edison(
         selected_subdfolders, root_folder, destination_folder, progress))
@@ -137,18 +142,19 @@ async def process_folders(request):
     selected_subdfolders_base_name = get_subfolders_basename(
         selected_subdfolders)
 
+    print("selected_subdfolders_base_name", selected_subdfolders_base_name)
+
     statistics = await sync_to_async(get_statistics_state_session)(request)
 
     data['statistics'] = statistics
     data['carpetas_procesando'] = selected_subdfolders_base_name
+    print("Wtf is going on 4")
 
     # return JsonResponse(data)
     return render(request, 'procesamiento/preproceso.html', data)
 
 
 async def move_files(request):
-    data = {}
-
     try:
         destination_folder = await sync_to_async(get_root_folder)()
     except Exception as e:
