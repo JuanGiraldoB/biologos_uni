@@ -222,12 +222,12 @@ def calculo_PSD_and_Espectro_promedio(df_ll, pbar=None):
 
 
 def _apply_df(args):
-    df, func, i, q = args
+    df, func, i = args
     res = df.apply(func, axis=1)
 
-    for file_processed in res:
-        if file_processed is not None:
-            q.put(i)
+    # for file_processed in res:
+    #     if file_processed is not None:
+    #         q.put(i)
 
     return res, i
 
@@ -373,8 +373,6 @@ async def run_algoritmo_lluvia_edison(carpetas, raiz, destino, progreso):
 
 
 def algoritmo_lluvia_edison(carpetas, raiz, destino, progreso):
-    print("wtf is going on 1")
-
     Edison_Duque = True
 
     # Ruta donde se encuentran los archivos
@@ -395,23 +393,16 @@ def algoritmo_lluvia_edison(carpetas, raiz, destino, progreso):
                "path_FI": [],
                "duracion_escog": []}
 
-    print("wtf is going on 2")
-
     # print(f"Inventorying Files...")
     start_time = time.time()
     numero_archivos = 0
     for carpeta in carpetas:
-        print("wtf is going on 3")
         for archivo in os.listdir(carpeta):
-            print("wtf is going on 4")
             file_name = os.path.join(carpeta, archivo)  # .replace('\\', '/')
 
             if os.path.isfile(file_name):
-                print("wtf is going on 5")
                 if any([f".{formato}" in archivo for formato in formatos]):
-                    print("wtf is going on 6")
                     if not (archivo.startswith(".")):
-                        print("wtf is going on 7")
                         numero_archivos += 1
 
                         dict_df["field_number_PR"].append(
@@ -425,25 +416,18 @@ def algoritmo_lluvia_edison(carpetas, raiz, destino, progreso):
                         duration = len(audio_file) / 1000
                         dict_df["duracion_escog"].append(duration)
 
-    print("wtf is going on 8")
-
     progreso.cantidad_archivos = numero_archivos
     progreso.save()
-
-    print("wtf is going on 9")
 
     df = pd.DataFrame(dict_df)
     df[['prefix', 'date', 'hour', 'format']] = df.name_FI.str.extract(
         r'(?P<prefix>\w+)_(?P<date>\d{8})_(?P<hour>\d{6}).(?P<format>[0-9a-zA-Z]+)')
-
-    print("wtf is going on 10")
+    # df[['duracion_escog']] = "60"
 
     # print(f"{len(df)} files found")
 
     df = df.loc[df.field_number_PR.apply(
         lambda x: x not in exclude_these_sites), :]
-
-    print("wtf is going on 11")
 
     # print(f"{len(df)} files found after exclude {','.join(exclude_these_sites)} sites")
 
@@ -455,48 +439,27 @@ def algoritmo_lluvia_edison(carpetas, raiz, destino, progreso):
     else:
         fact_split = 1
 
-    print("wtf is going on 12")
-
     df_split = np.array_split(df, fact_split * workers)
 
-    print("df_split", df_split)
-
-    manager = Manager()
-    print('manager', manager)
-    q = manager.Queue()
-    print('q', manager)
-
-    print("wtf is going on 13")
-
-    print('a',
-          progreso.archivos_completados)
+    # manager = Manager()
 
     if (Edison_Duque):
-        print('b',
-              progreso.archivos_completados)
         with Pool(processes=workers) as pool:
             result = []
-            print('c',
-                  progreso.archivos_completados)
 
-            for i, res in enumerate(tqdm.tqdm(pool.imap(_apply_df, [(d, calculo_PSD_and_Espectro_promedio, i, q) for i, d in enumerate(df_split)]), total=len(df_split))):
+            for i, res in enumerate(tqdm.tqdm(pool.imap(_apply_df, [(d, calculo_PSD_and_Espectro_promedio, i) for i, d in enumerate(df_split)]), total=len(df_split))):
                 result.append(res)
-                print('d',
-                      progreso.archivos_completados)
+                x = pd.concat([r[0] for r in result])
+                progreso.archivos_completados = len(x)
+                progreso.save()
 
-                while not q.empty():
-                    completed_task = q.get()
-                    completado = progreso.archivos_completados
-                    print('archivos completados',
-                          progreso.archivos_completados)
-                    progreso.archivos_completados += 1
-                    progreso.save()
-                    # print(f"Completed task {completed_task}: {completado}")
-            print("what is going on")
+                # while not q.empty():
+                #     completed_task = q.get()
+                #     completado = progreso.archivos_completados
+                #     progreso.archivos_completados += 1
+                #     progreso.save()
 
-        print("duh")
-
-        x = pd.concat([r[0] for r in result])
+        # x = pd.concat([r[0] for r in result])
 
         #     result = list(tqdm.tqdm(pool.imap(_apply_df, [
         #                   (d, calculo_PSD_and_Espectro_promedio) for d in df_split]), total=len(df_split)))
