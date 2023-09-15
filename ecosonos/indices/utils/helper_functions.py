@@ -4,7 +4,7 @@ from tkinter.filedialog import askdirectory, askopenfilename
 from asgiref.sync import sync_to_async
 import asyncio
 
-from .session_utils import (
+from .utils import (
     save_indices_session,
     get_indices_session,
 )

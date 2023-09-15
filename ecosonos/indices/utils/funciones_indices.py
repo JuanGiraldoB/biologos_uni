@@ -241,6 +241,8 @@ def calcular_indice(indices_select, carpeta, archivos, destino, progreso):
 
         progreso.archivos_completados += 1
         progreso.save()
+        from .utils import save_to_txt
+        save_to_txt('./nombres.txt', grabacion)
         Indices_grabaciones.append({"Grabacion": g, "Indices": list(aux)})
 
     csvIndices(Valores, carpeta, destino, indices_select)
