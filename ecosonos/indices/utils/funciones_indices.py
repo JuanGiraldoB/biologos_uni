@@ -12,6 +12,7 @@ from ecosonos.utils.archivos_utils import get_date_from_filename
 import pathlib
 from ast import literal_eval
 import os
+from .utils import save_to_txt
 
 # import matplotlib.pyplot as plt
 
@@ -98,19 +99,27 @@ def csvIndices(indicesCalculados, ruta, destino, indices_select):
     indices_select.append('Date')
     indicesDF = pd.DataFrame(data, columns=indices_select)
 
-    for j in range(len(indices_select)):
-        indicesDF[indices_select[j]] = Valores[j]
+    try:
 
-    if 'ADIm' in indicesDF:
-        for i in range(len(indicesDF['ADIm'][0])):
-            indicesDF[f'ADIm_{i}'] = indicesDF['ADIm'].apply(lambda x: x[i])
+        for j in range(len(indices_select)):
+            indicesDF[indices_select[j]] = Valores[j]
 
-        indicesDF = indicesDF.drop(columns=['ADIm'])
+        if 'ADIm' in indicesDF:
+            for i in range(len(indicesDF['ADIm'][0])):
+                indicesDF[f'ADIm_{i}'] = indicesDF['ADIm'].apply(
+                    lambda x: x[i])
+
+            indicesDF = indicesDF.drop(columns=['ADIm'])
+    except Exception as e:
+        print(e, " in adim")
 
     date_column = indicesDF.pop('Date')
     indicesDF['Date'] = date_column
 
     csv_path = os.path.join(destino, 'indices_acusticos.csv')
+
+    print("**************", csv_path)
+    print("**************", indicesDF.head())
 
     indicesDF.to_csv(csv_path,
                      encoding='utf_8_sig', index=False, sep=',')
