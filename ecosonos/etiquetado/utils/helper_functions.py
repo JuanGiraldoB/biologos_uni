@@ -24,7 +24,7 @@ from ecosonos.utils.archivos_utils import (
 )
 
 from ecosonos.utils.carpeta_utils import (
-    get_files_in_folder
+    get_wav_files_in_folder
 )
 
 from ecosonos.utils.tkinter_utils import get_root_folder
@@ -32,19 +32,24 @@ from ecosonos.utils.tkinter_utils import get_root_folder
 
 def load_folder(request):
     try:
+        # Get the root folder where the wav files are located
         root_folder = get_root_folder()
     except Exception as e:
         print("Error en cargar carpeta")
         return render(request, 'etiquetado/etiquetado.html')
 
+    # If no root folder is selected, render an error page or return an error response
     if not root_folder:
         return render(request, 'etiquetado/etiquetado.html')
 
+    # Save the root folder path to the session
     save_root_folder_session(
         request, root_folder, app="etiquetado")
 
-    files_paths, files_basenames = get_files_in_folder(root_folder)
+    # Get lists of wav files paths and their basenames
+    files_paths, files_basenames = get_wav_files_in_folder(root_folder)
 
+    # Replace the directory separator character in file paths with a hyphen to be used in the url
     files_paths = replace_char(files_paths, caracter=os.sep, reemplazo='-')
 
     files_details = []
@@ -56,10 +61,12 @@ def load_folder(request):
 
         files_details.append(file_details)
 
+    # Save the file details to the session
     save_files_session(request, files_details, app='etiquetado')
 
     # data['archivos'] = zip(files_paths, files_basenames)
 
+    # Return the prepared data with the template for rendering
     return render(request, 'etiquetado/etiquetado.html')
 
 
@@ -67,41 +74,61 @@ def prepare_destination_folder(request):
     data = {}
 
     try:
+        # Get the destination folder where the CSV file will be created
         destination_folder = get_root_folder()
     except Exception as e:
         print("Error en cargar carpeta", e)
         return render(request, 'etiquetado/etiquetado.html')
 
+    # If no destination folder is selected, render an error page or return an error response
     if not destination_folder:
         return render(request, 'etiquetado/etiquetado.html')
 
-    folder_basename = os.path.basename(destination_folder).split(".")[0]
+    # Extract the base name of the destination folder
+    folder_basename = os.path.basename(destination_folder)
 
+    # Create a CSV file in the destination folder with the same base name
     csv_path = create_csv(destination_folder, folder_basename)
+
+    # Save the path to the CSV file to the session
     save_csv_path_session(request, csv_path)
 
+    # Get the files from the session
     files_details = get_files_session(request, app='etiquetado')
     data['files_details'] = files_details
 
+    # Return the prepared data with the template for rendering
     return render(request, 'etiquetado/etiquetado.html', data)
 
 
 def prepare_label_data(request, path):
+    # Create an empty dictionary to store data that will be sent to the template
+    data = {}
+
+    # Get the files from the session
     files_details = get_files_session(request, app='etiquetado')
+
+    # Extract the file paths from files_details
     files_paths = [file_path['path'] for file_path in files_details]
 
+    # Replace the directory separator character with a '-' in file paths
     replace_char(files_paths, caracter=os.sep, reemplazo='-')
 
-    data = {}
     data['ruta'] = path
+    # Replace the '-' characters in 'path' with the correct directory separator
     path = path.replace('-', os.sep)
 
+    # Calculate the spectrogram for the given audio file
     f, t, s = calcular_espectrograma(path)
 
+    # Convert and store frequency, time, and spectrogram data as lists in 'data'
     data['frequencies'] = f.tolist()
     data['times'] = t.tolist()
     data['spectrogram'] = s.tolist()
+
+    # Extract and store the base name of the file in 'data'
     data['nombre'] = os.path.basename(path)
+
     data['files_details'] = files_details
 
     return data

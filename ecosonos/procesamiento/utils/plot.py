@@ -6,7 +6,7 @@ from django.templatetags.static import static
 from django.conf import settings
 
 
-def get_plot_url(csv_folder):
+def generate_and_get_plot_url_from_csv(csv_folder):
     # Step 1: Read the xlsx file and extract the necessary information
     csv_path = os.path.join(csv_folder, 'resultado_preproceso.csv')
     df = pd.read_csv(csv_path)

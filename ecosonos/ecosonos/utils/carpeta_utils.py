@@ -168,9 +168,6 @@ def get_subfolders_basename(folders):
 def get_folders_details(folders):
     folder_details = []
 
-    # for folder in folders:
-    #     folder_details.append(get_folder_detail(folder))
-
     with ThreadPoolExecutor() as executor:
         folder_details = list(executor.map(get_folder_detail, folders))
 
@@ -178,7 +175,7 @@ def get_folders_details(folders):
 
 
 def get_folder_detail(folder):
-    files_path, files_base_name = get_files_in_folder(folder)
+    files_path, files_base_name = get_wav_files_in_folder(folder)
     number_of_files = len(files_base_name)
     range_of_dates = get_date_range_from_filenames(files_base_name)
     range_of_lengths = get_files_range_length(files_path)
@@ -201,14 +198,14 @@ def get_all_files_in_all_folders(folders):
     all_files_path_basename = []
 
     for folder in folders:
-        files_path, files_basename = get_files_in_folder(folder)
+        files_path, files_basename = get_wav_files_in_folder(folder)
         all_files_path.extend(files_path)
         all_files_path_basename.extend(files_basename)
 
     return all_files_path, all_files_path_basename
 
 
-def get_files_in_folder(folder, file_extension='.wav'):
+def get_wav_files_in_folder(folder, file_extension='.wav'):
     files_path = []
     files_basename = []
 

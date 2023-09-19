@@ -226,7 +226,7 @@ def calcularIndice(indices_seleccionados, carpeta, grabacion, Valores):
     # return JsonResponse({"Indices calculados": Indices_grabaciones})
 
 
-def polar_plot(csv_path, indice, ADIm_index=False):
+def generate_polar_plot(csv_path, indice, ADIm_index=False):
     if ".csv" in csv_path:
         df_all = pd.read_csv(csv_path)
     else:
