@@ -78,16 +78,17 @@
 								<div class="thebuttons">
 									<input type="submit" value="Seleccionar Carpeta Principal" id="cargar"
 										name="cargar"></input>
-										<a href="#popup1" class="button-help">?</a>
-										<div id="popup1" class="overlay">
+									<a href="#popup1" class="button-help">?</a>
+									<div id="popup1" class="overlay">
 										<div class="popup">
-										<h2>Ayuda - Seleccionar carpeta principal</h2>
-										<a class="close" href="#">&times;</a>
-										<div class="content">
-										<p>Permite buscar en el equipo la carpeta de origen donde se almacenan los archivos de audio que serán procesados.</p>
+											<h2>Ayuda - Seleccionar carpeta principal</h2>
+											<a class="close" href="#">&times;</a>
+											<div class="content">
+												<p>Permite buscar en el equipo la carpeta de origen donde se almacenan
+													los archivos de audio que serán procesados.</p>
+											</div>
 										</div>
-										</div>
-										</div>
+									</div>
 								</div>
 								<div class="checks especialchecks">
 									{% if statistics %}
@@ -170,16 +171,17 @@
 									{% csrf_token %}
 									<input type="submit" value="Seleccionar Carpeta Destino" id="destino"
 										name="destino"></input>
-										<a href="#popup1" class="button-help">?</a>
-										<div id="popup1" class="overlay">
+									<a href="#popup1" class="button-help">?</a>
+									<div id="popup1" class="overlay">
 										<div class="popup">
-										<h2>Ayuda - Seleccionar carpeta principal</h2>
-										<a class="close" href="#">&times;</a>
-										<div class="content">
-										<p>Permite buscar en el equipo la carpeta de origen donde se almacenan los archivos de audio que serán procesados.</p>
+											<h2>Ayuda - Seleccionar carpeta principal</h2>
+											<a class="close" href="#">&times;</a>
+											<div class="content">
+												<p>Permite buscar en el equipo la carpeta de origen donde se almacenan
+													los archivos de audio que serán procesados.</p>
+											</div>
 										</div>
-										</div>
-										</div>
+									</div>
 								</div>
 
 							</form>
@@ -204,19 +206,22 @@
 								{% csrf_token %}
 								<input type="submit" value="Procesar Carpetas con Lluvia" id="procesar_carpetas"
 									name="procesar_carpetas"></input>
-									<a href="#popup1" class="button-help">?</a>
-										<div id="popup1" class="overlay">
-										<div class="popup">
+								<a href="#popup1" class="button-help">?</a>
+								<div id="popup1" class="overlay">
+									<div class="popup">
 										<h2>Ayuda - Seleccionar carpeta principal</h2>
 										<a class="close" href="#">&times;</a>
 										<div class="content">
-										<p>Permite buscar en el equipo la carpeta de origen donde se almacenan los archivos de audio que serán procesados.</p>
+											<p>Permite buscar en el equipo la carpeta de origen donde se almacenan los
+												archivos de audio que serán procesados.</p>
 										</div>
-										</div>
-										</div>
+									</div>
+								</div>
 							</form>
 
 							<br>
+
+							{% if mostrar_barra_proceso %}
 
 							<section>
 								<div class="chart">
@@ -225,6 +230,7 @@
 								</div>
 							</section>
 
+							{% endif %}
 							{% endif %}
 						</div>
 					</section>
@@ -239,16 +245,17 @@
 								<div class="thebuttons">
 									<input type="submit" value="Mover Archivos con Lluvia" id="mover_archivos"
 										name="mover_archivos"></input>
-										<a href="#popup1" class="button-help">?</a>
-										<div id="popup1" class="overlay">
+									<a href="#popup1" class="button-help">?</a>
+									<div id="popup1" class="overlay">
 										<div class="popup">
-										<h2>Ayuda - Seleccionar carpeta principal</h2>
-										<a class="close" href="#">&times;</a>
-										<div class="content">
-										<p>Permite buscar en el equipo la carpeta de origen donde se almacenan los archivos de audio que serán procesados.</p>
+											<h2>Ayuda - Seleccionar carpeta principal</h2>
+											<a class="close" href="#">&times;</a>
+											<div class="content">
+												<p>Permite buscar en el equipo la carpeta de origen donde se almacenan
+													los archivos de audio que serán procesados.</p>
+											</div>
 										</div>
-										</div>
-										</div>
+									</div>
 								</div>
 							</form>
 							<form id="mover_danado_form" method="POST" enctype="multipart/form-data">
@@ -256,16 +263,17 @@
 								<div class="thebuttons">
 									<input type="submit" class="botmalos" value="Mover Archivos Dañados"
 										id="mover_malos" name="mover_archivos"></input>
-										<a href="#popup1" class="button-help">?</a>
-										<div id="popup1" class="overlay">
+									<a href="#popup1" class="button-help">?</a>
+									<div id="popup1" class="overlay">
 										<div class="popup">
-										<h2>Ayuda - Seleccionar carpeta principal</h2>
-										<a class="close" href="#">&times;</a>
-										<div class="content">
-										<p>Permite buscar en el equipo la carpeta de origen donde se almacenan los archivos de audio que serán procesados.</p>
+											<h2>Ayuda - Seleccionar carpeta principal</h2>
+											<a class="close" href="#">&times;</a>
+											<div class="content">
+												<p>Permite buscar en el equipo la carpeta de origen donde se almacenan
+													los archivos de audio que serán procesados.</p>
+											</div>
 										</div>
-										</div>
-										</div>
+									</div>
 								</div>
 							</form>
 						</div>
@@ -275,16 +283,17 @@
 							{% csrf_token %}
 							<input type="submit" value="Mostrar gráfica" id="mostrar_grafica"
 								name="mostrar_grafica"></input>
-								<a href="#popup1" class="button-help">?</a>
-										<div id="popup1" class="overlay">
-										<div class="popup">
-										<h2>Ayuda - Seleccionar carpeta principal</h2>
-										<a class="close" href="#">&times;</a>
-										<div class="content">
-										<p>Permite buscar en el equipo la carpeta de origen donde se almacenan los archivos de audio que serán procesados.</p>
-										</div>
-										</div>
-										</div>
+							<a href="#popup1" class="button-help">?</a>
+							<div id="popup1" class="overlay">
+								<div class="popup">
+									<h2>Ayuda - Seleccionar carpeta principal</h2>
+									<a class="close" href="#">&times;</a>
+									<div class="content">
+										<p>Permite buscar en el equipo la carpeta de origen donde se almacenan los
+											archivos de audio que serán procesados.</p>
+									</div>
+								</div>
+							</div>
 						</form>
 					</section>
 					<section class="col-12 col-12-narrower">

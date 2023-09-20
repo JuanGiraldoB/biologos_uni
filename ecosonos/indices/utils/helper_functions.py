@@ -151,6 +151,7 @@ async def process_folders(request):
 
     data['carpetas_procesando'] = selected_subdfolders_base_name
     data['indices'] = selected_indices
+    data['mostrar_barra_proceso'] = True
 
     # Return the prepared data with the template for rendering
     return render(request, 'indices/indices.html', data)

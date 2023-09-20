@@ -168,6 +168,8 @@
 
                                 {% endfor %}
 
+                                {% if mostrar_barra_proceso %}
+
                                 <br>
                                 <section class="col-12 col-12-narrower">
                                     <div class="chart">
@@ -176,6 +178,7 @@
                                     </div>
                                 </section>
 
+                                {% endif %}
                                 {% endif %}
                             </section>
 
@@ -332,7 +335,7 @@
 
                                 {% endif %}
 
-                                {% if carpetas_procesando %}
+                                {% if mostrar_barra_proceso %}
                                 <br>
                                 <section class="col-12 col-12-narrower">
                                     <div class="chart">

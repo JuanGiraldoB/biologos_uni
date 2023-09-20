@@ -310,6 +310,8 @@ async def process_folders(request):
     await sync_to_async(save_csv_path_session)(
         request, csv_path, app='etiquetado_auto')
 
+    data['mostrar_barra_proceso'] = True
+
     # Return the prepared data with the template for rendering
     return render(request, "etiquetado_auto/etiquetado-auto.html", data)
 

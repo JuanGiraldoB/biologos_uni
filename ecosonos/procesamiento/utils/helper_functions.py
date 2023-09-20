@@ -169,6 +169,7 @@ async def process_folders(request):
 
     data['statistics'] = statistics
     data['carpetas_procesando'] = selected_subdfolders_base_name
+    data['mostrar_barra_proceso'] = True
 
     # Return the prepared data with the template for rendering
     # return JsonResponse(data)
