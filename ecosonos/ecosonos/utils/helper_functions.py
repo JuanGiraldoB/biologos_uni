@@ -14,8 +14,8 @@ def get_advance_percentage():
     cantidad_archivos = progreso.cantidad_archivos
 
     try:
-        porcentaje_completado = int(
-            (archivos_completados / cantidad_archivos) * 100)
+        porcentaje_completado = round(
+            (archivos_completados / cantidad_archivos) * 100, 2)
     except:
         porcentaje_completado = 0
 

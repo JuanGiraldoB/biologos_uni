@@ -3,6 +3,7 @@ let intervalId = null;
 document.addEventListener("DOMContentLoaded", function () {
 	let button_sonotipo = document.getElementById("procesar_carpetas_sonotipo");
 	let button_reconocer = document.getElementById("procesar_carpetas_reconocer");
+	let div_barra_temporal = document.getElementById("barra_temporal");
 
 	if (button_sonotipo) {
 		intervalId = setInterval(() => {
@@ -11,6 +12,10 @@ document.addEventListener("DOMContentLoaded", function () {
 	} else if (button_reconocer) {
 		intervalId = setInterval(() => {
 			updateProgressBar("reconocer");
+		}, 500);
+	} else if (div_barra_temporal) {
+		intervalId = setInterval(() => {
+			updateProgressBar("temporal");
 		}, 500);
 	}
 });
@@ -36,7 +41,11 @@ function updateProgressBar(type) {
 			if (porcentaje_completado == 100) {
 				spanValue.innerHTML = "Completado";
 				clearInterval(intervalId);
-				show_files(type);
+				if (type == "temporal") {
+					getPlots();
+				} else {
+					show_files(type);
+				}
 			}
 		}
 	};

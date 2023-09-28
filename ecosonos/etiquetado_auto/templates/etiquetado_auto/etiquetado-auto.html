@@ -27,6 +27,13 @@
 <body class="is-preload">
     <div id="page-wrapper">
 
+        {% for fig_url in fig_urls %}
+
+        <img src="{{ fig_url }}" alt="Your Image">
+
+        {% endfor %}
+
+
         <!-- Header -->
         <div id="header">
 
@@ -80,8 +87,8 @@
                         <div class="contenidos">
                             <button type="submit" name="sonotipo" id="sonotipo">Sonotipo</button>
                             <button type="submit" name="reconocer" id="reconocer">Reconocer</button>
-                            <!-- <button type="submit" name="mostrar-tabla">Visualizar Clasificación </button>
-                                <button type="submit" name="mostrar-tabla">Patrones temporales del sonotipo</button> -->
+                            <button type="submit" name="temporal" id="temporal">Patrones temporales del
+                                sonotipo</button>
                         </div>
                     </section>
                     <div class="contenedor-iframes">
@@ -375,6 +382,44 @@
                             </section>
                             {% endif %}
                         </div>
+                        <!-- Contenido patrones temporales -->
+                        <div id="temporal_div" style="display: {{ div_temporal|default:'none' }};">
+                            <h1>Patrones Temporales</h1>
+                            <section class="col-12 col-12-narrower">
+                                <form class="filtros" method="POST" action="{% url 'temporal' %}"
+                                    id="cargar_csv_nuevas_especies">
+                                    {% csrf_token %}
+                                    <section class="col-12 col-12-narrower">
+                                        <div class="contenidos">
+                                            <input type="hidden" name="div" value="div_temporal" />
+                                            <input type="submit" value="Seleccionar CSV Nuevas Especies"
+                                                id="nuevas_especies" name="nuevas_especies"></input>
+                                        </div>
+                                    </section>
+                                </form>
+
+                                {% if div_temporal == 'block' %}
+
+
+                                {% if mostrar_barra_proceso %}
+
+                                <br>
+                                <section class="col-12 col-12-narrower">
+                                    <div class="chart">
+                                        <div class="bar" id="barra_temporal"></div>
+                                        <span id="value1">0%</span>
+                                    </div>
+                                </section>
+
+                                {% endif %}
+
+                                <id id="contedorImagenes">
+
+                                </id>
+
+                                {% endif %}
+                            </section>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -430,6 +475,7 @@
     <script src="{% static 'etiquetado_auto/showFiles.js' %}"></script>
     <script src="{% static 'etiquetado_auto/progressBar.js' %}"></script>
     <script src="{% static 'etiquetado_auto/showOptions.js' %}"></script>
+    <script src="{% static 'etiquetado_auto/getPlots.js' %}"></script>
 </body>
 
 </html>

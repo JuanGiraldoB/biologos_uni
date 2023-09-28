@@ -11,7 +11,6 @@ import asyncio
 import pandas as pd
 import statistics as stat
 from scipy.stats import zscore
-from django.db import transaction
 
 
 def fcc5(canto, nfiltros, nc, nframes):
@@ -253,7 +252,10 @@ def time_and_date(archivos_full_dir, archivos_nombre_base):
 
     for direccion, nombre in zip(archivos_full_dir, archivos_nombre_base):
         audios.append(direccion)
-        datos = nombre.split("_")
+        if '__' in nombre:
+            datos = nombre.split("__")
+        else:
+            datos = nombre.split("_")
 
         if len(datos) > 2:
             cronologia["nombre_archivo"].append(direccion)
@@ -326,8 +328,11 @@ def segmentacion(archivos_full_dir, archivos_nombre_base, banda, canal, progreso
         fs (int): frecuencia de muestreo
     """
 
-    fechas, cronologia, audios = time_and_date(
-        archivos_full_dir, archivos_nombre_base)
+    try:
+        fechas, cronologia, audios = time_and_date(
+            archivos_full_dir, archivos_nombre_base)
+    except Exception as e:
+        print('error 3 : ', e)
 
     ##### Funcion segmentacion########
     # esta se programa dentro de primer for con i = 1
@@ -390,98 +395,100 @@ def segmentacion(archivos_full_dir, archivos_nombre_base, banda, canal, progreso
 
         segm_xie, segmentos_nor = seg_xie(intensity, time, frecuency)
 
-        for k in range(len(segm_xie[:, 1])):
-            try:
-                ti = np.array(segm_xie[k, 0])  # tiempo inicial (X)
-                tf = np.array(segm_xie[k, 1])  # tiempo final(X+W)
-                fi = np.array(segm_xie[k, 3])  # frecuencia inicial (Y)
-                fff = np.array(segm_xie[k, 2])  # frecuencia final (Y+H)
+        if len(segm_xie) > 0:
+            for k in range(len(segm_xie[:, 1])):
+                try:
+                    ti = np.array(segm_xie[k, 0])  # tiempo inicial (X)
+                    tf = np.array(segm_xie[k, 1])  # tiempo final(X+W)
+                    fi = np.array(segm_xie[k, 3])  # frecuencia inicial (Y)
+                    fff = np.array(segm_xie[k, 2])  # frecuencia final (Y+H)
 
-                if fi >= banda_aux[0] and fff <= banda_aux[1]:
-                    segm_xie_band = np.append(segm_xie_band, np.expand_dims(
-                        np.array([segm_xie[k, 0], segm_xie[k, 1], segm_xie[k, 2], segm_xie[k, 3]]), axis=0), axis=0)
-                    segmentos_nor_band = np.append(segmentos_nor_band, np.expand_dims(
-                        np.array([segmentos_nor[k, 0], segmentos_nor[k, 1],
-                                 segmentos_nor[k, 2], segmentos_nor[k, 3]]),
-                        axis=0), axis=0)
-            except:
-                0
-
-        segm_xie = segm_xie_band
-        segmentos_nor = segmentos_nor_band
-
-        k = 0
-        for k in range(len(segm_xie[:, 1])):
-            try:
-                ti = np.array(segm_xie[k, 0])  # tiempo inicial (X)
-                tf = np.array(segm_xie[k, 1])  # tiempo final(X+W)
-                fi = np.array(segm_xie[k, 3])  # frecuencia inicial (Y)
-                fff = np.array(segm_xie[k, 2])  # frecuencia final (Y+H)
-
-                x = np.array(segmentos_nor[k, 0]) + 1  # tiempo inicial (X)
-                xplusw = segmentos_nor[k, 0] + \
-                    segmentos_nor[k, 2]  # Tiempo final(X+W)
-                y = segmentos_nor[k, 1] + 1  # frecuencia inicial (Y)
-                # frecuencia final (Y+H)
-                yplush = segmentos_nor[k, 1] + segmentos_nor[k, 3]
-                seg = np.array(
-                    selband[int(y - 1):int(yplush), int(x - 1):int(xplusw)])
-                nfrec = 4
-                div = 4
-                nfiltros = 14  # se cambia porque con 30 se pierden muchos cantos
-                # 50 caracteristicas FCCs
-                features = fcc5(seg, nfiltros, div, nfrec)
-
-                fseg, cseg = np.shape(seg)
-                seg = ((seg - (np.matlib.repmat((np.min(np.real(seg[:]))), fseg, cseg)))
-                       / ((np.matlib.repmat((np.max(np.real(seg[:]))), fseg, cseg))
-                          - (np.matlib.repmat((np.min(np.real(seg[:]))), fseg, cseg))))
-
-                # cambio frecuencia dominante
-                sum_domin = np.transpose(
-                    np.expand_dims(np.sum(seg, 1), axis=0))
-
-                dummy, dom = (np.max(np.real(np.transpose(np.expand_dims(savgol_filter(np.ravel(sum_domin), 1, 0), axis=0))))), np.argmax(
-                    savgol_filter(np.ravel(sum_domin), 1, 0))
-
-                dom = ((((fi * u / (fs / 2)) + dom) / u)
-                       * fs / 2)  # frecuencia dominante
-
-                dfcc = np.diff(features, 1)
-                dfcc2 = np.diff(features, 2)
-                cf = np.cov(features)
-                ff = []
-                for r in range(len(features[:, 0]) - 1):
-                    ff = np.append(ff, np.diag(cf), axis=0)
-
-                # transforma la matriz en un vector tipo columna
-                features = np.expand_dims(features.flatten(order='F'), axis=0)
-                # se agregan los resultados de dffcc y dffc2 a features
-                features = np.append(features, np.concatenate(
-                    (np.expand_dims(np.mean(dfcc, 1), axis=0), np.expand_dims(np.mean(dfcc2, 1), axis=0)), axis=1),
-                    axis=1)
-                features = np.transpose(features)
-
-                if tf > ti and fff > fi:
-
-                    lista_aux1 = [np.int16(fechas.T[0, 2:6])]
-                    lista_aux1 = np.array(lista_aux1)
-                    lista_aux2 = np.concatenate(
-                        (np.expand_dims(ti, axis=0), np.expand_dims(tf, axis=0), np.expand_dims(tf - ti, axis=0),
-                         np.expand_dims(dom, axis=0), np.expand_dims(
-                             fi, axis=0), np.expand_dims(fff, axis=0),
-                         np.expand_dims(band_1, axis=0), np.expand_dims(band_2, axis=0)))
-                    lista_aux2 = np.array(lista_aux2)
-                    lista_aux3 = np.append(lista_aux1, lista_aux2)
-                    lista_aux4 = np.append(lista_aux3, features.T)
-
-                    segment_data.append(lista_aux4)
-                    nombre_archivo.append(fechas[0, contador_archivos])
-
-                else:
+                    if fi >= banda_aux[0] and fff <= banda_aux[1]:
+                        segm_xie_band = np.append(segm_xie_band, np.expand_dims(
+                            np.array([segm_xie[k, 0], segm_xie[k, 1], segm_xie[k, 2], segm_xie[k, 3]]), axis=0), axis=0)
+                        segmentos_nor_band = np.append(segmentos_nor_band, np.expand_dims(
+                            np.array([segmentos_nor[k, 0], segmentos_nor[k, 1],
+                                      segmentos_nor[k, 2], segmentos_nor[k, 3]]),
+                            axis=0), axis=0)
+                except:
                     0
-            except:
-                0
+
+            segm_xie = segm_xie_band
+            segmentos_nor = segmentos_nor_band
+
+            k = 0
+            for k in range(len(segm_xie[:, 1])):
+                try:
+                    ti = np.array(segm_xie[k, 0])  # tiempo inicial (X)
+                    tf = np.array(segm_xie[k, 1])  # tiempo final(X+W)
+                    fi = np.array(segm_xie[k, 3])  # frecuencia inicial (Y)
+                    fff = np.array(segm_xie[k, 2])  # frecuencia final (Y+H)
+
+                    x = np.array(segmentos_nor[k, 0]) + 1  # tiempo inicial (X)
+                    xplusw = segmentos_nor[k, 0] + \
+                        segmentos_nor[k, 2]  # Tiempo final(X+W)
+                    y = segmentos_nor[k, 1] + 1  # frecuencia inicial (Y)
+                    # frecuencia final (Y+H)
+                    yplush = segmentos_nor[k, 1] + segmentos_nor[k, 3]
+                    seg = np.array(
+                        selband[int(y - 1):int(yplush), int(x - 1):int(xplusw)])
+                    nfrec = 4
+                    div = 4
+                    nfiltros = 14  # se cambia porque con 30 se pierden muchos cantos
+                    # 50 caracteristicas FCCs
+                    features = fcc5(seg, nfiltros, div, nfrec)
+
+                    fseg, cseg = np.shape(seg)
+                    seg = ((seg - (np.matlib.repmat((np.min(np.real(seg[:]))), fseg, cseg)))
+                           / ((np.matlib.repmat((np.max(np.real(seg[:]))), fseg, cseg))
+                              - (np.matlib.repmat((np.min(np.real(seg[:]))), fseg, cseg))))
+
+                    # cambio frecuencia dominante
+                    sum_domin = np.transpose(
+                        np.expand_dims(np.sum(seg, 1), axis=0))
+
+                    dummy, dom = (np.max(np.real(np.transpose(np.expand_dims(savgol_filter(np.ravel(sum_domin), 1, 0), axis=0))))), np.argmax(
+                        savgol_filter(np.ravel(sum_domin), 1, 0))
+
+                    dom = ((((fi * u / (fs / 2)) + dom) / u)
+                           * fs / 2)  # frecuencia dominante
+
+                    dfcc = np.diff(features, 1)
+                    dfcc2 = np.diff(features, 2)
+                    cf = np.cov(features)
+                    ff = []
+                    for r in range(len(features[:, 0]) - 1):
+                        ff = np.append(ff, np.diag(cf), axis=0)
+
+                    # transforma la matriz en un vector tipo columna
+                    features = np.expand_dims(
+                        features.flatten(order='F'), axis=0)
+                    # se agregan los resultados de dffcc y dffc2 a features
+                    features = np.append(features, np.concatenate(
+                        (np.expand_dims(np.mean(dfcc, 1), axis=0), np.expand_dims(np.mean(dfcc2, 1), axis=0)), axis=1),
+                        axis=1)
+                    features = np.transpose(features)
+
+                    if tf > ti and fff > fi:
+
+                        lista_aux1 = [
+                            np.int16(fechas.T[contador_archivos, 2:6])]
+                        lista_aux1 = np.array(lista_aux1)
+                        lista_aux2 = np.concatenate(
+                            (np.expand_dims(ti, axis=0), np.expand_dims(tf, axis=0), np.expand_dims(tf - ti, axis=0),
+                             np.expand_dims(dom, axis=0), np.expand_dims(
+                                fi, axis=0), np.expand_dims(fff, axis=0),
+                             np.expand_dims(band_1, axis=0), np.expand_dims(band_2, axis=0)))
+                        lista_aux2 = np.array(lista_aux2)
+                        lista_aux3 = np.append(lista_aux1, lista_aux2)
+                        lista_aux4 = np.append(lista_aux3, features.T)
+
+                        segment_data.append(lista_aux4)
+                        nombre_archivo.append(fechas[0, contador_archivos])
+                    else:
+                        0
+                except:
+                    0
 
         progreso.archivos_completados += 1
         progreso.save()
@@ -807,11 +814,9 @@ def Metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, 
     dispersion = []
 
     if type(banda[0]) == str and type(banda[1]) == str:
-        print(f'banda: {banda} str')
         datos, nombre_archivo, fs = segmentacion(
             archivos_full_dir, archivos_nombre_base, ["min", "max"], canal, progreso)
     else:
-        print(f'banda: {banda} int')
         datos, nombre_archivo, fs = segmentacion(
             archivos_full_dir, archivos_nombre_base, banda, canal, progreso)
 
@@ -821,22 +826,25 @@ def Metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, 
         # datos,nombre_archivo=VisualizacionSegs(rutain,datos,nombre_archivo,canal,banda)
     else:
         0
+
     if len(datos) > 0:
         datos_carac1 = np.array(datos[:, 7:10])
         datos_carac = np.zeros((datos_carac1.shape[0], 27))
         datos_carac2 = np.array(datos[:, 12:])
 
-    datos_carac[:, 0:3] = datos_carac1
-    datos_carac[:, 3:] = datos_carac2
+    try:
+        datos_carac[:, 0:3] = datos_carac1
+        datos_carac[:, 3:] = datos_carac2
 
-    zscore_min = np.expand_dims(np.amin(datos_carac, axis=0), axis=0)
-    zscore_max = np.expand_dims(np.amax(datos_carac, axis=0), axis=0)
-    rel_zscore = zscore_max-zscore_min
+        zscore_min = np.expand_dims(np.amin(datos_carac, axis=0), axis=0)
+        zscore_max = np.expand_dims(np.amax(datos_carac, axis=0), axis=0)
+        rel_zscore = zscore_max-zscore_min
 
-    datos_clasifi = ZscoreMV(datos_carac, zscore_min, rel_zscore)
+        datos_clasifi = ZscoreMV(datos_carac, zscore_min, rel_zscore)
 
-    infoZC = np.array([zscore_min, zscore_max, 0], dtype=object)
-
+        infoZC = np.array([zscore_min, zscore_max, 0], dtype=object)
+    except Exception as e:
+        print(e)
     if autosel == 0:
         feat = np.array(list(range(0, len(datos_clasifi[1]))))
         infoZC[2] = np.expand_dims(feat, axis=0)
@@ -932,37 +940,42 @@ def Metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, 
             np.sum(np.std(datos_clasifi[(recon[0, :] == i), :], axis=1)))
     dispersion = np.expand_dims(np.array(dispersion), axis=0)
 
+    column_mapping = {
+        0: 'File',
+        1: 'Month',
+        2: 'Day',
+        3: 'Hour',
+        4: 'Minute',
+        5: 'Start',
+        6: 'End',
+        7: 'Length',
+        8: 'Fdom',
+        9: 'FminVoc',
+        10: 'FmaxVoc',
+        11: 'Fmin',
+        12: 'Fmax',
+        13: 'Cluster'
+    }
+
     Tabla_NewSpecies = pd.DataFrame(table)
+    Tabla_NewSpecies.rename(columns=column_mapping, inplace=True)
     Tabla_NewSpecies.to_csv(
         csv_name, index=False)
 
+    progreso.archivos_completados += progreso.uno_porciento
+    progreso.save()
+
     try:
-        print(1)
         metodologia_output.datos_clasifi = datos_clasifi.tolist()
-        print(2)
-
         metodologia_output.mean_class = mean_class.tolist()
-        print(3)
-
         infoZC = [arr.tolist() for arr in infoZC]
-
         metodologia_output.infoZC = infoZC
-        print(4)
-
         metodologia_output.gadso = gadso.tolist()
-        print(5)
-
         representativo = [int(item) for item in representativo]
-
         metodologia_output.representativo = representativo
-        print(6)
-
         metodologia_output.dispersion = dispersion.tolist()
-        print(7)
-
         metodologia_output.frecuencia = frecuencia.tolist()
         metodologia_output.save()
-        print(8)
     except Exception as e:
         print(e)
 
@@ -1241,9 +1254,30 @@ def Metodologia_Prueba(files_paths, files_basenames, banda, canal, specs, specie
     Dispersion = (Dispersion - min(Dispersion)) / \
         (max(Dispersion) - min(Dispersion))
 
+    column_mapping = {
+        0: 'File',
+        1: 'Month',
+        2: 'Day',
+        3: 'Hour',
+        4: 'Minute',
+        5: 'Start',
+        6: 'End',
+        7: 'Length',
+        8: 'Fdom',
+        9: 'FminVoc',
+        10: 'FmaxVoc',
+        11: 'Fmin',
+        12: 'Fmax',
+        13: 'Cluster'
+    }
+
     Tabla_NewSpecies = pd.DataFrame(table)
+    Tabla_NewSpecies.rename(columns=column_mapping, inplace=True)
     Tabla_NewSpecies.to_csv(
         csv_path, index=False)
+
+    progreso.archivos_completados += progreso.uno_porciento
+    progreso.save()
 
     return table, datos_clasifi, mean_clas2, infoZC, gadso, repre, Dispersion, frecuencia
 
@@ -1265,7 +1299,9 @@ def guardado_cluster(nombre1, table, mean_class, infoZC, representativo, frecuen
         el reconocimiento de esa especie, necesario para que "Metodologia_Prueba" identifique especies
     """
     newSpec = np.array([])
+    print('cantidad:', int(max(table[:, -1]+1)))
     for segmentos in range(0, int(max(table[:, -1]+1))):
+        print('segmento:', segmentos)
         Nombre = nombre1+str(segmentos)
         seleccion = np.where(table[:, -1] == segmentos)
         elegidos = table[seleccion]
@@ -1301,7 +1337,6 @@ def guardado_cluster(nombre1, table, mean_class, infoZC, representativo, frecuen
             for g in range(len(idx)):
                 if np.isnan(idx[g]):
                     ind[g] = 0
-                    print("a")
                 else:
                     ind[g] = 1
             ind = np.where(ind)[0]
@@ -1358,4 +1393,5 @@ def guardado_cluster(nombre1, table, mean_class, infoZC, representativo, frecuen
             newSpec = newSpec0
         else:
             newSpec = np.concatenate((newSpec, newSpec0))
+        print('terminado')
     return newSpec

@@ -2,6 +2,10 @@ from django.shortcuts import render
 from django.http import JsonResponse
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+import os
+from django.conf import settings
+from django.templatetags.static import static
 
 from ..models import MetodologiaResult
 
@@ -37,8 +41,11 @@ from ecosonos.utils.carpeta_utils import (
     get_all_files_in_all_folders
 )
 
-from .spectrogram_clusters import generate_spectrogram_with_clusters_plot, generate_spectrogram_representative_element_plot
-
+from .plot_helper import (
+    generate_spectrogram_with_clusters_plot,
+    generate_spectrogram_representative_element_plot,
+    run_generate_hourly_pattern_graph_of_the_sonotype
+)
 from procesamiento.models import Progreso
 import pandas as pd
 from ecosonos.utils.tkinter_utils import get_root_folder, get_file
@@ -51,9 +58,15 @@ def toogle_div_visibility(request, data):
     if div_type == "div_sonotipo":
         data['div_sonotipo'] = "block"
         data['div_reconocer'] = "none"
-    else:
-        data['div_sonotipo'] = "none"
+        data['div_temporal'] = "none"
+    elif div_type == "div_reconocer":
         data['div_reconocer'] = "block"
+        data['div_sonotipo'] = "none"
+        data['div_temporal'] = "none"
+    else:
+        data['div_temporal'] = "block"
+        data['div_sonotipo'] = "none"
+        data['div_reconocer'] = "none"
 
 
 async def load_folder(request):
@@ -128,11 +141,14 @@ async def load_csv(request):
         request, csv_path, app='etiquetado_auto')
 
     # Read the CSV file into a pandas DataFrame
+    print('loading')
     table = pd.read_csv(csv_path)
     table = table.to_numpy()
     cluster_names = 'Sp'
+    print('done loading')
 
     try:
+        print(1)
         # Get MetodologiaResult object obtained from running sonotipo
         metodologia = await sync_to_async(MetodologiaResult.objects.first)()
         mean_class = np.array(metodologia.mean_class)
@@ -140,12 +156,14 @@ async def load_csv(request):
         representativo = np.array(metodologia.representativo)
         frecuencia = np.array(metodologia.frecuencia)
     except:
+        print(2)
         return render(request, "etiquetado_auto/etiquetado-auto.html", data)
 
     # Generate new table with the values obtained from running sonotipo
+    print(3)
     new_specs = await sync_to_async(guardado_cluster)(cluster_names, table, mean_class,
                                                       infoZC, representativo, frecuencia)
-
+    print(4)
     # Extract cluster names from new_specs
     species_str = new_specs[0:, 0]
     species_str = [i[0] for i in species_str]
@@ -252,8 +270,11 @@ async def process_folders(request):
     # Save file details to the session
     save_files_session(request, files_details, app='etiquetado_auto')
 
+    # Calculate the 1% of total files
+    one_percent = int(0.01 * len(files_paths))
+
     # Create a progress object to track the processing progress with the amount of files from the selected folders
-    progreso = await sync_to_async(Progreso.objects.create)(cantidad_archivos=len(files_paths))
+    progreso = await sync_to_async(Progreso.objects.create)(cantidad_archivos=len(files_paths) + one_percent, uno_porciento=one_percent)
 
     # Get selected subfolders basenames
     selected_folders_basenames = get_subfolders_basename(
@@ -266,9 +287,11 @@ async def process_folders(request):
     banda = [minimum_frequency, maximum_frequency]
 
     # Determine if this is for "sonotipo" or "reconocer" and prepare the CSV path accordingly
-    table_type = 'sonotipo' if data['div_sonotipo'] == 'block' else 'reconocer'
-    csv_path = prepare_csv_path(
-        selected_folders_basenames, destination_folder, table_type)
+    csv_name = 'Tabla_Nuevas_especies.csv' if data['div_sonotipo'] == 'block' else 'Tabla_reconocimiento.csv'
+    # csv_path = prepare_csv_path(
+    #     selected_folders_basenames, destination_folder, table_type)
+
+    csv_path = os.path.join(destination_folder, csv_name)
 
     # Create a MetodologiaResult object for storing results
     metodologia_output = await sync_to_async(MetodologiaResult.objects.create)()
@@ -276,8 +299,12 @@ async def process_folders(request):
     data['carpetas_procesando'] = selected_folders_basenames
 
     if data['div_sonotipo'] == 'block':
-        asyncio.create_task(run_metodologia(
-            files_paths, files_basenames, banda, canal, autosel, visualize, progreso, csv_path, metodologia_output))
+        try:
+            asyncio.create_task(run_metodologia(
+                files_paths, files_basenames, banda, canal, autosel, visualize, progreso, csv_path, metodologia_output))
+        except Exception as e:
+            print('error: ***********', e)
+
     else:
         # For "reconocer" mode, load the CSV table and run the metodologia prueba
         csv_path_sonotipo_table = await sync_to_async(get_csv_path_session)(request, app='etiquetado_auto')
@@ -384,3 +411,48 @@ def get_spectrogram_data(request):
 
     # Return the data as a JSON response
     return JsonResponse(data)
+
+
+async def process_hourly_sonotype(request):
+    # Create an empty dictionary to store data that will be sent to the template
+    data = {}
+
+    await sync_to_async(toogle_div_visibility)(request, data)
+
+    try:
+        # Get the CSV file path
+        csv_path = await sync_to_async(get_file)()
+    except Exception as e:
+        print(e)
+        return render(request, "etiquetado_auto/etiquetado-auto.html", data)
+
+    # Check if there was a selected file and contains a ".csv" extension
+    if not csv_path or ".csv" not in csv_path:
+        return render(request, "etiquetado_auto/etiquetado-auto.html", data)
+
+    dft = pd.read_csv(csv_path)
+    unique_clusters = list(dft['Cluster'].unique())
+    progreso = await sync_to_async(Progreso.objects.create)(cantidad_archivos=len(unique_clusters))
+    asyncio.create_task(
+        run_generate_hourly_pattern_graph_of_the_sonotype(dft, progreso))
+
+    data['mostrar_barra_proceso'] = True
+
+    return render(request, "etiquetado_auto/etiquetado-auto.html", data)
+
+
+def get_hourly_sonotype_plots_urls():
+    img_dir = os.path.join(settings.BASE_DIR, 'etiquetado_auto', 'static',
+                           'etiquetado_auto', 'img')
+
+    # Get a list of image file names in the directory
+    img_file_names = [f for f in os.listdir(
+        img_dir) if f.lower().endswith(('.png'))]
+
+    # Construct the URLs for each image
+    img_urls = [os.path.join(
+        settings.STATIC_URL, 'etiquetado_auto', 'img', fname) for fname in img_file_names]
+
+    print(img_urls)
+
+    return JsonResponse({"img_urls": img_urls})

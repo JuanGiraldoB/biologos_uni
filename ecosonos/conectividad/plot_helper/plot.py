@@ -31,14 +31,14 @@ def create_map(departamentos, df_points):
                 min_lat - buffer_degrees]
 
     # Add scatter trace for the points
-    fig.add_trace(go.Scattermapbox(
-        lat=df_points['latitude_IG'],
-        lon=df_points['longitud_IG'],
-        mode='markers',
-        marker=dict(size=5, color='red'),
-        name='Points',
-        showlegend=False
-    ))
+    # fig.add_trace(go.Scattermapbox(
+    #     lat=df_points['latitude_IG'],
+    #     lon=df_points['longitud_IG'],
+    #     mode='markers',
+    #     marker=dict(size=5, color='red'),
+    #     name='Points',
+    #     showlegend=False
+    # ))
 
     # this is the square
     fig.add_trace(
@@ -51,13 +51,29 @@ def create_map(departamentos, df_points):
         )
     )
 
-    # Create an empty list to store the border traces
-
     # Add all border traces to the figure
-    border_traces = obtener_bordes_colombia(departamentos)
-    fig.add_traces(border_traces)
+    # border_traces = obtener_bordes_colombia(departamentos)
+    # fig.add_traces(border_traces)
+
+    random_values = np.random.uniform(0, 1, len(df_points['latitude_IG']))
+
+    # Create a heatmap trace with random values
+    heatmap_trace = go.Densitymapbox(
+        lat=df_points['latitude_IG'],
+        lon=df_points['longitud_IG'],
+        z=random_values,
+        radius=20,
+        showscale=True,
+        colorscale='Viridis',
+        colorbar_title='Heatmap Intensity',
+        opacity=1,
+    )
+
+    # Add the heatmap trace to the figure
+    fig.add_trace(heatmap_trace)
 
     fig.update_layout(mapbox_style="carto-positron",
+                      mapbox_accesstoken='pk.eyJ1IjoibWF4cm9ja2V0IiwiYSI6ImNsbjBxdWQwaTFxc2UyanQzaWJmMHEyMzIifQ.1gUmlIl8TbjowZyfurGLOA',
                       mapbox_zoom=10,
                       mapbox_center={
                           "lat": (max_lat + min_lat) / 2, "lon": (max_lon + min_lon) / 2},

@@ -3,7 +3,7 @@ function show_files(type) {
 	let formData = new FormData();
 	formData.append("informacion", "informacion");
 
-	xhr.open("POST", "/etiquetado-auto/espectrograma", true);
+	xhr.open("POST", "/etiquetado-auto/plots", true);
 	xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 
 	xhr.onreadystatechange = function () {
