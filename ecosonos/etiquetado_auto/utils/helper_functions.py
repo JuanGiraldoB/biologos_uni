@@ -141,14 +141,11 @@ async def load_csv(request):
         request, csv_path, app='etiquetado_auto')
 
     # Read the CSV file into a pandas DataFrame
-    print('loading')
     table = pd.read_csv(csv_path)
     table = table.to_numpy()
     cluster_names = 'Sp'
-    print('done loading')
 
     try:
-        print(1)
         # Get MetodologiaResult object obtained from running sonotipo
         metodologia = await sync_to_async(MetodologiaResult.objects.first)()
         mean_class = np.array(metodologia.mean_class)
@@ -156,14 +153,11 @@ async def load_csv(request):
         representativo = np.array(metodologia.representativo)
         frecuencia = np.array(metodologia.frecuencia)
     except:
-        print(2)
         return render(request, "etiquetado_auto/etiquetado-auto.html", data)
 
     # Generate new table with the values obtained from running sonotipo
-    print(3)
     new_specs = await sync_to_async(guardado_cluster)(cluster_names, table, mean_class,
                                                       infoZC, representativo, frecuencia)
-    print(4)
     # Extract cluster names from new_specs
     species_str = new_specs[0:, 0]
     species_str = [i[0] for i in species_str]
@@ -452,7 +446,5 @@ def get_hourly_sonotype_plots_urls():
     # Construct the URLs for each image
     img_urls = [os.path.join(
         settings.STATIC_URL, 'etiquetado_auto', 'img', fname) for fname in img_file_names]
-
-    print(img_urls)
 
     return JsonResponse({"img_urls": img_urls})

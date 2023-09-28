@@ -73,7 +73,7 @@ function createA(path, basename, type) {
 
 		// Create a new XMLHttpRequest object
 		let xhr = new XMLHttpRequest();
-		xhr.open("POST", "/etiquetado-auto/espectrograma", true);
+		xhr.open("POST", "/etiquetado-auto/plots", true);
 
 		// Set up the request headers
 		xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
@@ -227,7 +227,7 @@ function submitForm(selectedValue, type) {
 	formData.append("representativo", selectedValue);
 
 	let xhr = new XMLHttpRequest();
-	xhr.open("POST", "/etiquetado-auto/espectrograma", true);
+	xhr.open("POST", "/etiquetado-auto/plots", true);
 	xhr.onreadystatechange = function () {
 		if (xhr.readyState === 4) {
 			if (xhr.status === 200) {

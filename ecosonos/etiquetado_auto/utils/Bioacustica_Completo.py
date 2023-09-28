@@ -1299,15 +1299,12 @@ def guardado_cluster(nombre1, table, mean_class, infoZC, representativo, frecuen
         el reconocimiento de esa especie, necesario para que "Metodologia_Prueba" identifique especies
     """
     newSpec = np.array([])
-    print('cantidad:', int(max(table[:, -1]+1)))
     for segmentos in range(0, int(max(table[:, -1]+1))):
-        print('segmento:', segmentos)
         Nombre = nombre1+str(segmentos)
         seleccion = np.where(table[:, -1] == segmentos)
         elegidos = table[seleccion]
         fmin = np.mean(elegidos[:, 11])
         fmax = np.mean(elegidos[:, 12])
-        # print(segmentos)
         clase = stat.mode(elegidos[:, -1])
         if segmentos >= len(representativo):
             print(
@@ -1393,5 +1390,4 @@ def guardado_cluster(nombre1, table, mean_class, infoZC, representativo, frecuen
             newSpec = newSpec0
         else:
             newSpec = np.concatenate((newSpec, newSpec0))
-        print('terminado')
     return newSpec

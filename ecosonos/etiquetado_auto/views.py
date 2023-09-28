@@ -52,7 +52,6 @@ async def reconocer_view(request):
 async def temporal_view(request):
     if request.method == 'POST':
         if 'nuevas_especies' in request.POST:
-            print("something")
             return await process_hourly_sonotype(request)
 
     return render(request, "etiquetado_auto/etiquetado-auto.html")

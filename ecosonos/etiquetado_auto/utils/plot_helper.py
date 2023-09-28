@@ -149,7 +149,6 @@ def generate_spectrogram_with_clusters_plot(file_path, selected_clusters, df):
 def generate_spectrogram_representative_element_plot(metodologia_output, df, representativo_index):
     table = df
     representativo = metodologia_output.representativo
-    print("represnetativo mnetodologia:", representativo)
     # selección de un cluster numero minimo y maximo dado por la tabla puede cambiar este numero según los clusters que haya
     representativo_row = representativo[representativo_index]
 
@@ -248,11 +247,6 @@ def generate_hourly_pattern_graph_of_the_sonotype(dft, progreso):
     Dmin = int(dft.Day.min())
     Dmax = int(dft.Day.max())
     x = list(range(24))
-    print('Dia Minimo: ', Dmin)
-    print('Dia Maximo: ', Dmax)
-    print('Sitios: ', sitios)
-    # print('Cantidad de Sitios: ',len(sitios))
-    print('Sonotipos: ', max(sonotipos))
 
     fig_urls = []
 
@@ -306,8 +300,7 @@ def generate_hourly_pattern_graph_of_the_sonotype(dft, progreso):
         # Get the URL for the saved figure
         fig_url = static(relative_path)
         fig_urls.append(fig_url)
-        print(f"Saved figure {i} as {fig_url}")
-        print(f"relative path of fig {i} is {fig_url}")
+
         progreso.archivos_completados += 1
         progreso.save()
 
