@@ -2,12 +2,11 @@ from django.shortcuts import render
 from django.http import JsonResponse
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 import os
 from django.conf import settings
-from django.templatetags.static import static
 
-from ..models import MetodologiaResult
+
+from ..models import MetodologiaResult, GuardadoClusterResult
 
 from .Bioacustica_Completo import (
     run_metodologia,
@@ -18,7 +17,9 @@ from .Bioacustica_Completo import (
 from .utils import (
     prepare_csv_path,
     get_cluster_names_session,
-    save_cluster_names_session
+    save_cluster_names_session,
+    serialize_and_save_to_db,
+    deserialize_from_db
 )
 
 from ecosonos.utils.session_utils import (
@@ -142,6 +143,7 @@ async def load_csv(request):
 
     # Read the CSV file into a pandas DataFrame
     table = pd.read_csv(csv_path)
+    del table['Membership']
     table = table.to_numpy()
     cluster_names = 'Sp'
 
@@ -158,6 +160,10 @@ async def load_csv(request):
     # Generate new table with the values obtained from running sonotipo
     new_specs = await sync_to_async(guardado_cluster)(cluster_names, table, mean_class,
                                                       infoZC, representativo, frecuencia)
+
+    await sync_to_async(GuardadoClusterResult.objects.all().delete)()
+    await sync_to_async(serialize_and_save_to_db)(new_specs)
+
     # Extract cluster names from new_specs
     species_str = new_specs[0:, 0]
     species_str = [i[0] for i in species_str]
@@ -303,6 +309,7 @@ async def process_folders(request):
         # For "reconocer" mode, load the CSV table and run the metodologia prueba
         csv_path_sonotipo_table = await sync_to_async(get_csv_path_session)(request, app='etiquetado_auto')
         table = pd.read_csv(csv_path_sonotipo_table)
+        del table['Membership']
         table = table.to_numpy()
         cluster_names = 'Sp'
 
@@ -317,8 +324,9 @@ async def process_folders(request):
             return render(request, "etiquetado_auto/etiquetado-auto.html", data)
 
         # Generate new spectrogram features using cluster information
-        new_specs = await sync_to_async(guardado_cluster)(cluster_names, table, mean_class,
-                                                          infoZC, representativo, frecuencia)
+        # new_specs = await sync_to_async(guardado_cluster)(cluster_names, table, mean_class,
+        #                                                   infoZC, representativo, frecuencia)
+        new_specs = await sync_to_async(deserialize_from_db)()
 
         # Get selected cluster names from the session
         selected_cluster_names = await sync_to_async(get_cluster_names_session)(request)
@@ -397,7 +405,7 @@ def get_spectrogram_data(request):
     df = pd.read_csv(csv_path)
 
     # Get unique cluster labels from the last column of the DataFrame
-    clusters = df.iloc[:, -1].unique().tolist()
+    clusters = df.iloc[:, -2].unique().tolist()
 
     # Sort the cluster labels numerically
     data['clusters'] = sorted(clusters)

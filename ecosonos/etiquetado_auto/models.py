@@ -12,3 +12,7 @@ class MetodologiaResult(models.Model):
 
     def __str__(self):
         return f"Metodologia Result - ID: {self.pk} - {self.representativo}"
+
+
+class GuardadoClusterResult(models.Model):
+    data = models.JSONField()

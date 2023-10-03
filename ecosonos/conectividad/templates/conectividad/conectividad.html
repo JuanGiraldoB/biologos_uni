@@ -78,12 +78,32 @@
                         <form class="filtros" method="POST" action="">
                             {% csrf_token %}
                             <section class="col-12 col-12-narrower">
+                                <div class="row gtr-50 campostxt">
+                                    <div class="col-6 col-12-mobilep">
+                                        <label for="hoja_excel">Nombre de la Hoja de Excel</label>
+                                        <input type="text" name="hoja_excel" id="hoja_excel"
+                                            placeholder="Hoja de excel" />
+                                    </div>
+                                    <div class="col-6 col-12-mobilep">
+                                        <label for="latitud">Nombre del campo de latitud</label>
+                                        <input type="text" name="latitud" id="latitud" placeholder="Latitud" />
+                                    </div>
+                                    <div class="col-6 col-12-mobilep">
+                                        <label for="longitud">Nombre del campo de longitud</label>
+                                        <input type="text" name="longitud" id="longitud" placeholder="Longitud" />
+                                    </div>
+                                </div>
                                 <div class="contenidos">
                                     <input type="submit" value="Seleccionar Archivo xlsx" id="cargar"
                                         name="cargar"></input>
                                 </div>
                             </section>
                         </form>
+
+                        {% if fig_url %}
+                        <iframe src="{{ fig_url }}" width="100%" height="500"></iframe>
+                        {% endif %}
+
                         {% if carpetas_nombre_completo %}
                         <form method="POST">
                             {% csrf_token %}

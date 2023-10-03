@@ -935,6 +935,10 @@ def Metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, 
 
     table = np.concatenate([nombre_archivo, tarr], axis=1, dtype="object")
 
+    prob = np.expand_dims((np.max(gadso, axis=0)), axis=1)
+
+    table = np.concatenate([table, prob], axis=1, dtype="object")
+
     for i in range(0, np.max(recon)):
         dispersion.append(
             np.sum(np.std(datos_clasifi[(recon[0, :] == i), :], axis=1)))
@@ -954,7 +958,8 @@ def Metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, 
         10: 'FmaxVoc',
         11: 'Fmin',
         12: 'Fmax',
-        13: 'Cluster'
+        13: 'Cluster',
+        14: 'Membership'
     }
 
     Tabla_NewSpecies = pd.DataFrame(table)
@@ -1248,6 +1253,14 @@ def Metodologia_Prueba(files_paths, files_basenames, banda, canal, specs, specie
     Fecha = datos[:, 0:4]
     Dispersion = []
 
+    gadso = gadso.reshape(-1, 1)
+
+    try:
+        prob = np.expand_dims((np.max(gadso, axis=1)), axis=1)
+        table = np.concatenate([table, prob], axis=1, dtype="object")
+    except Exception as e:
+        print(e)
+
     for i in range(0, np.max(recon)+1):
         Dispersion.append(
             np.sum(np.std(datos_clasifi[np.where(recon == i)[0], :], axis=0)))
@@ -1268,14 +1281,14 @@ def Metodologia_Prueba(files_paths, files_basenames, banda, canal, specs, specie
         10: 'FmaxVoc',
         11: 'Fmin',
         12: 'Fmax',
-        13: 'Cluster'
+        13: 'Cluster',
+        14: 'Membership'
     }
 
     Tabla_NewSpecies = pd.DataFrame(table)
     Tabla_NewSpecies.rename(columns=column_mapping, inplace=True)
     Tabla_NewSpecies.to_csv(
         csv_path, index=False)
-
     progreso.archivos_completados += progreso.uno_porciento
     progreso.save()
 
