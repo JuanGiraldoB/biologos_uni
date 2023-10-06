@@ -137,4 +137,4 @@ dmypy.json
 seg_xie.png
 *.png
 *.tif
-conectivity_plot.html
+conectivity_plot*.html

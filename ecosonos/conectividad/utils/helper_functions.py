@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from ecosonos.utils.tkinter_utils import get_file
-from ..plot_helper.plot import get_conectivity_map_url
+from ..plot_helper.plot import get_conectivity_map_url, test
 from procesamiento.models import Progreso
 from etiquetado_auto.models import GuardadoClusterResult, MetodologiaResult
 
@@ -20,15 +20,18 @@ def conectivity_map_view(request):
         return render(request, 'conectividad/conectividad.html', data)
 
     # Check if there was a selected file and contains a ".csv" extension
-    if not xlsx_path or ".xlsx" not in xlsx_path:
+    # if not xlsx_path or ".xlsx" not in xlsx_path:
+    #     return render(request, 'conectividad/conectividad.html', data)
+
+    if ".csv" not in xlsx_path:
         return render(request, 'conectividad/conectividad.html', data)
 
     sheet_name = request.POST.get("hoja_excel")
     latitud_field_name = request.POST.get("latitud")
     longitud_field_name = request.POST.get("longitud")
 
-    data['fig_url'] = get_conectivity_map_url(xlsx_path, sheet_name,
-                                              latitud_field_name, longitud_field_name)
+    data['fig_urls'] = get_conectivity_map_url(
+        xlsx_path, latitud_field_name, longitud_field_name)
 
     # Return the prepared data with the template for rendering
     return render(request, 'conectividad/conectividad.html', data)

@@ -100,42 +100,9 @@
                             </section>
                         </form>
 
-                        {% if fig_url %}
+                        {% for fig_url in fig_urls %}
                         <iframe src="{{ fig_url }}" width="100%" height="500"></iframe>
-                        {% endif %}
-
-                        {% if carpetas_nombre_completo %}
-                        <form method="POST">
-                            {% csrf_token %}
-                            <div>
-                                {% for completo, base in completo_base_zip %}
-                                <div class="carpetas-cargadas">
-                                    <input type="checkbox" name="carpetas" value="{{ completo }}" checked>
-                                    <label for="carpetas">{{ base }}</label>
-                                </div>
-                                {% endfor %}
-                            </div>
-                            <input type="submit" value="Procesar Carpetas" id="procesar_carpetas"
-                                name="procesar_carpetas"></input>
-                        </form>
-                        {% endif %}
-
-                        {% if carpetas_procesando %}
-
-                        Procesando
-                        {% for procesando in carpetas_procesando %}
-
-                        <ul>
-                            <li>
-                                <label>{{procesando}}</label>
-                            </li>
-                        </ul>
-
                         {% endfor %}
-                        <input type="submit" value="Procesar Carpetas" id="procesar_carpetas"
-                            name="procesar_carpetas"></input>
-
-                        {% endif %}
                     </section>
 
                     <!-- <section class="col-12 col-12-narrower">
@@ -145,20 +112,6 @@
                         </div>
                     </section> -->
 
-                    <section class="col-12 col-12-narrower">
-                        <!-- <form class="mosgrafica" method="POST" action="">
-                            {% csrf_token %}
-                            <div class="contenidos">
-                                <button type="submit" name="mostrar-grafica">Mostar grafica</button>
-                            </div>
-                        </form> -->
-
-                        {% if fig %}
-                        {{ fig|safe }}
-                        {% endif %}
-
-                        <!-- {{ grafica|safe }} -->
-                    </section>
                 </div>
             </div>
         </section>
