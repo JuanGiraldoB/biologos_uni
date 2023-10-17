@@ -106,6 +106,7 @@ def generate_spectrogram_with_clusters_plot(file_path, selected_clusters, df):
     )
 
     # Add rectangles to the plot
+    print("here")
     ec = generate_distinct_colors(50)
     for i in range(filtered_df.shape[0]):
         clus = int(filtered_df.iloc[i, -1])
@@ -124,6 +125,7 @@ def generate_spectrogram_with_clusters_plot(file_path, selected_clusters, df):
                 y1=fv_max,
                 line=dict(color=f"rgb{ec[clus]}", width=2),
             )
+    print("here")
 
     fig.add_annotation(
         text=file_name,

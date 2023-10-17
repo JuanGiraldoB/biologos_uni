@@ -11,6 +11,8 @@ import asyncio
 import pandas as pd
 import statistics as stat
 from scipy.stats import zscore
+from ecosonos.utils.archivos_utils import save_filename_in_txt
+import os
 
 
 def fcc5(canto, nfiltros, nc, nframes):
@@ -266,6 +268,15 @@ def time_and_date(archivos_full_dir, archivos_nombre_base):
             cronologia["Minuto"].append(datos[2][2:4])
             cronologia["Segundo"].append(datos[2][4:6])
 
+        elif len(datos) > 1:
+            cronologia["nombre_archivo"].append(direccion)
+            cronologia["Año"].append(datos[0][0:4])
+            cronologia["Mes"].append(datos[0][4:6])
+            cronologia["Dia"].append(datos[0][6:8])
+            cronologia["Hora"].append(datos[1][0:2])
+            cronologia["Minuto"].append(datos[1][2:4])
+            cronologia["Segundo"].append(datos[1][4:6])
+
         else:
             cronologia["nombre_archivo"].append(direccion)
             cronologia["Año"].append("nan")
@@ -492,6 +503,8 @@ def segmentacion(archivos_full_dir, archivos_nombre_base, banda, canal, progreso
 
         progreso.archivos_completados += 1
         progreso.save()
+
+        save_filename_in_txt(archivo, "sonotipo")
 
     segment_data = np.array(segment_data)
     nombre_archivo = np.array(nombre_archivo)

@@ -152,6 +152,7 @@ async def process_folders(request):
     data['carpetas_procesando'] = selected_subdfolders_base_name
     data['indices'] = selected_indices
     data['mostrar_barra_proceso'] = True
+    data['button_disable'] = 'disabled'
 
     # Return the prepared data with the template for rendering
     return render(request, 'indices/indices.html', data)
@@ -181,7 +182,7 @@ async def show_plot(request):
         if "ADIm" in selected_indices:
             adim = []
 
-            for i in range(30):
+            for i in range(1_000_000):
                 adim_i = f'ADIm_{i}'
                 adim.append(adim_i)
                 graficas.append(await sync_to_async(generate_polar_plot)(destination_folder, indice, adim_i))

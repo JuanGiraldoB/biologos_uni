@@ -102,7 +102,7 @@
                                         <div class="contenidos">
                                             <input type="hidden" name="div" value="div_sonotipo" />
                                             <input type="submit" value="Seleccionar Carpeta Principal" id="cargar"
-                                                name="cargar"></input>
+                                                name="cargar" {{ button_disable|default:'' }}></input>
                                         </div>
                                     </section>
                                 </form>
@@ -130,8 +130,8 @@
                                             Carpetas
                                         </button>
                                     </div>
-                                    <input type="submit" value="Seleccionar Carpeta Destino" id="destino"
-                                        name="destino"></input>
+                                    <input type="submit" value="Seleccionar Carpeta Destino" id="destino" name="destino"
+                                        {{ button_disable|default:'' }}></input>
 
                                 </form>
                                 {% endif %}
@@ -156,7 +156,7 @@
                                     </div>
                                     <br>
                                     <input type="submit" value="Procesar Carpetas" id="procesar_carpetas_sonotipo"
-                                        name="procesar_carpetas"></input>
+                                        name="procesar_carpetas" {{ button_disable|default:'' }}></input>
                                 </form>
 
 
@@ -254,7 +254,7 @@
                                             {% endfor %}
                                             {% endif %}
                                             <input type="submit" value="Seleccionar Carpeta Principal" id="cargar"
-                                                name="cargar"></input>
+                                                name="cargar" {{ button_disable|default:'' }}></input>
                                         </div>
                                     </section>
                                 </form>
@@ -281,8 +281,8 @@
                                             Carpetas
                                         </button>
                                     </div>
-                                    <input type="submit" value="Seleccionar Carpeta Destino" id="destino"
-                                        name="destino"></input>
+                                    <input type="submit" value="Seleccionar Carpeta Destino" id="destino" name="destino"
+                                        {{ button_disable|default:'' }}></input>
 
                                 </form>
                                 {% endif %}
@@ -307,7 +307,7 @@
                                     </div>
                                     <br>
                                     <input type="submit" value="Procesar Carpetas" id="procesar_carpetas_reconocer"
-                                        name="procesar_carpetas"></input>
+                                        name="procesar_carpetas" {{ button_disable|default:'' }}></input>
                                 </form>
 
 

@@ -5,14 +5,10 @@ import pandas as pd
 from tkinter.filedialog import askdirectory
 from tqdm import tqdm
 import numpy as np
-from django.http import JsonResponse
 import asyncio
-import datetime
-from ecosonos.utils.archivos_utils import get_date_from_filename
+from ecosonos.utils.archivos_utils import get_date_from_filename, save_filename_in_txt
 import pathlib
-from ast import literal_eval
 import os
-from .utils import save_to_txt
 
 # import matplotlib.pyplot as plt
 
@@ -155,6 +151,7 @@ def calcular_indice(indices_select, carpeta, archivos, destino, progreso):
         Valores.append(list())
 
     for grabacion in tqdm(grabaciones):
+        # TODO: OS SEP
         g = str(grabacion).split("/")[-1]
         Valores[0].append(g)
 
@@ -250,8 +247,9 @@ def calcular_indice(indices_select, carpeta, archivos, destino, progreso):
 
         progreso.archivos_completados += 1
         progreso.save()
-        from .utils import save_to_txt
-        save_to_txt('./nombres.txt', grabacion)
+
+        save_filename_in_txt(grabacion)
+
         Indices_grabaciones.append({"Grabacion": g, "Indices": list(aux)})
 
     csvIndices(Valores, carpeta, destino, indices_select)

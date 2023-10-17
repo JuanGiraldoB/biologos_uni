@@ -8,18 +8,15 @@ from pydub import AudioSegment
 from concurrent.futures import ThreadPoolExecutor
 
 
-# def save_files_detail_session(request, detalle_archivos, app='preproceso'):
-#     if app == 'indices':
-#         request.session['detalle_archivos_indices'] = detalle_archivos
-#     else:
-#         request.session['detalle_archivos_preproceso'] = detalle_archivos
+def save_filename_in_txt(file_name, from_app="etiquetado"):
+    try:
 
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        with open(f"{from_app}_nombres.txt", 'a') as file:
+            file.write(f"{file_name} ---- {current_time}\n")
 
-# def get_files_detail_session(request, app='preproceso'):
-#     if app == 'indices':
-#         return request.session['detalle_archivos_indices']
-#     else:
-#         return request.session['detalle_archivos_preproceso']
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
 
 
 def move_files_depending_type(root_folder, destination_folder, type):

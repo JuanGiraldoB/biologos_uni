@@ -76,8 +76,8 @@
 								{% csrf_token %}
 								<p>Seleccionar la carpeta raiz que contiene los archivos (.wav)</p>
 								<div class="thebuttons">
-									<input type="submit" value="Seleccionar Carpeta Principal" id="cargar"
-										name="cargar"></input>
+									<input type="submit" value="Seleccionar Carpeta Principal" id="cargar" name="cargar"
+										{{ button_disable|default:'' }}></input>
 									<a href="#popup1" class="button-help">?</a>
 									<div id="popup1" class="overlay">
 										<div class="popup">
@@ -169,8 +169,8 @@
 								{% endif %}
 								<div class="thebuttons">
 									{% csrf_token %}
-									<input type="submit" value="Seleccionar Carpeta Destino" id="destino"
-										name="destino"></input>
+									<input type="submit" value="Seleccionar Carpeta Destino" id="destino" name="destino"
+										{{ button_disable|default:'' }}></input>
 									<a href="#popup1" class="button-help">?</a>
 									<div id="popup1" class="overlay">
 										<div class="popup">
@@ -205,7 +205,7 @@
 							<form method="POST">
 								{% csrf_token %}
 								<input type="submit" value="Procesar Carpetas con Lluvia" id="procesar_carpetas"
-									name="procesar_carpetas"></input>
+									name="procesar_carpetas" {{ button_disable|default:'' }}></input>
 								<a href="#popup1" class="button-help">?</a>
 								<div id="popup1" class="overlay">
 									<div class="popup">
@@ -244,7 +244,7 @@
 								{% csrf_token %}
 								<div class="thebuttons">
 									<input type="submit" value="Mover Archivos con Lluvia" id="mover_archivos"
-										name="mover_archivos"></input>
+										name="mover_archivos" {{ button_disable|default:'' }}></input>
 									<a href="#popup1" class="button-help">?</a>
 									<div id="popup1" class="overlay">
 										<div class="popup">
@@ -262,7 +262,7 @@
 								{% csrf_token %}
 								<div class="thebuttons">
 									<input type="submit" class="botmalos" value="Mover Archivos Dañados"
-										id="mover_malos" name="mover_archivos"></input>
+										id="mover_malos" name="mover_archivos" {{ button_disable|default:'' }}></input>
 									<a href="#popup1" class="button-help">?</a>
 									<div id="popup1" class="overlay">
 										<div class="popup">
@@ -281,8 +281,8 @@
 					<section class="col-12 col-12-narrower">
 						<form id="grafica_form" method="POST" enctype="multipart/form-data">
 							{% csrf_token %}
-							<input type="submit" value="Mostrar gráfica" id="mostrar_grafica"
-								name="mostrar_grafica"></input>
+							<input type="submit" value="Mostrar gráfica" id="mostrar_grafica" name="mostrar_grafica"
+								{{ button_disable|default:'' }}></input>
 							<a href="#popup1" class="button-help">?</a>
 							<div id="popup1" class="overlay">
 								<div class="popup">

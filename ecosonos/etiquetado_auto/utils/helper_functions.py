@@ -340,6 +340,7 @@ async def process_folders(request):
         request, csv_path, app='etiquetado_auto')
 
     data['mostrar_barra_proceso'] = True
+    data['button_disable'] = "disabled"
 
     # Return the prepared data with the template for rendering
     return render(request, "etiquetado_auto/etiquetado-auto.html", data)

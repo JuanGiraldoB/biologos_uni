@@ -138,3 +138,7 @@ seg_xie.png
 *.png
 *.tif
 conectivity_plot*.html
+installer_command.txt
+
+# txt files
+*nombres.txt 

@@ -89,8 +89,8 @@
 							{% csrf_token %}
 							<section class="col-12 col-12-narrower">
 								<div class="contenidos">
-									<input type="submit" value="Seleccionar Carpeta Principal" id="cargar"
-										name="cargar"></input>
+									<input type="submit" value="Seleccionar Carpeta Principal" id="cargar" name="cargar"
+										{{ button_disable|default:'' }}></input>
 								</div>
 							</section>
 						</form>
@@ -211,8 +211,8 @@
 							<br />
 							<section class="col-12 col-12-narrower">
 								<div class="contenidos">
-									<input type="submit" value="Seleccionar Carpeta Principal" id="cargar"
-										name="cargar"></input>
+									<input type="submit" value="Seleccionar Carpeta Principal" id="cargar" name="cargar"
+										{{ button_disable|default:'' }}></input>
 								</div>
 							</section>
 						</form>
@@ -236,8 +236,8 @@
 									<span class="glyphicon glyphicon-folder-close"></span> Deseleccionar Carpetas
 								</button>
 							</div>
-							<input type="submit" value="Seleccionar Carpeta Destino" id="destino"
-								name="destino"></input>
+							<input type="submit" value="Seleccionar Carpeta Destino" id="destino" name="destino"
+								{{ button_disable|default:'' }}></input>
 
 						</form>
 						{% endif %}
@@ -263,7 +263,7 @@
 						<form method="POST">
 							{% csrf_token %}
 							<input type="submit" value="Procesar Carpetas" id="procesar_carpetas"
-								name="procesar_carpetas"></input>
+								name="procesar_carpetas" {{ button_disable|default:'' }}></input>
 						</form>
 
 						<br>
@@ -286,7 +286,9 @@
 						<form class="mosgrafica" method="POST" action="">
 							{% csrf_token %}
 							<div class="contenidos">
-								<button type="submit" name="mostrar-grafica">Mostrar gráfica</button>
+								<button type="submit" name="mostrar-grafica" id="mostrar-grafica"
+									{{ button_disable|default:'' }}>Mostrar
+									gráfica</button>
 							</div>
 						</form>
 
@@ -295,7 +297,9 @@
 						<form class="mosgrafica" method="POST" action="">
 							{% csrf_token %}
 							<div class="contenidos">
-								<button type="submit" name="cargar-csv">Cargar CSV</button>
+								<button type="submit" name="cargar-csv" id="cargar-csv"
+									{{ button_disable|default:'' }}>Cargar
+									CSV</button>
 							</div>
 						</form>
 
@@ -306,10 +310,11 @@
 						{% for grafica, indice in zipped %}
 						<ul class="lista-graficas">
 							<h2 class="titulo-graficas">Gráfica para el índice {{indice}}</h2>
-							<li class="item-graficas">{{ grafica|safe }}</li>
-							<!--colocar aqui para desaparecer/mostrar grafica-->
-							<button id="swapFire" class="btn btn-primary showFire">
-								<span class="glyphicon glyphicon-eye-close"></span> Ocultar Gráfica
+							<li class="item-graficas" id="grafica-{{indice}}">{{ grafica|safe }}</li>
+							<button id="btn-{{indice}}" class="btn btn-primary showFire1"
+								onclick="toggleVisibility('{{indice}}')">
+								<span class="glyphicon glyphicon-eye-close"></span>
+								<span id="text-{{indice}}">Ocultar Gráfica</span>
 							</button>
 						</ul>
 						{% endfor %}
@@ -371,6 +376,7 @@
 	<script src="{% static 'ecosonos/assets/js/button-show-hide-carpetas.js' %}"></script>
 	<script src="{% static 'indices/indicesProgressBar.js' %}"></script>
 	<script src="{% static 'indices/selectAll.js' %}"></script>
+	<script src="{% static 'indices/togglePlotVisibility.js' %}"></script>
 
 </body>
 

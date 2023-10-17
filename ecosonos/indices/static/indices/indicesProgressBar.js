@@ -28,8 +28,17 @@ function updateProgressBar() {
 			if (porcentaje_completado == 100) {
 				spanValue.innerHTML = "Completado";
 				clearInterval(intervalId);
+				enableButtons();
 			}
 		}
 	};
 	xhr.send();
+}
+
+function enableButtons() {
+	document.getElementById("cargar").disabled = false;
+	// document.getElementById("destino").disabled = false;
+	document.getElementById("procesar_carpetas").disabled = false;
+	document.getElementById("mostrar-grafica").disabled = false;
+	document.getElementById("cargar-csv").disabled = false;
 }
