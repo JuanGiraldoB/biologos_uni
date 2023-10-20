@@ -3,8 +3,6 @@ let intervalId = null;
 document.addEventListener("DOMContentLoaded", function () {
 	let button = document.getElementById("procesar_carpetas");
 
-	console.log("aslkdfmalskdfmaskldmfklas");
-
 	if (button) {
 		intervalId = setInterval(updateProgressBar, 500);
 	}
@@ -38,7 +36,7 @@ function updateProgressBar() {
 
 function enableButtons() {
 	document.getElementById("cargar").disabled = false;
-	document.getElementById("destino").disabled = false;
+	// document.getElementById("destino").disabled = false;
 	document.getElementById("mover_archivos").disabled = false;
 	document.getElementById("mover_malos").disabled = false;
 	document.getElementById("mostrar_grafica").disabled = false;

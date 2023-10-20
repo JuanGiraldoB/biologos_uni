@@ -158,7 +158,10 @@ def seg_xie(intensityi, specgram_time, specgram_frecuency):
     gauss_intensity = cv2.GaussianBlur(spectgram_intensity, (13, 13), sigmaX=3,
                                        sigmaY=3)  # se utiliza un filtro gausiano.
     # modificar gaussian kernel
-    with_suband = without_subband_mode_intensities(gauss_intensity)
+    try:
+        with_suband = without_subband_mode_intensities(gauss_intensity)
+    except Exception as e:
+        print(e)
 
     with_suband = with_suband * (with_suband >= 0)
     # with_suband_normalizada = (with_suband -np.min(with_suband))/ (np.max(with_suband)-np.min(with_suband))
@@ -401,10 +404,16 @@ def segmentacion(archivos_full_dir, archivos_nombre_base, banda, canal, progreso
         # --------------------------  Xie ----------------------------------------
         if type(banda[1]) == np.str_:
             banda_aux = np.array([0, frecuency.max()])
-        else:
-            0
 
-        segm_xie, segmentos_nor = seg_xie(intensity, time, frecuency)
+        try:
+            segm_xie, segmentos_nor = seg_xie(intensity, time, frecuency)
+        except Exception as e:
+            progreso.archivos_completados += 1
+            progreso.save()
+
+            save_filename_in_txt(archivo, "sonotipo", True)
+
+            continue
 
         if len(segm_xie) > 0:
             for k in range(len(segm_xie[:, 1])):

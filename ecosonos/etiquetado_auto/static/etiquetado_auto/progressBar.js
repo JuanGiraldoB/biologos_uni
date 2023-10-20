@@ -44,10 +44,28 @@ function updateProgressBar(type) {
 				if (type == "temporal") {
 					getPlots();
 				} else {
+					enableButtons();
 					show_files(type);
 				}
 			}
 		}
 	};
 	xhr.send();
+}
+
+function enableButtons() {
+	document.getElementById("cargar").disabled = false;
+
+	try {
+		document.getElementById("cargar_csv_nuevas_especies").disabled = false;
+		document.getElementById("procesar_carpetas_reconocer").disabled = false;
+	} catch (error) {
+		console.log(error);
+	}
+
+	try {
+		document.getElementById("procesar_carpetas_sonotipo").disabled = false;
+	} catch (error) {
+		console.log(error);
+	}
 }

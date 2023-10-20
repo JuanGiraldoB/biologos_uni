@@ -144,12 +144,12 @@
                                     <input type="hidden" name="div" value="div_sonotipo" />
                                     <div class="row gtr-50 campostxt">
                                         <div class="col-6 col-12-mobilep">
-                                            <label for="frecuenciaminima">Frecuencia Mínima</label>
+                                            <label for="frecuenciaminima">Frecuencia Mínima (Hz)</label>
                                             <input type="text" name="frecuenciaminima" id="frecuenciaminima"
                                                 placeholder="Ingrese frecuencia mínima" />
                                         </div>
                                         <div class="col-6 col-12-mobilep">
-                                            <label for="frecuenciaminima">Frecuencia Máxima</label>
+                                            <label for="frecuenciaminima">Frecuencia Máxima (Hz)</label>
                                             <input type="text" name="frecuenciamaxima" id="frecuenciamaxima"
                                                 placeholder="Ingrese frecuencia máxima" />
                                         </div>
@@ -229,7 +229,7 @@
                                         <div class="contenidos">
                                             <input type="hidden" name="div" value="div_reconocer" />
                                             <input type="submit" value="Seleccionar CSV Nuevas Especies" id="cargar"
-                                                name="cargar_csv"></input>
+                                                name="cargar_csv" {{ button_disable|default:'' }}></input>
                                         </div>
                                     </section>
                                 </form>
@@ -295,12 +295,12 @@
                                     <input type="hidden" name="div" value="div_reconocer" />
                                     <div class="row gtr-50 campostxt">
                                         <div class="col-6 col-12-mobilep">
-                                            <label for="frecuenciaminima">Frecuencia Mínima</label>
+                                            <label for="frecuenciaminima">Frecuencia Mínima (Hz)</label>
                                             <input type="text" name="frecuenciaminima" id="frecuenciaminima"
                                                 placeholder="Ingrese frecuencia mínima" />
                                         </div>
                                         <div class="col-6 col-12-mobilep">
-                                            <label for="frecuenciaminima">Frecuencia Máxima</label>
+                                            <label for="frecuenciaminima">Frecuencia Máxima (Hz)</label>
                                             <input type="text" name="frecuenciamaxima" id="frecuenciamaxima"
                                                 placeholder="Ingrese frecuencia máxima" />
                                         </div>

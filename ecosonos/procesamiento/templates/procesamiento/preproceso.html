@@ -130,6 +130,7 @@
 								{% endif %}
 							</form> -->
 
+							{% if folders_details %}
 							<form id="carpeta_destino" method="POST" enctype="multipart/form-data">
 
 								{% if not carpetas_procesando %}
@@ -185,14 +186,12 @@
 								</div>
 
 							</form>
+							{% endif %}
 
 							{% if carpetas_procesando %}
 
 							{% if seleccionadas %}
 							Carpetas seleccionadas
-							{% else %}
-							Procesando
-							{% endif %}
 							{% for procesando in carpetas_procesando %}
 
 							<ul>
@@ -202,6 +201,7 @@
 							</ul>
 
 							{% endfor %}
+							{% endif %}
 							<form method="POST">
 								{% csrf_token %}
 								<input type="submit" value="Procesar Carpetas con Lluvia" id="procesar_carpetas"
@@ -218,6 +218,22 @@
 									</div>
 								</div>
 							</form>
+
+							{% if carpetas_procesando %}
+
+							{% if not seleccionadas %}
+							Procesando
+							{% for procesando in carpetas_procesando %}
+
+							<ul>
+								<li>
+									<label>{{procesando}}</label>
+								</li>
+							</ul>
+
+							{% endfor %}
+							{% endif %}
+							{% endif %}
 
 							<br>
 

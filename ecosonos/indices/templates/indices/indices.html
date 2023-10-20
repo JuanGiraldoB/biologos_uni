@@ -247,10 +247,9 @@
 						{% if carpetas_procesando %}
 
 						{% if seleccionadas %}
+
 						Carpetas seleccionadas
-						{% else %}
-						Procesando
-						{% endif %}
+
 						{% for procesando in carpetas_procesando %}
 
 						<ul>
@@ -260,11 +259,30 @@
 						</ul>
 
 						{% endfor %}
+						{% endif %}
 						<form method="POST">
 							{% csrf_token %}
 							<input type="submit" value="Procesar Carpetas" id="procesar_carpetas"
 								name="procesar_carpetas" {{ button_disable|default:'' }}></input>
 						</form>
+
+						{% if carpetas_procesando %}
+
+						{% if not seleccionadas %}
+						Procesando
+
+						{% for procesando in carpetas_procesando %}
+
+						<ul>
+							<li>
+								<label>{{procesando}}</label>
+							</li>
+						</ul>
+						{% endfor %}
+
+						{% endif %}
+
+						{% endif %}
 
 						<br>
 

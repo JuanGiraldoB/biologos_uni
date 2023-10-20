@@ -17,6 +17,9 @@ document.addEventListener("DOMContentLoaded", function () {
 				if (xhr.status === 200) {
 					let response = JSON.parse(xhr.responseText);
 					let graficaDiv = document.getElementById("grafica_div");
+
+					removeAllChildElements(graficaDiv);
+
 					let iframe = document.createElement("iframe");
 
 					// Fetch the HTML content from the URL
@@ -42,3 +45,9 @@ document.addEventListener("DOMContentLoaded", function () {
 		xhr.send(formData);
 	});
 });
+
+function removeAllChildElements(tag) {
+	while (tag.firstChild) {
+		tag.removeChild(tag.firstChild);
+	}
+}

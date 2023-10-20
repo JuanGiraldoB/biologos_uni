@@ -8,12 +8,13 @@ from pydub import AudioSegment
 from concurrent.futures import ThreadPoolExecutor
 
 
-def save_filename_in_txt(file_name, from_app="etiquetado"):
+def save_filename_in_txt(file_name, from_app="etiquetado", broken=False):
     try:
 
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         with open(f"{from_app}_nombres.txt", 'a') as file:
-            file.write(f"{file_name} ---- {current_time}\n")
+            file.write(
+                f"{file_name} ---- {current_time} ---- no sirve: {broken}\n")
 
     except Exception as e:
         print(f"An error occurred: {str(e)}")
