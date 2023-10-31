@@ -36,16 +36,16 @@ from ecosonos.utils.archivos_utils import (
 )
 
 
-async def load_folder(request):
+def load_folder(request):
     # Create an empty dictionary to store data that will be sent to the template
     data = {}
 
     # Delete all records in the Progreso model
-    await sync_to_async(Progreso.objects.all().delete)()
+    Progreso.objects.all().delete()
 
     try:
         # Get the root folder where the wav files are located
-        root_folder = await sync_to_async(get_root_folder)()
+        root_folder = get_root_folder()
     except Exception as e:
         print("Error en cargar carpeta load_folder ", e)
         # return JsonResponse({'error': 'Must select a folder'}, status=500)
@@ -57,7 +57,7 @@ async def load_folder(request):
         return render(request, 'procesamiento/preproceso.html')
 
     # Save the root folder path to the session
-    await sync_to_async(save_root_folder_session)(request, root_folder)
+    save_root_folder_session(request, root_folder)
 
     # Check if statistics option is selected in the POST request
     statistics_checked = request.POST.get('estadisticas')
@@ -86,8 +86,8 @@ async def load_folder(request):
         data['folders_details'] = folders_details
 
     # Save the statistics state and subfolder details to the session
-    await sync_to_async(save_statistics_state_session)(request, statistics_checked)
-    await sync_to_async(save_subfolders_details_session)(request, folders_details)
+    save_statistics_state_session(request, statistics_checked)
+    save_subfolders_details_session(request, folders_details)
 
     # return JsonResponse(data)
     # Return the prepared data with the template for rendering
