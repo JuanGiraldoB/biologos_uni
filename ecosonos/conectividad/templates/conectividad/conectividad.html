@@ -1,11 +1,7 @@
 {% load static%}
 
 <!DOCTYPE HTML>
-<!--
-	Arcana by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
+
 <html lang="en">
 
 <head>
@@ -93,9 +89,16 @@
                                         <input type="text" name="longitud" id="longitud" placeholder="Longitud" />
                                     </div>
                                 </div>
-                                <div class="contenidos">
+                                <div class="contenidos button-excel">
                                     <input type="submit" value="Seleccionar Archivo xlsx" id="cargar"
                                         name="cargar"></input>
+                                </div>
+                            </section>
+                            <section class="col-12 col-12-narrower">
+                                <div id="app">
+                                    <div  class="custom-tiny">
+                                       <time-slider :ds="{ w:1713, h:55, y:0.7125, tmy:0.21, tsz:0.06, lby:0.91, mv:0.41 }" :n="{ t:172.5, l:167, k:1000 }" :tick-count=23 color-main='#19a173' color='#fff' v-on:current-time="shiftTime($event)" ></time-slider> 
+                                    </div>  
                                 </div>
                             </section>
                         </form>
@@ -162,8 +165,11 @@
     <script src="{% static 'ecosonos/assets/js/breakpoints.min.js' %}"></script>
     <script src="{% static 'ecosonos/assets/js/util.js' %}"></script>
     <script src="{% static 'ecosonos/assets/js/main.js' %}"></script>
-
     <script src="{% static 'indices/indicesProgressBar.js' %}"></script>
+    <script src="{% static 'ecosonos/assets/js/timeslider_1.js' %}"></script>
+    <script src="{% static 'ecosonos/assets/js/timeslider_2.js' %}"></script>
+    <script src="{% static 'ecosonos/assets/js/timeslider_3.js' %}"></script>
+
     <!-- <script src="{% static 'indices/selectAll.js' %}"></script> -->
 
 </body>

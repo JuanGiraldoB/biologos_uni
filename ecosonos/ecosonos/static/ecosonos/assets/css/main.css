@@ -2403,7 +2403,8 @@ input, select, textarea {
 	input[type="reset"],
 	input[type="button"],
 	button,
-	.button {
+	.button,
+	.button-help {
 		-moz-appearance: none;
 		-webkit-appearance: none;
 		-ms-appearance: none;
@@ -2429,6 +2430,15 @@ input, select, textarea {
 		text-decoration: none;
 		font-weight: 600;
 		letter-spacing: -0.025em;
+	}
+
+	.button-help{
+		min-width: 1.6em !important;
+		padding: 0 1.2em !important;
+	}
+
+	.button-excel{
+		margin-top: 0.65em;
 	}
 
 		input[type="submit"]:hover,
@@ -3553,7 +3563,7 @@ input, select, textarea {
 	  
 	  .card__arc path {
 		fill: var(--surface-color);
-		d: path("M 40 80 c 22 0 40 -22 40 -40 v 40 Z");
+		background: path("M 40 80 c 22 0 40 -22 40 -40 v 40 Z");
 	  }       
 	  
 	  .card:hover .card__header {
@@ -4673,4 +4683,61 @@ input, select, textarea {
 
 .content-input:hover input[type=radio]:not(:checked) + i{
 	background: #B1E8CD;
+}
+
+
+/* Estas reglas se usan para el time slider*/
+
+#app{
+	margin-top: 1.6em;
+}
+
+.default {
+	fill: red;
+	width: 100%;
+	height: 100%;
+	background-color: transparent;
+}
+.custom {
+	margin :1px;
+	padding:5px;
+	 width: 70%;
+	height: 100%;
+	background-color: transparent;
+}
+.custom-red {
+	margin :1px;
+	padding:7px;
+	width: 90%;
+	height: 100%;
+	background-color: transparent;
+}
+.custom-red #v-time-slider .zero .rect{
+	rx: 1px !important ;
+	border-style:  solid !important;
+	stroke-opacity:  0.31 !important ;
+}
+
+.custom-red #v-time-slider .axis {
+	fill-opacity:  0.31 !important ;
+	stroke-width: 0.5 !important ;
+	stroke: indigo ;
+}
+.custom-red #v-time-slider .axis.ticks.labels {
+	stroke: indigo !important;
+	stroke-width: 0.2 !important;
+
+}
+.custom-red #v-time-slider .axis.ticks {
+	stroke: red !important;
+	stroke-width: 0.9 !important;
+}
+.custom-red #v-time-slider .lblNowTime {
+	fill: red !important;
+}
+
+.custom-tiny #v-time-slider .zero .rect{
+	rx: 3px !important ;
+	border-style:  solid !important;
+	stroke-opacity:  0.31 !important ;
 }
