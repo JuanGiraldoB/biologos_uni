@@ -1,2 +1,2 @@
 @echo off
-start /B /WAIT mysite.exe runserver --noreload
+start /B /WAIT ecos.exe runserver --noreload
