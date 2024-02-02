@@ -2,8 +2,11 @@ from django.shortcuts import render
 import json
 import os
 
+from .constants import REEMPLAZO
+
 from ecosonos.utils.session_utils import (
     save_root_folder_session,
+    get_root_folder_session,
     save_csv_path_session,
     get_csv_path_session,
     save_csv_path_session,
@@ -50,7 +53,8 @@ def load_folder(request):
     files_paths, files_basenames = get_wav_files_in_folder(root_folder)
 
     # Replace the directory separator character in file paths with a hyphen to be used in the url
-    files_paths = replace_char(files_paths, caracter=os.sep, reemplazo='-')
+    files_paths = replace_char(
+        files_paths, caracter=os.sep, reemplazo=REEMPLAZO)
 
     files_details = []
     for path, basename in zip(files_paths, files_basenames):
@@ -64,10 +68,14 @@ def load_folder(request):
     # Save the file details to the session
     save_files_session(request, files_details, app='etiquetado')
 
+    data = {
+        "selected_folder": root_folder.split('/')[-1]
+    }
+
     # data['archivos'] = zip(files_paths, files_basenames)
 
     # Return the prepared data with the template for rendering
-    return render(request, 'etiquetado/etiquetado.html')
+    return render(request, 'etiquetado/etiquetado.html', data)
 
 
 def prepare_destination_folder(request):
@@ -95,7 +103,11 @@ def prepare_destination_folder(request):
 
     # Get the files from the session
     files_details = get_files_session(request, app='etiquetado')
+
     data['files_details'] = files_details
+    data['selected_folder'] = get_root_folder_session(
+        request, app="etiquetado").split('/')[-1]
+    data['selected_destination_folder'] = destination_folder.split('/')[-1]
 
     # Return the prepared data with the template for rendering
     return render(request, 'etiquetado/etiquetado.html', data)
@@ -111,12 +123,12 @@ def prepare_label_data(request, path):
     # Extract the file paths from files_details
     files_paths = [file_path['path'] for file_path in files_details]
 
-    # Replace the directory separator character with a '-' in file paths
-    replace_char(files_paths, caracter=os.sep, reemplazo='-')
+    # Replace the directory separator character in file paths
+    replace_char(files_paths, caracter=os.sep, reemplazo=REEMPLAZO)
 
     data['ruta'] = path
-    # Replace the '-' characters in 'path' with the correct directory separator
-    path = path.replace('-', os.sep)
+    # Replace the auxiliar characters in 'path' with the correct directory separator
+    path = path.replace(REEMPLAZO, os.sep)
 
     # Calculate the spectrogram for the given audio file
     f, t, s = calcular_espectrograma(path)
@@ -130,6 +142,10 @@ def prepare_label_data(request, path):
     data['nombre'] = os.path.basename(path)
 
     data['files_details'] = files_details
+    data['selected_folder'] = get_root_folder_session(
+        request, app="etiquetado").split('/')[-1]
+    data['selected_destination_folder'] = get_csv_path_session(
+        request).split('/')[-2]
 
     return data
 

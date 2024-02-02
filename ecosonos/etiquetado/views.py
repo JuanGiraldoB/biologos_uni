@@ -1,6 +1,7 @@
 from django.shortcuts import render
-import os
 
+import os
+from .utils.constants import REEMPLAZO
 
 from .utils.spectograma import (
     play_segment,
@@ -30,7 +31,7 @@ def spectrogram_view(request, path):
 
 
 def play_segment_view(request, path):
-    path = path.replace('-', os.sep)
+    path = path.replace(REEMPLAZO, os.sep)
 
     segment_data = get_segment_data(request)
     add_label(request, path, segment_data)

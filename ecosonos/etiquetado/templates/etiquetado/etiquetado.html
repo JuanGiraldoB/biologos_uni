@@ -73,6 +73,25 @@
                     <section class="col-12 col-12-narrower">
                         <div class="contenidos">
                             <!-- Formulario seleccionar carpeta raiz -->
+
+                            {% if selected_folder %}
+                            <h1>Carpeta seleccionada: {{selected_folder}}</h1>
+
+                            {% if selected_destination_folder %}
+                            <h1>Carpeta destino seleccionada: {{selected_destination_folder}}</h1>
+
+                            {% else %}
+                            <form method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="thebuttons">
+                                    <input type="submit" value="Seleccionar Carpeta Destino" id="destino"
+                                        name="destino"></input>
+                                </div>
+                            </form>
+
+                            {% endif %}
+
+                            {% else %}
                             <form method="POST" action="{% url 'etiquetado' %}" enctype="multipart/form-data">
                                 {% csrf_token %}
                                 <p>Seleccionar la carpeta raiz que contiene los archivos (.wav)</p>
@@ -82,13 +101,13 @@
                                 </div>
                             </form>
 
-                            <form method="POST" enctype="multipart/form-data">
-                                {% csrf_token %}
-                                <div class="thebuttons">
-                                    <input type="submit" value="Seleccionar Carpeta Destino" id="destino"
-                                        name="destino"></input>
-                                </div>
-                            </form>
+                            {% endif %}
+
+                            <!-- Formulario seleccionar carpeta destino -->
+
+
+
+
 
                             <!-- Formulario con lista de audios de carpeta raiz -->
                             {% if files_details %}
