@@ -60,7 +60,7 @@
 				<header class="major">
 					<h2
 						style="font-family: hocus_regularregular; letter-spacing: 0.1em; font-size: 4em; line-height: 0.2em; color: #19a173;">
-						ÍNDICES</h2>
+						ÍNDICES ACÚSTICOS</h2>
 					<p>Este módulo estima 54 índices acústicos de los audios usando la librería scikit-maad.
 					</p>
 				</header>
@@ -196,6 +196,17 @@
 									<div class="contenidos">
 										<input type="button" value="Seleccionar todos los filtros"
 											id="seleccionar-todos" name="true"></input>
+											<a href="#popup1" class="button-help">?</a>
+									<div id="popup1" class="overlay">
+										<div class="popup">
+											<h2>Ayuda - Seleccionar carpeta principal</h2>
+											<a class="close" href="#">&times;</a>
+											<div class="content">
+												<p>Permite buscar en el equipo la carpeta de origen donde se almacenan
+													los archivos de audio que serán procesados.</p>
+											</div>
+										</div>
+									</div>
 									</div>
 								</section>
 							</div>
@@ -204,6 +215,17 @@
 								<div class="contenidos">
 									<input type="submit" value="Seleccionar Carpeta Principal" id="cargar" name="cargar"
 										{{ button_disable|default:'' }}></input>
+										<a href="#popup1" class="button-help">?</a>
+									<div id="popup1" class="overlay">
+										<div class="popup">
+											<h2>Ayuda - Seleccionar carpeta principal</h2>
+											<a class="close" href="#">&times;</a>
+											<div class="content">
+												<p>Permite buscar en el equipo la carpeta de origen donde se almacenan
+													los archivos de audio que serán procesados.</p>
+											</div>
+										</div>
+									</div>
 								</div>
 							</section>
 						</form>
@@ -313,9 +335,20 @@
 						<form class="mosgrafica" method="POST" action="">
 							{% csrf_token %}
 							<div class="contenidos">
-								<button type="submit" name="cargar-csv" id="cargar-csv" {{ button_disable|default:''
-									}}>Cargar
-									CSV</button>
+								<button type="submit" name="mostrar-grafica" id="mostrar-grafica"
+									{{ button_disable|default:'' }}>Mostrar gráfica
+								</button>
+									<a href="#popup1" class="button-helpsmall">?</a>
+									<div id="popup1" class="overlay">
+										<div class="popup">
+											<h2>Ayuda - Seleccionar carpeta principal</h2>
+											<a class="close" href="#">&times;</a>
+											<div class="content">
+												<p>Permite buscar en el equipo la carpeta de origen donde se almacenan
+													los archivos de audio que serán procesados.</p>
+											</div>
+										</div>
+									</div>
 							</div>
 						</form>
 
@@ -323,9 +356,21 @@
 
 						<form class="mosgrafica" method="POST" action="">
 							{% csrf_token %}
-							<div class="contenidos" id="mostrar-grafica-div">
-								<!-- <button type="submit" name="mostrar-grafica" id="mostrar-grafica">Mostrar
-									gráfica</button> -->
+							<div class="contenidos">
+								<button type="submit" name="cargar-csv" id="cargar-csv"
+									{{ button_disable|default:'' }}>Cargar CSV
+								</button>
+								<a href="#popup1" class="button-helpsmall">?</a>
+									<div id="popup1" class="overlay">
+										<div class="popup">
+											<h2>Ayuda - Seleccionar carpeta principal</h2>
+											<a class="close" href="#">&times;</a>
+											<div class="content">
+												<p>Permite buscar en el equipo la carpeta de origen donde se almacenan
+													los archivos de audio que serán procesados.</p>
+											</div>
+										</div>
+									</div>
 							</div>
 						</form>
 
