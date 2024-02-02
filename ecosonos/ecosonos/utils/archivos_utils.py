@@ -6,6 +6,7 @@ from datetime import datetime
 import csv
 from pydub import AudioSegment
 from concurrent.futures import ThreadPoolExecutor
+import platform
 
 
 def save_filename_in_txt(file_name, from_app="etiquetado", broken=False):
@@ -195,7 +196,11 @@ def get_date_from_filename(file):
 
 def create_csv(carpeta_raiz, nombre_carpeta):
     nombre_csv = f'etiquetas_{nombre_carpeta}.csv'
-    csv_ruta = os.path.join(carpeta_raiz, nombre_csv)
+
+    if platform.system() == 'Windows':
+        csv_ruta = os.path.join(carpeta_raiz, nombre_csv).replace('\\', '/')
+    else:
+        csv_ruta = os.path.join(carpeta_raiz, nombre_csv)
 
     if not os.path.exists(csv_ruta):
         with open(csv_ruta, mode='w', newline='') as csv_file:
