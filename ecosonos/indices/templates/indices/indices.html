@@ -313,9 +313,9 @@
 						<form class="mosgrafica" method="POST" action="">
 							{% csrf_token %}
 							<div class="contenidos">
-								<button type="submit" name="mostrar-grafica" id="mostrar-grafica" {{
-									button_disable|default:'' }}>Mostrar
-									gráfica</button>
+								<button type="submit" name="cargar-csv" id="cargar-csv" {{ button_disable|default:''
+									}}>Cargar
+									CSV</button>
 							</div>
 						</form>
 
@@ -323,10 +323,9 @@
 
 						<form class="mosgrafica" method="POST" action="">
 							{% csrf_token %}
-							<div class="contenidos">
-								<button type="submit" name="cargar-csv" id="cargar-csv" {{ button_disable|default:''
-									}}>Cargar
-									CSV</button>
+							<div class="contenidos" id="mostrar-grafica-div">
+								<!-- <button type="submit" name="mostrar-grafica" id="mostrar-grafica">Mostrar
+									gráfica</button> -->
 							</div>
 						</form>
 
