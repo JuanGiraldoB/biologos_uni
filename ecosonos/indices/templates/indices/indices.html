@@ -85,15 +85,6 @@
 
 							{% endfor %}
 						</ul>
-						<form method="POST">
-							{% csrf_token %}
-							<section class="col-12 col-12-narrower">
-								<div class="contenidos">
-									<input type="submit" value="Seleccionar Carpeta Principal" id="cargar" name="cargar"
-										{{ button_disable|default:'' }}></input>
-								</div>
-							</section>
-						</form>
 
 						{% else %}
 						<form class="filtros" method="POST" action="">
@@ -225,19 +216,36 @@
 						{% if folders_details %}
 						<form method="POST">
 							{% csrf_token %}
+
+							{% if folders_details|length == 1 %}
+							<h1>Carpeta seleccionada</h1>
+
 							{% for folder_detail in folders_details %}
 							<div class="carpetas-cargadas">
 								<input type="checkbox" name="carpetas" value="{{ folder_detail.folders_path }}" checked>
 								<label for="carpetas">{{ folder_detail.folders_basename }}</label>
 							</div>
 							{% endfor %}
+
+							{% else %}
+							<h1>Seleccionar subcarpetas a procesar</h1>
+
+							{% for folder_detail in folders_details %}
+							<div class="carpetas-cargadas">
+								<input type="checkbox" name="carpetas" value="{{ folder_detail.folders_path }}" checked>
+								<label for="carpetas">{{ folder_detail.folders_basename }}</label>
+							</div>
+							{% endfor %}
+							{% endif %}
+
+
 							<div class="thebuttons">
 								<button type="button" id="swapFire" class="btn btn-primary showFire" name="false">
 									<span class="glyphicon glyphicon-folder-close"></span> Deseleccionar Carpetas
 								</button>
 							</div>
-							<input type="submit" value="Seleccionar Carpeta Destino" id="destino" name="destino"
-								{{ button_disable|default:'' }}></input>
+							<input type="submit" value="Seleccionar Carpeta Destino" id="destino" name="destino" {{
+								button_disable|default:'' }}></input>
 
 						</form>
 						{% endif %}
@@ -250,20 +258,21 @@
 
 						Carpetas seleccionadas
 
-						{% for procesando in carpetas_procesando %}
 
 						<ul>
+							{% for procesando in carpetas_procesando %}
 							<li>
 								<label>{{procesando}}</label>
 							</li>
+							{% endfor %}
 						</ul>
 
-						{% endfor %}
 						{% endif %}
 						<form method="POST">
 							{% csrf_token %}
 							<input type="submit" value="Procesar Carpetas" id="procesar_carpetas"
-								name="procesar_carpetas" {{ button_disable|default:'' }}></input>
+								name="procesar_carpetas"
+								style="display: {{button_disable_process|default:'block' }};"></input>
 						</form>
 
 						{% if carpetas_procesando %}
@@ -271,14 +280,14 @@
 						{% if not seleccionadas %}
 						Procesando
 
-						{% for procesando in carpetas_procesando %}
 
 						<ul>
+							{% for procesando in carpetas_procesando %}
 							<li>
 								<label>{{procesando}}</label>
 							</li>
+							{% endfor %}
 						</ul>
-						{% endfor %}
 
 						{% endif %}
 
@@ -304,8 +313,8 @@
 						<form class="mosgrafica" method="POST" action="">
 							{% csrf_token %}
 							<div class="contenidos">
-								<button type="submit" name="mostrar-grafica" id="mostrar-grafica"
-									{{ button_disable|default:'' }}>Mostrar
+								<button type="submit" name="mostrar-grafica" id="mostrar-grafica" {{
+									button_disable|default:'' }}>Mostrar
 									gráfica</button>
 							</div>
 						</form>
@@ -315,8 +324,8 @@
 						<form class="mosgrafica" method="POST" action="">
 							{% csrf_token %}
 							<div class="contenidos">
-								<button type="submit" name="cargar-csv" id="cargar-csv"
-									{{ button_disable|default:'' }}>Cargar
+								<button type="submit" name="cargar-csv" id="cargar-csv" {{ button_disable|default:''
+									}}>Cargar
 									CSV</button>
 							</div>
 						</form>
