@@ -153,6 +153,7 @@ async def process_folders(request):
     data['indices'] = selected_indices
     data['mostrar_barra_proceso'] = True
     data['button_disable'] = 'disabled'
+    data['button_disable_process'] = 'none'
 
     # Return the prepared data with the template for rendering
     return render(request, 'indices/indices.html', data)

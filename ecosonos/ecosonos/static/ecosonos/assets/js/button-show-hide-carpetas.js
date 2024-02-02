@@ -8,7 +8,7 @@ jQuery(function ($) {
 		textNode.nodeValue =
 			($el.hasClass("showFire") ? "Deseleccionar" : "Seleccionar") +
 			" Carpetas ";
-		$el.toggleClass("showFire");
+		// $el.toggleClass("showFire");
 	});
 });
 
