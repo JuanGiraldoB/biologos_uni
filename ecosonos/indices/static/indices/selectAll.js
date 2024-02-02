@@ -13,8 +13,13 @@ selectAllBtn.addEventListener("click", function () {
         this.name = 'false';
     }
 
+    if (value){
+        selectAllBtn.value = "Deseeleccionar todos los filtros";
+    }else{
+        selectAllBtn.value = "Seleccionar todos los filtros";
+    }
+
     for (const checkbox of checkboxes) {
-        console.log(value)
         checkbox.checked = value;
     }
 });
