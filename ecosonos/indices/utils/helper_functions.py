@@ -76,6 +76,7 @@ async def load_folder(request):
 
     data['folders_details'] = folders_details
     data['indices'] = selected_indices
+    data['button_display_csv'] = 'none'
 
     # Return the prepared data with the template for rendering
     return render(request, 'indices/indices.html', data)
@@ -119,6 +120,7 @@ async def prepare_destination_folder(request):
     data['folders_details'] = folder_details
     data['indices'] = indices
     data['seleccionadas'] = 'seleccionadas'
+    data['button_display_csv'] = 'none'
 
     return render(request, 'indices/indices.html', data)
 
@@ -153,7 +155,10 @@ async def process_folders(request):
     data['indices'] = selected_indices
     data['mostrar_barra_proceso'] = True
     data['button_disable'] = 'disabled'
+    data['button_display_csv'] = 'none'
     data['button_disable_process'] = 'none'
+    data['carpeta_principal_seleccionada'] = root_folder.split('/')[-1]
+    data['carpeta_destino_seleccionada'] = destination_folder.split('/')[-1]
 
     # Return the prepared data with the template for rendering
     return render(request, 'indices/indices.html', data)

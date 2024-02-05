@@ -35,5 +35,5 @@ function updateProgressBar() {
 }
 
 function enableButtons() {
-	document.getElementById("botones-mover-mostrar").style.display = "block";
+	document.getElementById("div-mover-mostrar").style.display = "block";
 }

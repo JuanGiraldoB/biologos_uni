@@ -29,7 +29,7 @@ function updateProgressBar() {
 				spanValue.innerHTML = "Completado";
 				clearInterval(intervalId);
 				enableButtons();
-				createMostrarGraficaButton();
+				// createMostrarGraficaButton();
 			}
 		}
 	};
@@ -40,7 +40,8 @@ function enableButtons() {
 	// document.getElementById("cargar").disabled = false;
 	// document.getElementById("destino").disabled = false;
 	// document.getElementById("procesar_carpetas").disabled = false;
-	document.getElementById("cargar-csv").disabled = false;
+	document.getElementById("div-mostrar-grafica").style.display = "block";
+	document.getElementById("div-mostrar-csv").style.display = "block";
 }
 
 function createMostrarGraficaButton() {
