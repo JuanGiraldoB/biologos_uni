@@ -6,9 +6,9 @@ jQuery(function ($) {
 			.find("span")
 			.toggleClass("glyphicon-folder-close glyphicon-folder-open");
 		textNode.nodeValue =
-			($el.hasClass("showFire") ? "Deseleccionar" : "Seleccionar") +
+			($el.hasClass("showFire") ? "Seleccionar" : "Deseleccionar") +
 			" Carpetas ";
-		// $el.toggleClass("showFire");
+		$el.toggleClass("showFire");
 	});
 });
 

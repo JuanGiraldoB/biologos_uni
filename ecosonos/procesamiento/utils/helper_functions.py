@@ -166,11 +166,16 @@ async def process_folders(request):
 
     # Get the statistics state from the session
     statistics = await sync_to_async(get_statistics_state_session)(request)
+    folder_details = await sync_to_async(get_subfolders_details_session)(request)
 
+    data['folders_details'] = folder_details
     data['statistics'] = statistics
     data['carpetas_procesando'] = selected_subdfolders_base_name
     data['mostrar_barra_proceso'] = True
-    data['button_disable'] = 'disabled'
+    data['procesando'] = True
+    data['button_disable_process'] = 'none'
+    data['carpeta_principal_seleccionada'] = root_folder.split('/')[-1]
+    data['carpeta_destino_seleccionada'] = destination_folder.split('/')[-1]
 
     # Return the prepared data with the template for rendering
     # return JsonResponse(data)

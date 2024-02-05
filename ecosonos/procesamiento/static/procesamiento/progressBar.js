@@ -35,10 +35,5 @@ function updateProgressBar() {
 }
 
 function enableButtons() {
-	document.getElementById("cargar").disabled = false;
-	// document.getElementById("destino").disabled = false;
-	document.getElementById("mover_archivos").disabled = false;
-	document.getElementById("mover_malos").disabled = false;
-	document.getElementById("mostrar_grafica").disabled = false;
-	document.getElementById("procesar_carpetas").disabled = false;
+	document.getElementById("botones-mover-mostrar").style.display = "block";
 }

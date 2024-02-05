@@ -72,12 +72,17 @@
 				<div class="row">
 					<section class="col-12 col-12-narrower">
 						<div class="contenidos">
+
+							{% if not folders_details %}
+							<!-- Form seleccionar carpeta principal -->
 							<form id="cargar_carpeta" method="POST" enctype="multipart/form-data">
 								{% csrf_token %}
 								<p>Seleccionar la carpeta raiz que contiene los archivos (.wav)</p>
 								<div class="thebuttons">
-									<input type="submit" value="Seleccionar Carpeta Principal" id="cargar" name="cargar"
-										{{ button_disable|default:'' }}></input>
+									<input type="submit" value="Seleccionar Carpeta Principal" id="cargar"
+										name="cargar"></input>
+
+									<!-- Popup seleccionar carpeta principal -->
 									<a href="#popup1" class="button-help">?</a>
 									<div id="popup1" class="overlay">
 										<div class="popup">
@@ -90,6 +95,8 @@
 										</div>
 									</div>
 								</div>
+
+								<!-- Checkbox Estadisticas -->
 								<div class="checks especialchecks">
 									{% if statistics %}
 									<input type="checkbox" id="estadisticas" name="estadisticas" value="estadisticas"
@@ -101,34 +108,7 @@
 									<label for="estadisticas">Estadísticas</label>
 								</div>
 							</form>
-
-							<!-- <form id="seleccionar_carpetas" class="carpetaprincipal" method="POST">
-								{% csrf_token %}
-
-
-								{% if statistics %}
-								<div>
-									{% for folder_detail in folders_details %}
-									<div class="carpetas-cargadas">
-										<input type="checkbox" name="carpetas" value="{{ folder_detail.folder_path }}"
-											checked>
-										<label for="carpetas">{{ folder_detail.folder_name }} - Numero de Archivos:
-											{{folder_detail.number_of_files}} -
-											Rango de duracion: {{folder_detail.range_of_lengths}} -
-											Rango de fechas: {{folder_detail.range_of_dates}}</label>
-									</div>
-									{% endfor %}
-								</div>
-								{% else %}
-								{% for folder_detail in folders_details %}
-								<div class="carpetas-cargadas">
-									<input type="checkbox" name="carpetas" value="{{ folder_detail.folder_path }}"
-										checked>
-									<label for="carpetas">{{ folder_detail.folder_name }}</label>
-								</div>
-								{% endfor %}
-								{% endif %}
-							</form> -->
+							{% endif %}
 
 							{% if folders_details %}
 							<form id="carpeta_destino" method="POST" enctype="multipart/form-data">
@@ -136,6 +116,8 @@
 								{% if not carpetas_procesando %}
 								{% if statistics %}
 								<div>
+									{% if folders_details|length == 1 %}
+									<h1>Carpeta seleccionada</h1>
 
 									{% for folder_detail in folders_details %}
 									<div class="carpetas-cargadas">
@@ -147,8 +129,36 @@
 											Rango de fechas: {{folder_detail.range_of_dates}}</label>
 									</div>
 									{% endfor %}
+
+									{% else %}
+									<h1>Seleccionar subcarpetas a procesar</h1>
+									{% for folder_detail in folders_details %}
+									<div class="carpetas-cargadas">
+										<input type="checkbox" name="carpetas" value="{{ folder_detail.folder_path }}"
+											checked>
+										<label for="carpetas">{{ folder_detail.folder_name }} - Numero de Archivos:
+											{{folder_detail.number_of_files}} -
+											Rango de duracion: {{folder_detail.range_of_lengths}} -
+											Rango de fechas: {{folder_detail.range_of_dates}}</label>
+									</div>
+									{% endfor %}
+									{% endif %}
 								</div>
 								{% else %}
+
+								{% if folders_details|length == 1 %}
+								<h1>Carpeta seleccionada</h1>
+
+								{% for folder_detail in folders_details %}
+								<div class="carpetas-cargadas">
+									<input type="checkbox" name="carpetas" value="{{ folder_detail.folder_path }}"
+										checked>
+									<label for="carpetas">{{ folder_detail.folder_name }}</label>
+								</div>
+								{% endfor %}
+
+								{% else %}
+								<h1>Seleccionar subcarpetas a procesar</h1>
 
 								{% for folder_detail in folders_details %}
 								<div class="carpetas-cargadas">
@@ -159,7 +169,6 @@
 								{% endfor %}
 								{% endif %}
 
-								{% if folders_details%}
 								<div class="thebuttons">
 									<button type="button" id="swapFire" class="btn btn-primary showFire" name="false">
 										<span class="glyphicon glyphicon-folder-close"></span> Deseleccionar Carpetas
@@ -169,9 +178,10 @@
 
 								{% endif %}
 								<div class="thebuttons">
+									{% if not carpetas_procesando %}
 									{% csrf_token %}
-									<input type="submit" value="Seleccionar Carpeta Destino" id="destino" name="destino"
-										{{ button_disable|default:'' }}></input>
+									<input type="submit" value="Seleccionar Carpeta Destino" id="destino"
+										name="destino"></input>
 									<a href="#popup1" class="button-help">?</a>
 									<div id="popup1" class="overlay">
 										<div class="popup">
@@ -183,30 +193,43 @@
 											</div>
 										</div>
 									</div>
+									{% endif %}
 								</div>
-
 							</form>
 							{% endif %}
 
 							{% if carpetas_procesando %}
 
+							{% if carpeta_principal_seleccionada %}
+							<h1>Carpeta principal seleccionada: {{carpeta_principal_seleccionada}}</h1>
+							<h1>Carpeta destino seleccionada: {{carpeta_destino_seleccionada}}</h1>
+							{% endif %}
+
 							{% if seleccionadas %}
 							Carpetas seleccionadas
-							{% for procesando in carpetas_procesando %}
-
 							<ul>
+								{% for procesando in carpetas_procesando %}
+
 								<li>
 									<label>{{procesando}}</label>
 								</li>
-							</ul>
 
-							{% endfor %}
+								{% endfor %}
+							</ul>
 							{% endif %}
+
+
+							<!-- Form procesar carpetas -->
 							<form method="POST">
 								{% csrf_token %}
 								<input type="submit" value="Procesar Carpetas con Lluvia" id="procesar_carpetas"
-									name="procesar_carpetas" {{ button_disable|default:'' }}></input>
+									name="procesar_carpetas"
+									style="display: {{button_disable_process|default:'block' }};"></input>
 								<a href="#popup1" class="button-help">?</a>
+								<!-- <a href="#popup1" class="button-help"
+									style="display: {{button_disable_process|default:'block' }};">?</a> -->
+
+								<!-- Popup procesar carpetas -->
 								<div id="popup1" class="overlay">
 									<div class="popup">
 										<h2>Ayuda - Seleccionar carpeta principal</h2>
@@ -223,21 +246,19 @@
 
 							{% if not seleccionadas %}
 							Procesando
-							{% for procesando in carpetas_procesando %}
 
 							<ul>
+								{% for procesando in carpetas_procesando %}
 								<li>
 									<label>{{procesando}}</label>
 								</li>
+								{% endfor %}
 							</ul>
 
-							{% endfor %}
 							{% endif %}
 							{% endif %}
 
 							<br>
-
-							{% if mostrar_barra_proceso %}
 
 							<section>
 								<div class="chart">
@@ -245,73 +266,75 @@
 									<span id="value1">0%</span>
 								</div>
 							</section>
-
-							{% endif %}
 							{% endif %}
 						</div>
 					</section>
 
-
-					<section class="col-12 col-12-narrower">
-						<div class="contenidos">
-							<p class="warningtext"><span>¡Importante!</span> Si pulsa cualquiera de las opciones de
-								mover el sistema desplazará sus archivos a una nueva ubicación.</p>
-							<form id="mover_lluvia_form" method="POST" enctype="multipart/form-data">
-								{% csrf_token %}
-								<div class="thebuttons">
-									<input type="submit" value="Mover Archivos con Lluvia" id="mover_archivos"
-										name="mover_archivos" {{ button_disable|default:'' }}></input>
-									<a href="#popup1" class="button-help">?</a>
-									<div id="popup1" class="overlay">
-										<div class="popup">
-											<h2>Ayuda - Seleccionar carpeta principal</h2>
-											<a class="close" href="#">&times;</a>
-											<div class="content">
-												<p>Permite buscar en el equipo la carpeta de origen donde se almacenan
-													los archivos de audio que serán procesados.</p>
+					<div id="botones-mover-mostrar" style="display: none;">
+						<section class="col-12 col-12-narrower">
+							<div class="contenidos">
+								<p class="warningtext"><span>¡Importante!</span> Si pulsa cualquiera de las opciones de
+									mover el sistema desplazará sus archivos a una nueva ubicación.</p>
+								<form id="mover_lluvia_form" method="POST" enctype="multipart/form-data">
+									{% csrf_token %}
+									<div class="thebuttons">
+										<input type="submit" value="Mover Archivos con Lluvia" id="mover_archivos"
+											name="mover_archivos"></input>
+										<a href="#popup1" class="button-help">?</a>
+										<div id="popup1" class="overlay">
+											<div class="popup">
+												<h2>Ayuda - Seleccionar carpeta principal</h2>
+												<a class="close" href="#">&times;</a>
+												<div class="content">
+													<p>Permite buscar en el equipo la carpeta de origen donde se
+														almacenan
+														los archivos de audio que serán procesados.</p>
+												</div>
 											</div>
 										</div>
 									</div>
-								</div>
-							</form>
-							<form id="mover_danado_form" method="POST" enctype="multipart/form-data">
-								{% csrf_token %}
-								<div class="thebuttons">
-									<input type="submit" class="botmalos" value="Mover Archivos Dañados"
-										id="mover_malos" name="mover_archivos" {{ button_disable|default:'' }}></input>
-									<a href="#popup1" class="button-help">?</a>
-									<div id="popup1" class="overlay">
-										<div class="popup">
-											<h2>Ayuda - Seleccionar carpeta principal</h2>
-											<a class="close" href="#">&times;</a>
-											<div class="content">
-												<p>Permite buscar en el equipo la carpeta de origen donde se almacenan
-													los archivos de audio que serán procesados.</p>
+								</form>
+								<form id="mover_danado_form" method="POST" enctype="multipart/form-data">
+									{% csrf_token %}
+									<div class="thebuttons">
+										<input type="submit" class="botmalos" value="Mover Archivos Dañados"
+											id="mover_malos" name="mover_archivos" {{ button_disable|default:''
+											}}></input>
+										<a href="#popup1" class="button-help">?</a>
+										<div id="popup1" class="overlay">
+											<div class="popup">
+												<h2>Ayuda - Seleccionar carpeta principal</h2>
+												<a class="close" href="#">&times;</a>
+												<div class="content">
+													<p>Permite buscar en el equipo la carpeta de origen donde se
+														almacenan
+														los archivos de audio que serán procesados.</p>
+												</div>
 											</div>
 										</div>
 									</div>
-								</div>
-							</form>
-						</div>
-					</section>
-					<section class="col-12 col-12-narrower">
-						<form id="grafica_form" method="POST" enctype="multipart/form-data">
-							{% csrf_token %}
-							<input type="submit" value="Mostrar gráfica" id="mostrar_grafica" name="mostrar_grafica"
-								{{ button_disable|default:'' }}></input>
-							<a href="#popup1" class="button-help">?</a>
-							<div id="popup1" class="overlay">
-								<div class="popup">
-									<h2>Ayuda - Seleccionar carpeta principal</h2>
-									<a class="close" href="#">&times;</a>
-									<div class="content">
-										<p>Permite buscar en el equipo la carpeta de origen donde se almacenan los
-											archivos de audio que serán procesados.</p>
-									</div>
-								</div>
+								</form>
 							</div>
-						</form>
-					</section>
+						</section>
+						<section class="col-12 col-12-narrower">
+							<form id="grafica_form" method="POST" enctype="multipart/form-data">
+								{% csrf_token %}
+								<input type="submit" value="Mostrar gráfica" id="mostrar_grafica"
+									name="mostrar_grafica"></input>
+								<a href="#popup1" class="button-help">?</a>
+								<div id="popup1" class="overlay">
+									<div class="popup">
+										<h2>Ayuda - Seleccionar carpeta principal</h2>
+										<a class="close" href="#">&times;</a>
+										<div class="content">
+											<p>Permite buscar en el equipo la carpeta de origen donde se almacenan los
+												archivos de audio que serán procesados.</p>
+										</div>
+									</div>
+								</div>
+							</form>
+						</section>
+					</div>
 					<section class="col-12 col-12-narrower">
 						<div id="grafica_div" style="height: 100%; width: 100%;">
 					</section>
