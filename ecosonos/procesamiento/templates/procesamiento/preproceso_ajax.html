@@ -1,0 +1,326 @@
+{% load static %}
+<!DOCTYPE HTML>
+
+<html lang="en">
+
+<head>
+    <title>EcoSonos</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="{% static 'ecosonos/assets/css/main.css' %}" />
+    <style>
+        #load {
+            animation-name: load;
+            animation-duration: 2s;
+            animation-timing-function: ease-out;
+            animation-fill-mode: forwards;
+        }
+    </style>
+</head>
+
+<body class="is-preload">
+    <div id="page-wrapper">
+
+        <!-- Header -->
+        <div id="header">
+
+            <!-- Logo -->
+            <div class="logoup"><a href="{% url 'index' %}"><img
+                        src="{% static 'ecosonos/images/logo_econosonos.png' %}"></a></div>
+
+            <!-- Nav -->
+            <nav id="nav">
+                <ul>
+                    <li class="current"> <a href="{% url 'preproceso' %}">Lluvia/Archivo Corrupto</a></li>
+                    <li><a href="{% url 'indices' %}">Índices Acústicos</a></li>
+                    <li><a href="{% url 'etiquetado' %}">Segmentación Manual</a></li>
+                    <li><a href="{% url 'etiquetado-auto' %}">Sonotipos</a></li>
+                    <li><a href="{% url 'conectividad' %}">Heterogeneidad Acústica</a></li>
+                </ul>
+            </nav>
+
+        </div>
+
+        <!-- Banner -->
+        <section id="banner">
+            <header>
+                <h2>EcoSonos: <em>Observación a través del sonido</em></h2>
+                <a href="#" class="button">Conocer más</a>
+            </header>
+        </section>
+        <!-- Descripción Módulo -->
+        <section class="wrapper style2">
+            <div class="container">
+                <header class="major">
+                    <h2
+                        style="font-family: hocus_regularregular; letter-spacing: 0.1em; font-size: 4em; line-height: 0.2em; color: #19a173;">
+                        LLUVIA/ARCHIVO CORRUPTO</h2>
+                    <p>Este módulo permite identificar los audios que presentan patrón de comportamiento en frecuencia
+                        similar al que se tiene en presencia de lluvia. Además, detecta los archivos corruptos y las
+                        grabaciones con duración de más de un minuto. Los resultados se visualizan en gráficas que
+                        indican en el tiempo los archivos que presentaron lluvia o están corruptos.</p>
+                </header>
+            </div>
+        </section>
+        <!-- Posts -->
+        <section class="wrapper style1 wrappeados">
+            <div class="container">
+                <div class="row">
+                    <section class="col-12 col-12-narrower">
+                        <div class="contenidos">
+
+                            <!-- Div seleccionar carpeta principal -->
+                            <div id="div-seleccionar-carpeta-principal">
+                                <form id="cargar_carpeta" method="POST" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <p>Seleccionar la carpeta raiz que contiene los archivos (.wav)</p>
+                                    <div class="thebuttons">
+                                        <input type="submit" value="Seleccionar Carpeta Principal" id="cargar"
+                                            name="cargar"></input>
+
+                                        <!-- Popup seleccionar carpeta principal -->
+                                        <a href="#popup1" class="button-help">?</a>
+                                        <div id="popup1" class="overlay">
+                                            <div class="popup">
+                                                <h2>Ayuda - Seleccionar carpeta principal</h2>
+                                                <a class="close" href="#">&times;</a>
+                                                <div class="content">
+                                                    <p>Permite buscar en el equipo la carpeta de origen donde se
+                                                        almacenan
+                                                        los archivos de audio que serán procesados.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Checkbox Estadisticas -->
+                                    <div class="checks especialchecks">
+                                        <input type="checkbox" id="estadisticas" name="estadisticas"
+                                            value="estadisticas"></input>
+                                        <label for="estadisticas">Estadísticas</label>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Div carpeta destino -->
+                            <div id="div-seleccionar-carpeta-destino" style="display: none;">
+                                <form id="carpeta_destino" method="POST" enctype="multipart/form-data">
+
+                                    <div id="div-seleccionar-subcarpetas">
+
+                                    </div>
+
+                                    <div class="thebuttons">
+                                        <button type="button" id="swapFire" class="btn btn-primary showFire"
+                                            name="false">
+                                            <span class="glyphicon glyphicon-folder-close"></span> Deseleccionar
+                                            Carpetas
+                                        </button>
+                                    </div>
+
+                                    <div class="thebuttons">
+                                        {% csrf_token %}
+
+                                        <input type="submit" value="Seleccionar Carpeta Destino" id="destino"
+                                            name="destino"></input>
+
+                                        <a href="#popup1" class="button-help">?</a>
+                                        <div id="popup1" class="overlay">
+                                            <div class="popup">
+                                                <h2>Ayuda - Seleccionar carpeta principal</h2>
+                                                <a class="close" href="#">&times;</a>
+                                                <div class="content">
+                                                    <p>Permite buscar en el equipo la carpeta de origen donde se
+                                                        almacenan
+                                                        los archivos de audio que serán procesados.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <div>
+                                <div>
+                                    <h1 id="titulo-carpetas-procesar" style="display: none;">Carpetas
+                                        a procesar</h1>
+                                    <ul id="lista-nombre-carpetas-procesar">
+
+                                    </ul>
+                                </div>
+                                <h1 id="nombre-carpeta-destino-seleccionada"></h1>
+                            </div>
+
+
+                            <!-- Form procesar carpetas -->
+                            <div id="div-procesar" style="display: none;">
+                                <form method="POST" id="form_procesar">
+                                    {% csrf_token %}
+                                    <input type="submit" value="Procesar Carpetas con Lluvia" id="procesar_carpetas"
+                                        name="procesar_carpetas"></input>
+                                    <a href="#popup1" class="button-help">?</a>
+
+                                    <!-- Popup procesar carpetas -->
+                                    <div id="popup1" class="overlay">
+                                        <div class="popup">
+                                            <h2>Ayuda - Seleccionar carpeta principal</h2>
+                                            <a class="close" href="#">&times;</a>
+                                            <div class="content">
+                                                <p>Permite buscar en el equipo la carpeta de origen donde se almacenan
+                                                    los
+                                                    archivos de audio que serán procesados.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <br>
+
+                            <section>
+                                <div class="chart" id="div-barra-progreso" style="display: none;">
+                                    <div class="bar"></div>
+                                    <span id="value1">0%</span>
+                                </div>
+                            </section>
+                        </div>
+                    </section>
+
+                    <div id="div-mover-mostrar" style="display: none;">
+                        <section class="col-12 col-12-narrower">
+                            <div class="contenidos">
+                                <p class="warningtext"><span>¡Importante!</span> Si pulsa cualquiera de las opciones de
+                                    mover el sistema desplazará sus archivos a una nueva ubicación.</p>
+                                <form id="mover_lluvia_form" method="POST" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <div class="thebuttons">
+                                        <input type="submit" value="Mover Archivos con Lluvia" id="mover_archivos"
+                                            name="mover_archivos"></input>
+                                        <a href="#popup1" class="button-help">?</a>
+                                        <div id="popup1" class="overlay">
+                                            <div class="popup">
+                                                <h2>Ayuda - Seleccionar carpeta principal</h2>
+                                                <a class="close" href="#">&times;</a>
+                                                <div class="content">
+                                                    <p>Permite buscar en el equipo la carpeta de origen donde se
+                                                        almacenan
+                                                        los archivos de audio que serán procesados.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <p id="p-lluvia" style="display: none;">Los archivos con lluvia se movieron a la
+                                            carpeta: </p>
+                                    </div>
+                                </form>
+                                <form id="mover_danado_form" method="POST" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <div class="thebuttons">
+                                        <input type="submit" class="botmalos" value="Mover Archivos Dañados"
+                                            id="mover_malos" name="mover_archivos"></input>
+                                        <a href="#popup1" class="button-help">?</a>
+                                        <div id="popup1" class="overlay">
+                                            <div class="popup">
+                                                <h2>Ayuda - Seleccionar carpeta principal</h2>
+                                                <a class="close" href="#">&times;</a>
+                                                <div class="content">
+                                                    <p>Permite buscar en el equipo la carpeta de origen donde se
+                                                        almacenan
+                                                        los archivos de audio que serán procesados.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <p id="p-danado" style="display: none;">Los archivos dañados se movieron a la
+                                            carpeta: </p>
+                                    </div>
+                                </form>
+                            </div>
+                        </section>
+                        <section class="col-12 col-12-narrower">
+                            <form id="grafica_form" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <input type="submit" value="Mostrar gráfica" id="mostrar_grafica"
+                                    name="mostrar_grafica"></input>
+                                <a href="#popup1" class="button-help">?</a>
+                                <div id="popup1" class="overlay">
+                                    <div class="popup">
+                                        <h2>Ayuda - Seleccionar carpeta principal</h2>
+                                        <a class="close" href="#">&times;</a>
+                                        <div class="content">
+                                            <p>Permite buscar en el equipo la carpeta de origen donde se almacenan los
+                                                archivos de audio que serán procesados.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </section>
+                    </div>
+                    <section class="col-12 col-12-narrower">
+                        <div id="grafica_div" style="height: 100%; width: 100%;">
+                    </section>
+                </div>
+            </div>
+    </div>
+    </section>
+
+    <!-- Footer -->
+    <div id="footer">
+        <div class="container">
+            <!-- Creditos -->
+            <section id="cta2" class="wrapper2 style3">
+                <div class="container">
+                    <div class="logos participantes">
+                        <img src="{% static 'ecosonos/images/u_antioquia.png' %}">
+                    </div>
+                    <div class="logos participantes">
+                        <img src="{% static 'ecosonos/images/ITM.png' %}">
+                    </div>
+                    <div class="logos participantes">
+                        <img src="{% static 'ecosonos/images/humboldt_v1.png' %}">
+                    </div>
+                    <div class="logos texto">
+                        <p>Apoya:</p>
+                    </div>
+                    <div class="logos participantes">
+                        <img src="{% static 'ecosonos/images/Ciencias.png' %}">
+                    </div>
+                </div>
+            </section>
+        </div>
+
+
+
+        <!-- Copyright -->
+        <div class="copyright">
+            <ul class="menu">
+                <li>&copy; Todos los derechos reservados</li>
+                <li>Diseño: <a href="#">Grupo Investigación</a></li>
+            </ul>
+        </div>
+
+    </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="{% static 'ecosonos/assets/js/jquery.min.js' %}"></script>
+    <script src="{% static 'ecosonos/assets/js/jquery.dropotron.min.js' %}"></script>
+    <script src="{% static 'ecosonos/assets/js/browser.min.js' %}"></script>
+    <script src="{% static 'ecosonos/assets/js/breakpoints.min.js' %}"></script>
+    <script src="{% static 'ecosonos/assets/js/util.js' %}"></script>
+    <script src="{% static 'ecosonos/assets/js/main.js' %}"></script>
+    <script src="{% static 'ecosonos/assets/js/button-show-hide-carpetas.js' %}"></script>
+    <script src="{% static 'procesamiento/submitCargarForm.js' %}"></script>
+    <!-- <script src="{% static 'procesamiento/destinoUtils.js' %}"></script> -->
+    <script src="{% static 'procesamiento/submitMoverLluviaForm.js' %}"></script>
+    <script src="{% static 'procesamiento/submitMoverDanadoForm.js' %}"></script>
+    <script src="{% static 'procesamiento/submitGraficaForm.js' %}"></script>
+    <script src="{% static 'procesamiento/progressBar.js' %}"></script>
+    <script src="{% static 'procesamiento/tagManipulation.js' %}"></script>
+
+</body>
+
+</html>

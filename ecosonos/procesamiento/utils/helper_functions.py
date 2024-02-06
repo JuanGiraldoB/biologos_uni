@@ -2,6 +2,7 @@ from django.shortcuts import render
 from asgiref.sync import sync_to_async
 from django.http import JsonResponse
 import asyncio
+import os
 
 from procesamiento.models import Progreso
 
@@ -61,7 +62,7 @@ async def load_folder(request):
 
     # Check if statistics option is selected in the POST request
     statistics_checked = request.POST.get('estadisticas')
-    statistics_checked = True if statistics_checked else False
+    statistics_checked = True if statistics_checked == 'true' else False
 
     # Get lists of folder paths and their basenames
     folders_wav_path, folders_wav_basename = get_folders_with_wav(
@@ -89,9 +90,9 @@ async def load_folder(request):
     await sync_to_async(save_statistics_state_session)(request, statistics_checked)
     await sync_to_async(save_subfolders_details_session)(request, folders_details)
 
-    # return JsonResponse(data)
+    return JsonResponse(data)
     # Return the prepared data with the template for rendering
-    return render(request, 'procesamiento/preproceso.html', data)
+    # return render(request, 'procesamiento/preproceso.html', data)
 
 
 async def prepare_destination_folder(request):
@@ -100,6 +101,7 @@ async def prepare_destination_folder(request):
 
     # Get the list of selected subfolders from the POST request
     selected_subdfolders = request.POST.getlist('carpetas')
+    print(selected_subdfolders)
 
     # Get the base names of the selected subfolders
     selected_subdfolders_base_name = get_subfolders_basename(
@@ -131,15 +133,15 @@ async def prepare_destination_folder(request):
     await sync_to_async(save_destination_folder_session)(request, destination_folder)
 
     # Get folder details, statistics state, and selected subfolders from the session
-    folder_details = await sync_to_async(get_subfolders_details_session)(request)
+    # folder_details = await sync_to_async(get_subfolders_details_session)(request)
     statistics = await sync_to_async(get_statistics_state_session)(request)
-    data['folders_details'] = folder_details
     data['statistics'] = statistics
-    data['seleccionadas'] = 'seleccionadas'
+    data['folders'] = selected_subdfolders_base_name
+    data['destination_folder'] = destination_folder.split('/')[-1]
 
     # Return the prepared data with the template for rendering
-    # return JsonResponse(data)
-    return render(request, 'procesamiento/preproceso.html', data)
+    return JsonResponse(data)
+    # return render(request, 'procesamiento/preproceso.html', data)
 
 
 async def process_folders(request):
@@ -178,11 +180,13 @@ async def process_folders(request):
     data['carpeta_destino_seleccionada'] = destination_folder.split('/')[-1]
 
     # Return the prepared data with the template for rendering
-    # return JsonResponse(data)
-    return render(request, 'procesamiento/preproceso.html', data)
+    return JsonResponse(data)
+    # return render(request, 'procesamiento/preproceso.html', data)
 
 
 async def move_files(request):
+    data = {}
+
     try:
         # Attempt to retrieve the destination folder path from the session
         destination_folder = await sync_to_async(get_root_folder)()
@@ -210,13 +214,16 @@ async def move_files(request):
         # Move files depending on their type
         move_files_depending_type(
             csv_folder, destination_folder, type_of_files_to_move)
+
+        data['folder'] = destination_folder.split('/')[-1]
+
     except Exception as e:
         # If there's an error, return a JSON response indicating that a folder must be selected
         print(e)
         return JsonResponse({'error': 'Must select a folder'}, status=500)
         # return render(request, 'procesamiento/preproceso.html')
 
-    return render(request, 'procesamiento/preproceso.html')
+    return JsonResponse(data)
 
 
 async def show_plot(request):

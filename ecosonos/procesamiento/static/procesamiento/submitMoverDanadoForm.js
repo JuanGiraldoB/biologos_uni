@@ -16,6 +16,11 @@ document.addEventListener("DOMContentLoaded", function () {
 			if (xhr.readyState === XMLHttpRequest.DONE) {
 				if (xhr.status === 200) {
 					let response = JSON.parse(xhr.responseText);
+					let folder = response.folder;
+
+					let pDanado = document.getElementById("p-danado");
+					pDanado.style.display = "block";
+					pDanado.textContent += folder;
 				} else {
 					let response = JSON.parse(xhr.responseText);
 					console.error(response.error + " " + xhr.status);

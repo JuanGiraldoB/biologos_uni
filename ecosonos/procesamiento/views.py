@@ -32,7 +32,7 @@ async def lluvia(request):
             return await show_plot(request)
 
     else:
-        return render(request, 'procesamiento/preproceso.html')
+        return render(request, 'procesamiento/preproceso_ajax.html')
 
 
 @csrf_exempt

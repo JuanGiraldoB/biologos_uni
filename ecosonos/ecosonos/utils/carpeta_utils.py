@@ -36,7 +36,7 @@ def obtener_subcarpetas(carpeta):
     for ruta, carpetas_subdir, _ in os.walk(carpeta):
         for carpeta_subdir in carpetas_subdir:
             nombre_completo = os.path.join(
-                ruta, carpeta_subdir)  # .replace(os.path.sep, '/')
+                ruta, carpeta_subdir)
             carpetas_nombre_completo.append(nombre_completo)
 
             nombre_base = os.path.basename(os.path.join(ruta, carpeta_subdir))
@@ -76,69 +76,6 @@ def subcarpetas_seleccionadas(carpetas):
     """
     return not carpetas
 
-
-# def save_root_folder_session(request, raiz, app='preproceso'):
-#     if app == 'indices':
-#         request.session['raiz_indices'] = raiz
-#     elif app == 'etiquetado':
-#         request.session['raiz_etiquetado'] = raiz
-#     elif app == 'etiquetado-auto':
-#         request.session['raiz_etiquetado_auto'] = raiz
-#     else:
-#         request.session['raiz_preproceso'] = raiz
-
-
-# def get_root_folder_session(request, app='preproceso'):
-#     if app == 'indices':
-#         return request.session['raiz_indices']
-#     elif app == 'etiquetado':
-#         return request.session['raiz_etiquetado']
-#     elif app == 'etiquetado-auto':
-#         return request.session['raiz_etiquetado_auto']
-
-#     return request.session['raiz_preproceso']
-
-
-# def save_selected_subfolders_session(request, carpetas, app='preproceso'):
-#     if app == 'indices':
-#         request.session['carpetas_indices'] = carpetas
-#     elif app == 'etiquetado-auto':
-#         request.session['carpetas_etiquetado_auto'] = carpetas
-#     else:
-#         request.session['carpetas_preproceso'] = carpetas
-
-
-# def get_selected_subfolders_session(request, app='preproceso'):
-#     if app == 'indices':
-#         return request.session['carpetas_indices']
-
-#     return request.session['carpetas_preproceso']
-
-
-def cambiar_diagonales_carpeta(carpeta):
-    return carpeta.replace('\\', '/')
-
-
-# def save_csv_path_session(request, ruta_csv):
-#     request.session['csv_etiquetado'] = ruta_csv
-
-
-# def get_csv_path_session(request):
-#     return request.session['csv_etiquetado']
-
-
-# def guardar_ruta_csv_session(request, ruta_csv, app='preproceso'):
-#     if app == 'etiquetado':
-#         request.session['csv_etiquetado'] = ruta_csv
-#     elif app == 'etiquetado-auto':
-#         request.session['csv_etiquetado_auto'] = ruta_csv
-
-
-# def obtener_ruta_csv_session(request, app='preproceso'):
-#     if app == 'etiquetado':
-#         return request.session['csv_etiquetado']
-#     elif app == 'etiquetado-auto':
-#         return request.session['csv_etiquetado_auto']
 
 def get_folders_with_wav(folder, file_extension='.wav'):
     subfolders_wav_path = []

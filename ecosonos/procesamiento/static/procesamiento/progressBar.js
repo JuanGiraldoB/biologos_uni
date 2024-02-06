@@ -1,12 +1,12 @@
 let intervalId = null;
 
-document.addEventListener("DOMContentLoaded", function () {
-	let button = document.getElementById("procesar_carpetas");
+// document.addEventListener("DOMContentLoaded", function () {
+// 	let button = document.getElementById("procesar_carpetas");
 
-	if (button) {
-		intervalId = setInterval(updateProgressBar, 500);
-	}
-});
+// 	if (button) {
+// 		intervalId = setInterval(updateProgressBar, 500);
+// 	}
+// });
 
 function updateProgressBar() {
 	let xhr = new XMLHttpRequest();

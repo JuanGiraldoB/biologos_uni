@@ -16,6 +16,11 @@ document.addEventListener("DOMContentLoaded", function () {
 			if (xhr.readyState === XMLHttpRequest.DONE) {
 				if (xhr.status === 200) {
 					let response = JSON.parse(xhr.responseText);
+					let folder = response.folder;
+					
+					let pLluvia = document.getElementById("p-lluvia");
+					pLluvia.style.display = "block";
+					pLluvia.textContent += folder;
 				} else {
 					let response = JSON.parse(xhr.responseText);
 					console.error(response.error + " " + xhr.status);
