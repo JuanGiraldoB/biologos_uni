@@ -99,6 +99,10 @@ function displayDivProcess() {
 	document.getElementById("div-procesar").style.display = "block";
 }
 
+function hideDivProcess() {
+	document.getElementById("div-procesar").style.display = "none";
+}
+
 function displayDivProgressBar() {
 	document.getElementById("div-barra-progreso").style.display = "block";
 	const spanValue = document.getElementById("value1");

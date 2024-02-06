@@ -3,12 +3,11 @@ from scipy import signal
 from .calculo_indices import *
 import pandas as pd
 from tkinter.filedialog import askdirectory
-from tqdm import tqdm
 import numpy as np
-from django.http import JsonResponse
 import os
 import plotly.express as px
-# import matplotlib.pyplot as plt
+from django.templatetags.static import static
+from django.conf import settings
 
 
 def getRutasArchivos():
@@ -280,8 +279,17 @@ def generate_polar_plot(csv_path, indice, ADIm_index=False):
         ),
     )
 
-    fig = fig.to_html(config=config)
-    return fig
+    relative_path = os.path.join(
+        'indices', 'plot', f'indice_plot_{indice}.html')
+    static_folder = os.path.join(settings.BASE_DIR, 'indices', 'static')
+    fig_path = os.path.join(static_folder, relative_path)
+    fig.write_html(fig_path)
+    fig_url = static(relative_path)
+
+    return fig_url
+
+    # fig = fig.to_html(config=config)
+    # return fig
 
 
 def graficaErrorBar(ruta, grabaciones):

@@ -1,8 +1,8 @@
 from django.shortcuts import render
 import pandas as pd
-from tkinter.filedialog import askdirectory, askopenfilename
 from asgiref.sync import sync_to_async
 import asyncio
+from django.http import JsonResponse
 
 from .utils import (
     save_indices_session,
@@ -52,6 +52,7 @@ async def load_folder(request):
 
     # Get the selected indices from the POST request
     selected_indices = request.POST.getlist('options')
+    print(selected_indices)
 
     # If no indices are selected, render an error page or return an error response
     if not selected_indices:
@@ -64,8 +65,8 @@ async def load_folder(request):
     folders_details = []
     for path, basename in zip(folders_wav_path, folders_wav_basename):
         folder_detail = {
-            'folders_path': path,
-            'folders_basename': basename,
+            'folder_path': path,
+            'folder_name': basename,
         }
         folders_details.append(folder_detail)
 
@@ -78,8 +79,9 @@ async def load_folder(request):
     data['indices'] = selected_indices
     data['button_display_csv'] = 'none'
 
+    return JsonResponse(data)
     # Return the prepared data with the template for rendering
-    return render(request, 'indices/indices.html', data)
+    # return render(request, 'indices/indices.html', data)
 
 
 async def prepare_destination_folder(request):
@@ -113,16 +115,14 @@ async def prepare_destination_folder(request):
     await sync_to_async(save_selected_subfolders_session)(request, selected_subdfolders, app="indices")
 
     # Get subfolder details and selected indices from session
-    folder_details = await sync_to_async(get_subfolders_details_session)(request, app='indices')
     indices = await sync_to_async(get_indices_session)(request)
 
-    data['carpetas_procesando'] = selected_subdfolders_base_name
-    data['folders_details'] = folder_details
+    data['folders'] = selected_subdfolders_base_name
     data['indices'] = indices
-    data['seleccionadas'] = 'seleccionadas'
-    data['button_display_csv'] = 'none'
+    data['destination_folder'] = destination_folder.split('/')[-1]
 
-    return render(request, 'indices/indices.html', data)
+    return JsonResponse(data)
+    # return render(request, 'indices/indices.html', data)
 
 
 async def process_folders(request):
@@ -161,10 +161,13 @@ async def process_folders(request):
     data['carpeta_destino_seleccionada'] = destination_folder.split('/')[-1]
 
     # Return the prepared data with the template for rendering
-    return render(request, 'indices/indices.html', data)
+    return JsonResponse(data)
+    # return render(request, 'indices/indices.html', data)
 
 
 async def show_plot(request):
+    data = {}
+
     try:
         # Get the destination folder and selected indices from session
         destination_folder = await sync_to_async(get_destination_folder_session)(request, app='indices')
@@ -200,15 +203,22 @@ async def show_plot(request):
         print(e)
 
     # Create a zipped iterable to pair plots with their corresponding indices
-    zipped = zip(graficas, selected_indices)
-    context = {'graficas': graficas,
-               'indices': selected_indices, 'zipped': zipped}
+    # zipped = zip(graficas, selected_indices)
+    data['plots_urls'] = graficas
+    data['indices'] = selected_indices
+    # data['zipped'] = zipped
+
+    # data = {'graficas': graficas,
+    #         'indices': selected_indices, 'zipped': zipped}
 
     # Return the prepared data with the template for rendering
-    return render(request, 'indices/indices.html', context)
+    return JsonResponse(data)
+    # return render(request, 'indices/indices.html', data)
 
 
 async def load_csv(request):
+    data = {}
+
     try:
         # Get the uploaded CSV file
         file = await sync_to_async(get_file)()
@@ -229,9 +239,12 @@ async def load_csv(request):
         graficas.append(await sync_to_async(generate_polar_plot)(file, indice))
 
     # Create a zipped iterable to pair plots with their corresponding indices
-    zipped = zip(graficas, indices)
-    context = {'graficas': graficas,
-               'indices': indices, 'zipped': zipped}
+    # zipped = zip(graficas, indices)
+    # context = {'graficas': graficas,
+    #            'indices': indices, 'zipped': zipped}
+    data['plots_urls'] = graficas
+    data['indices'] = indices
 
+    return JsonResponse(data)
     # Return the prepared data with the template for rendering
-    return render(request, 'indices/indices.html', context)
+    # return render(request, 'indices/indices.html', data)

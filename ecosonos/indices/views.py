@@ -106,7 +106,7 @@ async def indices_vista(request):
             return await load_csv(request)
 
     else:
-        return render(request, 'indices/indices.html')
+        return render(request, 'indices/indices_ajax.html')
 
 
 @csrf_exempt

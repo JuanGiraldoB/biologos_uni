@@ -3,11 +3,9 @@ let formMainFolder = document.getElementById("cargar_carpeta");
 formMainFolder.addEventListener("submit", handleSubmiSelectMainFolder);
 
 function selectMainFolder() {
-    let estadisticasCheckbox = document.getElementById("estadisticas");
     let submitButton = document.getElementById("cargar");
 
     let formData = new FormData(formMainFolder);
-    formData.append("estadisticas", estadisticasCheckbox.checked);
     formData.append("cargar", submitButton.name);
 
     fetch("", {
@@ -23,13 +21,13 @@ function selectMainFolder() {
         }
     })
     .then(jsonResponse => {
-
-        let statistics = jsonResponse.statistics;
+        let indices = jsonResponse.indices;
         let folders = jsonResponse.folders_details;
-
         hideDivMainFolder();
+        hideDivCsv();
         displayDivDestinationFolder();
-        generateSubfolderCheckboxList(statistics, folders);
+        generateIndexList(indices);
+        generateSubfolderCheckboxList(folders);
     })
     .catch(error => {
         console.error("Error during fetch:", error.error, error.status);
@@ -40,7 +38,6 @@ function handleSubmiSelectMainFolder(event) {
     event.preventDefault();
     selectMainFolder();
 }
-
 
 // Destination folder
 let formDestinationFolder = document.getElementById("carpeta_destino");
@@ -71,7 +68,8 @@ function selectDestinationFolder() {
 		}
 	})
 	.then(jsonResponse => {
-		let folders = jsonResponse.folders;
+        console.log(jsonResponse)
+        let folders = jsonResponse.folders;
 		let destinationFolder = jsonResponse.destination_folder;
 		hideDivDestinationFolder();
 		emptyDiv("div-seleccionar-subcarpetas");
@@ -113,10 +111,93 @@ function processFolders() {
 	})
 	.then(jsonResponse => {
         displayDivProgressBar();
-		hideDivProcess();
+        hideDivProcess();
         intervalId = setInterval(updateProgressBar, 500);
 	})
 	.catch(error => {
 		console.error("Error during fetch:", error.error, error.status);
+	});
+}
+
+// Show plot
+let formDisplayPlot = document.getElementById("form_grafica");
+formDisplayPlot.addEventListener("submit", handleSubmiDisplayPlot);
+
+
+function handleSubmiDisplayPlot(event) {
+    event.preventDefault();
+    displayPlot();
+}
+
+function displayPlot() {
+    let form = document.getElementById("form_grafica");
+    let submitButton = document.getElementById("mostrar-grafica");
+    
+	let formData = new FormData(form);
+	formData.append("mostrar-grafica", submitButton.name);
+    
+	fetch("", {
+        method: "POST",
+		body: formData,
+	})
+	.then(async response => {
+        if (response.ok) {
+            return response.json();
+		} else {
+            const data = await response.json();
+			return await Promise.reject(data);
+		}
+	})
+	.then(jsonResponse => {
+        let plots = jsonResponse.plots_urls;
+        let indices = jsonResponse.indices;
+        
+        generatePlotList(plots, indices);
+	})
+	.catch(error => {
+        console.error("Error during fetch:", error.error, error.status);
+	});
+}
+
+// CSV
+let formCSV = document.getElementById("form-csv");
+formCSV.addEventListener("submit", handleSubmiCSV);
+
+function handleSubmiCSV(event) {
+    event.preventDefault();
+    loadCSV();
+}
+
+function loadCSV() {
+    let form = document.getElementById("form_grafica");
+    let submitButton = document.getElementById("cargar-csv");
+    
+	let formData = new FormData(form);
+	formData.append("cargar-csv", submitButton.name);
+    
+	fetch("", {
+        method: "POST",
+		body: formData,
+	})
+	.then(async response => {
+        if (response.ok) {
+            return response.json();
+		} else {
+            const data = await response.json();
+			return await Promise.reject(data);
+		}
+	})
+	.then(jsonResponse => {
+        let plots = jsonResponse.plots_urls;
+        let indices = jsonResponse.indices;
+
+        hideDivMainFolder();
+        hideDivDestinationFolder();
+        hideDivProcess();
+        generateIndexList(indices);
+        generatePlotList(plots, indices);
+	})
+	.catch(error => {
+        console.error("Error during fetch:", error.error, error.status);
 	});
 }

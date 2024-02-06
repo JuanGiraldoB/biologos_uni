@@ -2,7 +2,6 @@ from django.shortcuts import render
 from asgiref.sync import sync_to_async
 from django.http import JsonResponse
 import asyncio
-import os
 
 from procesamiento.models import Progreso
 

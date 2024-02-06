@@ -1,0 +1,421 @@
+{% load static%}
+
+<!DOCTYPE HTML>
+<!--
+	Arcana by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html lang="en">
+
+<head>
+	<title>EcoSonos</title>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" href="{% static 'ecosonos/assets/css/main.css' %}" />
+	<style>
+		#progress-bar {
+			background-color: #4CAF50;
+			height: 20px;
+			width: 0%;
+		}
+	</style>
+</head>
+
+<body class="is-preload">
+	<div id="page-wrapper">
+
+		<!-- Header -->
+		<div id="header">
+
+			<!-- Logo -->
+			<div class="logoup"><a href="{% url 'index' %}"><img
+						src="{% static 'ecosonos/images/logo_econosonos.png' %}"></a></div>
+
+			<!-- Nav -->
+			<nav id="nav">
+				<ul>
+					<li> <a href="{% url 'preproceso' %}">Lluvia/Archivo Corrupto</a></li>
+					<li class="current"><a href="{% url 'indices' %}">Índices Acústicos</a></li>
+					<li><a href="{% url 'etiquetado' %}">Segmentación Manual</a></li>
+					<li><a href="{% url 'etiquetado-auto' %}">Sonotipos</a></li>
+					<li><a href="{% url 'conectividad' %}">Heterogeneidad Acústica</a></li>
+				</ul>
+			</nav>
+
+		</div>
+
+		<!-- Banner -->
+		<section id="banner">
+			<header>
+				<h2>EcoSonos: <em>Observación a través del sonido</em></h2>
+				<a href="#" class="button">Conocer más</a>
+			</header>
+		</section>
+
+		<!-- Descripción Módulo -->
+		<section class="wrapper style2 wrappeados">
+			<div class="container">
+				<header class="major">
+					<h2
+						style="font-family: hocus_regularregular; letter-spacing: 0.1em; font-size: 4em; line-height: 0.2em; color: #19a173;">
+						ÍNDICES ACÚSTICOS</h2>
+					<p>Este módulo estima 54 índices acústicos de los audios usando la librería scikit-maad.
+					</p>
+				</header>
+			</div>
+		</section>
+		<!-- Posts -->
+		<section class="wrapper style1 wrappeados">
+			<div class="container">
+				<div class="row">
+					<section class="col-12 col-12-narrower">
+
+						<!-- Div indices seleccionados -->
+						<div id="div-indices-selecionados">
+							<h1 id="h1-indices-seleccionados" style="display: none;">Indices seleccionados</h1>
+							<ul id="ul-indices-seleccionados">
+
+							</ul>
+						</div>
+
+						<!-- Div seleccionar carpeta principal -->
+						<div id="div-seleccionar-carpeta-principal">
+							<form class="filtros" method="POST" id="cargar_carpeta">
+								{% csrf_token %}
+								<div class="fila1">
+									<div class="checks">
+										<input type="checkbox" name="options" value="ACIft"></input>
+										<label for="ACIft">ACIft</label>
+									</div>
+									<div class="checks">
+										<input type="checkbox" name="options" value="ADI"></input>
+										<label for="ADI">ADI</label>
+									</div>
+									<div class="checks">
+										<input type="checkbox" name="options" value="ACItf"></input>
+										<label for="ACItf">ACItf</label>
+									</div>
+									<div class="checks">
+										<input type="checkbox" name="options" value="BETA"></input>
+										<label for="BETA">BETA</label>
+									</div>
+									<div class="checks">
+										<input type="checkbox" name="options" value="TE"></input>
+										<label for="TE">TE</label>
+									</div>
+									<div class="checks">
+										<input type="checkbox" name="options" value="ESM"></input>
+										<label for="ESM">ESM</label>
+									</div>
+									<div class="checks">
+										<input type="checkbox" name="options" value="NDSI"></input>
+										<label for="NDSI">NDSI</label>
+									</div>
+									<div class="checks">
+										<input type="checkbox" name="options" value="P"></input>
+										<label for="P">P</label>
+									</div>
+								</div>
+								<div class="fila2">
+									<div class="checks">
+										<input type="checkbox" name="options" value="M"></input>
+										<label for="M">M</label>
+									</div>
+									<div class="checks">
+										<input type="checkbox" name="options" value="NP"></input>
+										<label for="NP">NP</label>
+									</div>
+									<div class="checks">
+										<input type="checkbox" name="options" value="MID"></input>
+										<label for="MID">MID</label>
+									</div>
+									<div class="checks">
+										<input type="checkbox" name="options" value="BNF"></input>
+										<label for="BNF">BNF</label>
+									</div>
+									<div class="checks">
+										<input type="checkbox" name="options" value="BNT"></input>
+										<label for="BNT">BNT</label>
+									</div>
+									<div class="checks">
+										<input type="checkbox" name="options" value="MD"></input>
+										<label for="MD">MD</label>
+									</div>
+									<div class="checks">
+										<input type="checkbox" name="options" value="FM"></input>
+										<label for="opcion2">FM</label>
+									</div>
+									<div class="checks">
+										<input type="checkbox" name="options" value="SF"></input>
+										<label for="SF">SF</label>
+									</div>
+								</div>
+								<div class="fila3">
+									<div class="checks">
+										<input type="checkbox" name="options" value="RMS"></input>
+										<label for="RMS">RMS</label>
+									</div>
+									<div class="checks">
+										<input type="checkbox" name="options" value="CF"></input>
+										<label for="CF">CF</label>
+									</div>
+									<div class="checks">
+										<input type="checkbox" name="options" value="SC"></input>
+										<label for="SC">SC</label>
+									</div>
+									<div class="checks">
+										<input type="checkbox" name="options" value="SB"></input>
+										<label for="SB">SB</label>
+									</div>
+									<div class="checks">
+										<input type="checkbox" name="options" value="Tonnets"></input>
+										<label for="Tonnets">Tonnets</label>
+									</div>
+									<div class="checks">
+										<input type="checkbox" name="options" value="SVE"></input>
+										<label for="SVE">SVE</label>
+									</div>
+									<div class="checks">
+										<input type="checkbox" name="options" value="SNR"></input>
+										<label for="SNR">SNR</label>
+									</div>
+									<div class="checks">
+										<input type="checkbox" name="options" value="ADIm"></input>
+										<label for="ADIm">ADIm</label>
+									</div>
+								</div>
+								<div class="fila4">
+									<section class="col-12 col-12-narrower">
+										<div class="contenidos">
+											<input type="button" value="Seleccionar todos los filtros"
+												id="seleccionar-todos" name="true"></input>
+											<a href="#popup3" class="button-help">?</a>
+											<div id="popup3" class="overlay">
+												<div class="popup">
+													<h2>Ayuda - Seleccionar carpeta principal</h2>
+													<a class="close" href="#">&times;</a>
+													<div class="content">
+														<p>Permite buscar en el equipo la carpeta de origen donde se
+															almacenan
+															los archivos de audio que serán procesados.</p>
+													</div>
+												</div>
+											</div>
+										</div>
+									</section>
+								</div>
+								<br />
+								<section class="col-12 col-12-narrower">
+									<div class="contenidos">
+										<!-- Form seleccionar carpeta principal -->
+										<input type="submit" value="Seleccionar Carpeta Principal" id="cargar"
+											name="cargar"></input>
+
+										<!-- Popup seleccionar carpeta principal -->
+										<a href="#popup4" class="button-help">?</a>
+										<div id="popup4" class="overlay">
+											<div class="popup">
+												<h2>Ayuda - Seleccionar carpeta principal</h2>
+												<a class="close" href="#">&times;</a>
+												<div class="content">
+													<p>Permite buscar en el equipo la carpeta de origen donde se
+														almacenan
+														los archivos de audio que serán procesados.</p>
+												</div>
+											</div>
+										</div>
+									</div>
+								</section>
+							</form>
+						</div>
+
+						<br>
+
+						<!-- Div carpeta destino -->
+						<div id="div-seleccionar-carpeta-destino" style="display: none;">
+							<form id="carpeta_destino" method="POST">
+								{% csrf_token %}
+
+								<div id="div-seleccionar-subcarpetas">
+
+								</div>
+
+								<div class="thebuttons">
+									<button type="button" id="swapFire" class="btn btn-primary showFire" name="false">
+										<span class="glyphicon glyphicon-folder-close"></span> Deseleccionar Carpetas
+									</button>
+								</div>
+								<input type="submit" value="Seleccionar Carpeta Destino" id="destino" name="destino" {{
+									button_disable|default:'' }}></input>
+							</form>
+						</div>
+
+						<div>
+							<div>
+								<h1 id="titulo-carpetas-procesar" style="display: none;">Carpetas
+									a procesar</h1>
+								<ul id="lista-nombre-carpetas-procesar">
+
+								</ul>
+							</div>
+							<h1 id="nombre-carpeta-destino-seleccionada"></h1>
+						</div>
+
+						<!-- Form procesar carpetas -->
+						<div id="div-procesar" style="display: none;">
+							<form method="POST" id="form_procesar">
+								{% csrf_token %}
+								<input type="submit" value="Procesar Carpetas" id="procesar_carpetas"
+									name="procesar_carpetas"></input>
+							</form>
+						</div>
+
+						<br>
+
+						<section>
+							<div class="chart" id="div-barra-progreso" style="display: none;">
+								<div class="bar"></div>
+								<span id="value1">0%</span>
+							</div>
+						</section>
+					</section>
+
+					<section class="col-12 col-12-narrower colfullwidth">
+						<!-- Div mostrar grafica -->
+						<div id="div-mostrar-grafica" style="display: none;">
+							<form class="mosgrafica" method="POST" id="form_grafica">
+								{% csrf_token %}
+								<div class="contenidos">
+									<button type="submit" name="mostrar-grafica" id="mostrar-grafica">Mostrar gráfica
+									</button>
+									<a href="#popup10" class="button-helpsmall" id="test2">?</a>
+									<div id="popup10" class="overlay">
+										<div class="popup" id="test3">
+											<h2>Ayuda - Seleccionar carpeta principal</h2>
+											<a class="close" href="#" id="test">&times;</a>
+											<div class="content">
+												<p>Permite buscar en el equipo la carpeta de origen donde se almacenan
+													los archivos de audio que serán procesados.</p>
+											</div>
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+
+						<br>
+
+						<div id="div-mostrar-csv">
+							<form class="mosgrafica" method="POST" id="form-csv">
+								{% csrf_token %}
+								<div class="contenidos">
+									<button type="submit" name="cargar-csv" id="cargar-csv">Cargar CSV
+									</button>
+									<a href="#popup2" class="button-helpsmall">?</a>
+									<div id="popup2" class="overlay">
+										<div class="popup">
+											<h2>Ayuda - Seleccionar carpeta principal</h2>
+											<a class="close" href="#">&times;</a>
+											<div class="content">
+												<p>Permite buscar en el equipo la carpeta de origen donde se almacenan
+													los archivos de audio que serán procesados.</p>
+											</div>
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+
+						<br>
+						<br>
+
+						<div id="div-graficas">
+
+						</div>
+
+						<!-- <ul id="ul-graficas" class="lista-graficas">
+
+						</ul> -->
+
+
+						<!-- {% if graficas %}
+
+						{% for grafica, indice in zipped %}
+						<ul id="ul-graficas" class="lista-graficas">
+							<h2 class="titulo-graficas">Gráfica para el índice {{indice}}</h2>
+							<li class="item-graficas" id="grafica-{{indice}}">{{ grafica|safe }}</li>
+							<button id="btn-{{indice}}" class="btn btn-primary showFire1"
+								onclick="toggleVisibility('{{indice}}')">
+								<span class="glyphicon glyphicon-eye-close"></span>
+								<span id="text-{{indice}}">Ocultar Gráfica</span>
+							</button>
+						</ul>
+						{% endfor %}
+
+						{% endif %} -->
+
+					</section>
+				</div>
+			</div>
+		</section>
+
+		<!-- Footer -->
+		<div id="footer">
+			<div class="container">
+				<!-- Creditos -->
+				<section id="cta2" class="wrapper2 style3">
+					<div class="container">
+						<div class="logos participantes">
+							<img src="{% static 'ecosonos/images/u_antioquia.png' %}">
+						</div>
+						<div class="logos participantes">
+							<img src="{% static 'ecosonos/images/ITM.png' %}">
+						</div>
+						<div class="logos participantes">
+							<img src="{% static 'ecosonos/images/humboldt_v1.png' %}">
+						</div>
+						<div class="logos texto">
+							<p>Apoya:</p>
+						</div>
+						<div class="logos participantes">
+							<img src="{% static 'ecosonos/images/Ciencias.png' %}">
+						</div>
+					</div>
+				</section>
+			</div>
+
+
+
+			<!-- Copyright -->
+			<div class="copyright">
+				<ul class="menu">
+					<li>&copy; Todos los derechos reservados</li>
+					<li>Diseño: <a href="#">Grupo Investigación</a></li>
+				</ul>
+			</div>
+
+		</div>
+
+	</div>
+
+	<!-- Scripts -->
+	<script src="{% static 'ecosonos/assets/js/jquery.min.js' %}"></script>
+	<script src="{% static 'ecosonos/assets/js/jquery.dropotron.min.js' %}"></script>
+	<script src="{% static 'ecosonos/assets/js/browser.min.js' %}"></script>
+	<script src="{% static 'ecosonos/assets/js/breakpoints.min.js' %}"></script>
+	<script src="{% static 'ecosonos/assets/js/util.js' %}"></script>
+	<script src="{% static 'ecosonos/assets/js/main.js' %}"></script>
+	<script src="{% static 'ecosonos/assets/js/button-show-hide.js' %}"></script>
+	<script src="{% static 'ecosonos/assets/js/button-show-hide-carpetas.js' %}"></script>
+	<script src="{% static 'indices/indicesProgressBar.js' %}"></script>
+	<script src="{% static 'indices/selectAll.js' %}"></script>
+	<script src="{% static 'indices/togglePlotVisibility.js' %}"></script>
+	<script src="{% static 'indices/popup.js' %}"></script>
+	<script src="{% static 'indices/formHandler.js' %}"></script>
+	<script src="{% static 'indices/tagManipulation.js' %}"></script>
+
+</body>
+
+</html>

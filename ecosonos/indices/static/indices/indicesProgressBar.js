@@ -1,13 +1,5 @@
 let intervalId = null;
 
-document.addEventListener("DOMContentLoaded", function () {
-	let button = document.getElementById("procesar_carpetas");
-
-	if (button) {
-		intervalId = setInterval(updateProgressBar, 500);
-	}
-});
-
 function updateProgressBar() {
 	let xhr = new XMLHttpRequest();
 	xhr.open("POST", "/indices/barra_progreso", true);
@@ -29,7 +21,6 @@ function updateProgressBar() {
 				spanValue.innerHTML = "Completado";
 				clearInterval(intervalId);
 				enableButtons();
-				// createMostrarGraficaButton();
 			}
 		}
 	};
@@ -37,24 +28,6 @@ function updateProgressBar() {
 }
 
 function enableButtons() {
-	// document.getElementById("cargar").disabled = false;
-	// document.getElementById("destino").disabled = false;
-	// document.getElementById("procesar_carpetas").disabled = false;
 	document.getElementById("div-mostrar-grafica").style.display = "block";
 	document.getElementById("div-mostrar-csv").style.display = "block";
-}
-
-function createMostrarGraficaButton() {
-	
-	let button = document.createElement("button");
-	
-	// Set button attributes
-	button.type = "submit";
-	button.name = "mostrar-grafica";
-	button.id = "mostrar-grafica";
-	button.textContent = "Mostrar gráfica";
-	
-	// Append the button to the specified div
-	let div = document.getElementById("mostrar-grafica-div");
-	div.appendChild(button);
 }
