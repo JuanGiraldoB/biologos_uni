@@ -15,8 +15,6 @@ function updateProgressBar() {
 			const barElement = document.querySelector(".bar");
 			barElement.style.setProperty("--percentage", spanValue.textContent);
 
-			console.log(porcentaje_completado);
-
 			if (porcentaje_completado == 100) {
 				spanValue.innerHTML = "Completado";
 				clearInterval(intervalId);
