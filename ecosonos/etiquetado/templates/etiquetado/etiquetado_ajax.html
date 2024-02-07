@@ -1,0 +1,194 @@
+{% load static %}
+<!DOCTYPE HTML>
+<!--
+	Arcana by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html lang="en">
+
+<head>
+    <title>EcoSonos</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.20.0.min.js" charset="utf-8"></script>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="{% static 'ecosonos/assets/css/main.css' %}" />
+</head>
+
+<body class="is-preload">
+    <div id="page-wrapper">
+
+        <!-- Header -->
+        <div id="header">
+
+            <!-- Logo -->
+            <div class="logoup"><a href="{% url 'index' %}"><img
+                        src="{% static 'ecosonos/images/logo_econosonos.png' %}"></a></div>
+
+            <!-- Nav -->
+            <nav id="nav">
+                <ul>
+                    <li> <a href="{% url 'preproceso' %}">Lluvia/Archivo Corrupto</a></li>
+                    <li><a href="{% url 'indices' %}">Índices Acústicos</a></li>
+                    <li class="current"><a href="{% url 'etiquetado' %}">Segmentación Manual</a></li>
+                    <li><a href="{% url 'etiquetado-auto' %}">Sonotipos</a></li>
+                    <li><a href="{% url 'conectividad' %}">Heterogeneidad Acústica</a></li>
+                </ul>
+            </nav>
+
+        </div>
+
+        <!-- Banner -->
+        <section id="banner">
+            <header>
+                <h2>EcoSonos: <em>Observación a través del sonido</em></h2>
+                <a href="#" class="button">Conocer más</a>
+            </header>
+        </section>
+
+        <!-- Descripción Módulo -->
+        <section class="wrapper style2">
+            <div class="container">
+                <header class="major">
+                    <h2
+                        style="font-family: hocus_regularregular; letter-spacing: 0.1em; font-size: 4em; line-height: 0.2em; color: #19a173;">
+                        SEGMENTACIÓN MANUAL</h2>
+                    <p>Este módulo permite visualizar el espectrograma del audio que se elija y marcar los segmentos que
+                        el experto asocie a una especie. Queda registrada la frecuencia máxima, frecuencia mínima, el
+                        tiempo de inicio y el tiempo de finalización de cada segmento que selecciona el usuario.
+                    </p>
+                </header>
+            </div>
+        </section>
+
+        <!-- Posts -->
+        <section class="wrapper style1 wrappeados">
+            <div class="container">
+                <div class="row">
+                    <section class="col-12 col-12-narrower">
+                        <div class="contenidos">
+
+                            <div id="selected-folders">
+
+                            </div>
+
+                            <!-- Div seleccionar carpeta raiz -->
+                            <div id="div-seleccionar-carpeta-principal">
+                                <form method="POST" action="{% url 'etiquetado' %}" enctype="multipart/form-data"
+                                    id="cargar_carpeta">
+                                    {% csrf_token %}
+                                    <p>Seleccionar la carpeta raiz que contiene los archivos (.wav)</p>
+                                    <div class="thebuttons">
+                                        <input type="submit" value="Seleccionar Carpeta Principal" id="cargar"
+                                            name="cargar"></input>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Div seleccionar carpeta destino -->
+                            <div id="div-seleccionar-carpeta-destino" style="display: none;">
+                                <form method="POST" enctype="multipart/form-data" id="carpeta_destino">
+                                    {% csrf_token %}
+                                    <div class="thebuttons">
+                                        <input type="submit" value="Seleccionar Carpeta Destino" id="destino"
+                                            name="destino"></input>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <form id="form-lista-archivos" class="carpetaprincipal" method="POST">
+                                <div>
+                                    <ul id="ul-lista-archivos">
+
+                                    </ul>
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+
+                    <section id="section-espectrograma" style="display: none;">
+                        <h1 id="espectrograma-h1"></h1>
+                        <input id="etiqueta" type="text" placeholder="etiqueta">
+                        <div id="plot"></div>
+                    </section>
+
+                    {% if frequencies %}
+                    <section>
+
+                        <h1>Espectrograma de {{nombre}}</h1>
+                        <div id="plot"></div>
+
+                        <script>
+                            let ruta = JSON.parse('"{{ ruta|safe }}"');
+                            // ruta = ruta.replaceAll('-', '/')
+                            console.log(ruta)
+                            let frequencies = JSON.parse("{{ frequencies|safe }}");
+                            let times = JSON.parse("{{ times|safe }}");
+                            let spectrogram = JSON.parse("{{ spectrogram|safe }}");
+                        </script>
+                    </section>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <div id="footer">
+            <div class="container">
+                <!-- Creditos -->
+                <section id="cta2" class="wrapper2 style3">
+                    <div class="container">
+                        <div class="logos participantes">
+                            <img src="{% static 'ecosonos/images/u_antioquia.png' %}">
+                        </div>
+                        <div class="logos participantes">
+                            <img src="{% static 'ecosonos/images/ITM.png' %}">
+                        </div>
+                        <div class="logos participantes">
+                            <img src="{% static 'ecosonos/images/humboldt_v1.png' %}">
+                        </div>
+                        <div class="logos texto">
+                            <p>Apoya:</p>
+                        </div>
+                        <div class="logos participantes">
+                            <img src="{% static 'ecosonos/images/Ciencias.png' %}">
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+
+
+            <!-- Copyright -->
+            <div class="copyright">
+                <ul class="menu">
+                    <li>&copy; Todos los derechos reservados</li>
+                    <li>Diseño: <a href="#">Grupo Investigación</a></li>
+                </ul>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="{% static 'ecosonos/assets/js/jquery.min.js' %}"></script>
+    <script src="{% static 'ecosonos/assets/js/jquery.dropotron.min.js' %}"></script>
+    <script src="{% static 'ecosonos/assets/js/browser.min.js' %}"></script>
+    <script src="{% static 'ecosonos/assets/js/breakpoints.min.js' %}"></script>
+    <script src="{% static 'ecosonos/assets/js/util.js' %}"></script>
+    <script src="{% static 'ecosonos/assets/js/main.js' %}"></script>
+    <!-- <script src="{% static 'etiquetado/spectrograma.js' %}"></script> -->
+    <script src="{% static 'etiquetado/formHandler.js' %}"></script>
+    <script src="{% static 'etiquetado/tagManipulation.js' %}"></script>
+
+    <!-- <script src="{% static 'procesamiento/progressBar.js' %}"></script> -->
+
+</body>
+
+</html>

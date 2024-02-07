@@ -1,5 +1,5 @@
 from django.shortcuts import render
-
+from django.http import JsonResponse
 import os
 from .utils.constants import REEMPLAZO
 
@@ -23,7 +23,7 @@ def label_view(request):
         elif 'destino' in request.POST:
             return prepare_destination_folder(request)
 
-    return render(request, 'etiquetado/etiquetado.html')
+    return render(request, 'etiquetado/etiquetado_ajax.html')
 
 
 def spectrogram_view(request, path):
@@ -37,4 +37,5 @@ def play_segment_view(request, path):
     add_label(request, path, segment_data)
     play_segment(path, segment_data['x0'], segment_data['x1'])
 
-    return render(request, 'etiquetado/etiquetado.html')
+    return JsonResponse({"ok": 200})
+    # return render(request, 'etiquetado/etiquetado_ajax.html')

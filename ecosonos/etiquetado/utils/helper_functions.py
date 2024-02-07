@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.http import JsonResponse
 import json
 import os
 
@@ -74,8 +75,9 @@ def load_folder(request):
 
     # data['archivos'] = zip(files_paths, files_basenames)
 
+    return JsonResponse(data)
     # Return the prepared data with the template for rendering
-    return render(request, 'etiquetado/etiquetado.html', data)
+    # return render(request, 'etiquetado/etiquetado.html', data)
 
 
 def prepare_destination_folder(request):
@@ -109,8 +111,9 @@ def prepare_destination_folder(request):
         request, app="etiquetado").split('/')[-1]
     data['selected_destination_folder'] = destination_folder.split('/')[-1]
 
+    return JsonResponse(data)
     # Return the prepared data with the template for rendering
-    return render(request, 'etiquetado/etiquetado.html', data)
+    # return render(request, 'etiquetado/etiquetado.html', data)
 
 
 def prepare_label_data(request, path):
@@ -152,7 +155,9 @@ def prepare_label_data(request, path):
 
 def label_data(request, path):
     data = prepare_label_data(request, path)
-    return render(request, 'etiquetado/etiquetado.html', data)
+
+    return JsonResponse(data)
+    # return render(request, 'etiquetado/etiquetado.html', data)
 
 
 def add_label(request, path, segement_data):
