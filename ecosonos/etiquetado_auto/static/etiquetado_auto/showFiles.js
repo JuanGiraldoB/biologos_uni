@@ -117,13 +117,13 @@ function createA(path, basename, type) {
 }
 
 function setupDivCheckbox(clustersDiv, clusters) {
-	let clusterHeader = createHeader("Seleccione Clusters");
+	let clusterHeader = createHeaderFiles("Seleccione Clusters");
 	clustersDiv.appendChild(clusterHeader);
 
 	for (let i = 0; i < clusters.length; i++) {
 		const cluster = clusters[i];
 		let checkbox = createCheckBox(cluster);
-		let label = createLabel(cluster, false);
+		let label = createLabelFiles(cluster, false);
 		let div = createCheckboxDiv();
 
 		div.appendChild(checkbox);
@@ -134,12 +134,12 @@ function setupDivCheckbox(clustersDiv, clusters) {
 }
 
 function setupFormRadio(representativoDiv, clusters, type) {
-	let clusterHeader = createHeader("Seleccione elemento representativo");
+	let clusterHeader = createHeaderFiles("Seleccione elemento representativo");
 	representativoDiv.appendChild(clusterHeader);
 
 	for (let i = 0; i < clusters.length; i++) {
 		const cluster = clusters[i];
-		let label = createLabel(cluster, true);
+		let label = createLabelFiles(cluster, true);
 		let radio = createRadio(cluster, type);
 		let iTag = createI();
 
@@ -150,7 +150,7 @@ function setupFormRadio(representativoDiv, clusters, type) {
 	}
 }
 
-function createHeader(content) {
+function createHeaderFiles(content) {
 	let clusterHeader = document.createElement("h3");
 	clusterHeader.textContent = content;
 
@@ -180,7 +180,7 @@ function createRadio(value, type) {
 	return radio;
 }
 
-function createLabel(name, isRadio) {
+function createLabelFiles(name, isRadio) {
 	let label = document.createElement("label");
 	label.for = name;
 	label.textContent = name;

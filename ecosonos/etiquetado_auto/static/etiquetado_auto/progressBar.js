@@ -1,25 +1,5 @@
 let intervalId = null;
 
-document.addEventListener("DOMContentLoaded", function () {
-	let button_sonotipo = document.getElementById("procesar_carpetas_sonotipo");
-	let button_reconocer = document.getElementById("procesar_carpetas_reconocer");
-	let div_barra_temporal = document.getElementById("barra_temporal");
-
-	if (button_sonotipo) {
-		intervalId = setInterval(() => {
-			updateProgressBar("sonotipo");
-		}, 500);
-	} else if (button_reconocer) {
-		intervalId = setInterval(() => {
-			updateProgressBar("reconocer");
-		}, 500);
-	} else if (div_barra_temporal) {
-		intervalId = setInterval(() => {
-			updateProgressBar("temporal");
-		}, 500);
-	}
-});
-
 function updateProgressBar(type) {
 	let xhr = new XMLHttpRequest();
 	xhr.open("POST", "/etiquetado-auto/barra_progreso", true);
@@ -44,28 +24,10 @@ function updateProgressBar(type) {
 				if (type == "temporal") {
 					getPlots();
 				} else {
-					enableButtons();
 					show_files(type);
 				}
 			}
 		}
 	};
 	xhr.send();
-}
-
-function enableButtons() {
-	document.getElementById("cargar").disabled = false;
-
-	try {
-		document.getElementById("cargar_csv_nuevas_especies").disabled = false;
-		document.getElementById("procesar_carpetas_reconocer").disabled = false;
-	} catch (error) {
-		console.log(error);
-	}
-
-	try {
-		document.getElementById("procesar_carpetas_sonotipo").disabled = false;
-	} catch (error) {
-		console.log(error);
-	}
 }

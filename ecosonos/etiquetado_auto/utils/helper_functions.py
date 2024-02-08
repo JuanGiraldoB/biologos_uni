@@ -54,27 +54,9 @@ import asyncio
 from asgiref.sync import sync_to_async
 
 
-def toogle_div_visibility(request, data):
-    div_type = request.POST.get("div")
-    if div_type == "div_sonotipo":
-        data['div_sonotipo'] = "block"
-        data['div_reconocer'] = "none"
-        data['div_temporal'] = "none"
-    elif div_type == "div_reconocer":
-        data['div_reconocer'] = "block"
-        data['div_sonotipo'] = "none"
-        data['div_temporal'] = "none"
-    else:
-        data['div_temporal'] = "block"
-        data['div_sonotipo'] = "none"
-        data['div_reconocer'] = "none"
-
-
-async def load_folder(request):
+async def load_main_folder(request):
     # Create an empty dictionary to store data that will be sent to the template
     data = {}
-
-    await sync_to_async(toogle_div_visibility)(request, data)
 
     # Delete all records in the Progreso model
     await sync_to_async(Progreso.objects.all().delete)()
@@ -123,8 +105,6 @@ async def load_folder(request):
 async def load_csv(request):
     # Create an empty dictionary to store data that will be sent to the template
     data = {}
-
-    await sync_to_async(toogle_div_visibility)(request, data)
 
     try:
         # Get the CSV file path
@@ -177,8 +157,6 @@ async def load_csv(request):
 async def prepare_destination_folder(request):
     # Create an empty dictionary to store data that will be sent to the template
     data = {}
-
-    await sync_to_async(toogle_div_visibility)(request, data)
 
     # Get the list of selected subfolders from the POST request
     selected_subdfolders = request.POST.getlist('carpetas')
@@ -236,8 +214,6 @@ async def process_folders(request):
     # Get frequency range from POST request
     minimum_frequency = request.POST.get('frecuenciaminima')
     maximum_frequency = request.POST.get('frecuenciamaxima')
-
-    await sync_to_async(toogle_div_visibility)(request, data)
 
     # Check and set minimum and maximum frequency values
     if minimum_frequency:
@@ -419,8 +395,6 @@ def get_spectrogram_data(request):
 async def process_hourly_sonotype(request):
     # Create an empty dictionary to store data that will be sent to the template
     data = {}
-
-    await sync_to_async(toogle_div_visibility)(request, data)
 
     try:
         # Get the CSV file path

@@ -12,7 +12,6 @@ import pandas as pd
 import statistics as stat
 from scipy.stats import zscore
 from ecosonos.utils.archivos_utils import save_filename_in_txt
-import os
 
 
 def fcc5(canto, nfiltros, nc, nframes):

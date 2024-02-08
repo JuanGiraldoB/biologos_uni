@@ -1,0 +1,142 @@
+{% load static%}
+
+<!DOCTYPE HTML>
+<!--
+	Arcana by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html lang="en">
+
+<head>
+    <title>EcoSonos</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" <meta name="viewport"
+        content="width=device-width, initial-scale=1, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'ecosonos/assets/css/main.css' %}" />
+    <style>
+        #progress-bar {
+            background-color: #4CAF50;
+            height: 20px;
+            width: 0%;
+        }
+    </style>
+</head>
+
+<body class="is-preload">
+    <div id="page-wrapper">
+
+        <!-- Header -->
+        <div id="header">
+
+            <!-- Logo -->
+            <div class="logoup"><a href="{% url 'index' %}"><img
+                        src="{% static 'ecosonos/images/logo_econosonos.png' %}"></a></div>
+
+            <!-- Nav -->
+            <nav id="nav">
+                <ul>
+                    <li> <a href="{% url 'preproceso' %}">Lluvia/Archivo Corrupto</a></li>
+                    <li><a href="{% url 'indices' %}">Índices Acústicos</a></li>
+                    <li><a href="{% url 'etiquetado' %}">Segmentación Manual</a></li>
+                    <li class="current"><a href="{% url 'etiquetado-auto' %}">Sonotipos</a></li>
+                    <li><a href="{% url 'conectividad' %}">Heterogeneidad Acústica</a></li>
+                </ul>
+            </nav>
+
+        </div>
+
+        <!-- Banner -->
+        <section id="banner">
+            <header>
+                <h2>EcoSonos: <em>Observación a través del sonido</em></h2>
+                <a href="#" class="button">Conocer más</a>
+            </header>
+        </section>
+
+        <!-- Descripción Módulo -->
+        <section class="wrapper style2">
+            <div class="container">
+                <header class="major">
+                    <h2
+                        style="font-family: hocus_regularregular; letter-spacing: 0.1em; font-size: 4em; line-height: 0.2em; color: #19a173;">
+                        SONOTIPOS</h2>
+                    <p>Este módulo sugiere automáticamente segmentos donde posiblemente hay vocalizaciones de animales.
+                        El software realiza un análisis de clustering y propone agrupaciones de segmentos llamados
+                        sonotipos, de tal manera que el usuario asocia los sonotipos propuestos a
+                        vocalizaciones/llamados de una especie de interés. Se puede almacenar la información, de tal
+                        manera que luego se pueden reconocer las vocalizaciones/llamados de especies en nuevos audios.
+                    </p>
+                </header>
+            </div>
+        </section>
+
+        <!-- Posts -->
+        <section class="wrapper style1 wrappeados">
+            <div class="container">
+                <div class="row">
+                    <section class="col-12 col-12-narrower">
+                        <div class="contenidos">
+                            <button type="submit" name="sonotipo" id="sonotipo">Sonotipo</button>
+                            <button type="submit" name="reconocer" id="reconocer">Reconocer</button>
+                            <button type="submit" name="temporal" id="temporal">Patrones temporales del
+                                sonotipo</button>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer">
+        <div class="container">
+            <!-- Creditos -->
+            <section id="cta2" class="wrapper2 style3">
+                <div class="container">
+                    <div class="logos participantes">
+                        <img src="{% static 'ecosonos/images/u_antioquia.png' %}">
+                    </div>
+                    <div class="logos participantes">
+                        <img src="{% static 'ecosonos/images/ITM.png' %}">
+                    </div>
+                    <div class="logos participantes">
+                        <img src="{% static 'ecosonos/images/humboldt_v1.png' %}">
+                    </div>
+                    <div class="logos texto">
+                        <p>Apoya:</p>
+                    </div>
+                    <div class="logos participantes">
+                        <img src="{% static 'ecosonos/images/Ciencias.png' %}">
+                    </div>
+                </div>
+            </section>
+        </div>
+
+
+
+        <!-- Copyright -->
+        <div class="copyright">
+            <ul class="menu">
+                <li>&copy; Todos los derechos reservados</li>
+                <li>Diseño: <a href="#">Grupo Investigación</a></li>
+            </ul>
+        </div>
+
+    </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="{% static 'ecosonos/assets/js/jquery.min.js' %}"></script>
+    <script src="{% static 'ecosonos/assets/js/jquery.dropotron.min.js' %}"></script>
+    <script src="{% static 'ecosonos/assets/js/browser.min.js' %}"></script>
+    <script src="{% static 'ecosonos/assets/js/breakpoints.min.js' %}"></script>
+    <script src="{% static 'ecosonos/assets/js/util.js' %}"></script>
+    <script src="{% static 'ecosonos/assets/js/main.js' %}"></script>
+    <script src="{% static 'ecosonos/assets/js/button-show-hide-carpetas.js' %}"></script>
+    <script src="{% static 'etiquetado_auto/navigator.js' %}"></script>
+</body>
+
+</html>
