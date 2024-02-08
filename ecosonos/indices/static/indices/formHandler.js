@@ -23,9 +23,9 @@ function selectMainFolder() {
     .then(jsonResponse => {
         let indices = jsonResponse.indices;
         let folders = jsonResponse.folders_details;
-        hideDivMainFolder();
-        hideDivCsv();
-        displayDivDestinationFolder();
+		hideDiv("div-seleccionar-carpeta-principal");
+		hideDiv("div-mostrar-csv");
+		displayDiv("div-seleccionar-carpeta-destino");
         generateIndexList(indices);
         generateSubfolderCheckboxList(folders);
     })
@@ -71,10 +71,10 @@ function selectDestinationFolder() {
         console.log(jsonResponse)
         let folders = jsonResponse.folders;
 		let destinationFolder = jsonResponse.destination_folder;
-		hideDivDestinationFolder();
+		hideDiv("div-seleccionar-carpeta-destino");
 		emptyDiv("div-seleccionar-subcarpetas");
 		generateSelectedFoldersList(folders, destinationFolder);
-        displayDivProcess();
+        displayDiv("div-procesar");
 	})
 	.catch(error => {
 		console.error("Error during fetch:", error.error, error.status);
@@ -111,7 +111,7 @@ function processFolders() {
 	})
 	.then(jsonResponse => {
         displayDivProgressBar();
-        hideDivProcess();
+        hideDiv("div-procesar");
         intervalId = setInterval(updateProgressBar, 500);
 	})
 	.catch(error => {
@@ -191,9 +191,9 @@ function loadCSV() {
         let plots = jsonResponse.plots_urls;
         let indices = jsonResponse.indices;
 
-        hideDivMainFolder();
-        hideDivDestinationFolder();
-        hideDivProcess();
+		hideDiv("div-seleccionar-carpeta-principal");
+		hideDiv("div-seleccionar-carpeta-destino");
+		hideDiv("div-procesar");
         generateIndexList(indices);
         generatePlotList(plots, indices);
 	})

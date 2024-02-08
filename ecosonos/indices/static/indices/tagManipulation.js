@@ -180,28 +180,12 @@ function createHeader(type, text) {
 }
 
 // Hide Show Tags
-function hideDivMainFolder() {
-	document.getElementById("div-seleccionar-carpeta-principal").style.display = "none";
+function displayDiv(id){
+	document.getElementById(id).style.display = "block";
 }
 
-function hideDivCsv() {
-	document.getElementById("div-mostrar-csv").style.display = "none";
-}
-
-function displayDivCsv() {
-	document.getElementById("div-mostrar-csv").style.display = "block";
-}
-
-function displayDivDestinationFolder() {
-	document.getElementById("div-seleccionar-carpeta-destino").style.display = "block";
-}
-
-function displayDivProcess() {
-	document.getElementById("div-procesar").style.display = "block";
-}
-
-function hideDivProcess() {
-	document.getElementById("div-procesar").style.display = "none";
+function hideDiv(id){
+	document.getElementById(id).style.display = "none";
 }
 
 function displayDivProgressBar() {
@@ -212,12 +196,8 @@ function displayDivProgressBar() {
 	barElement.style.setProperty("--percentage", spanValue.textContent);
 }
 
-function hideDivDestinationFolder() {
-	document.getElementById("div-seleccionar-carpeta-destino").style.display = "none";
-}
-
 function emptyDiv(id){
-	document.getElementById("div-seleccionar-subcarpetas").innerHTML = ""
+	document.getElementById(id).innerHTML = ""
 }
 
 function toggleVisibility(indice) {

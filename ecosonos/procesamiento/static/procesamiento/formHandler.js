@@ -23,12 +23,10 @@ function selectMainFolder() {
         }
     })
     .then(jsonResponse => {
-
         let statistics = jsonResponse.statistics;
         let folders = jsonResponse.folders_details;
-
-        hideDivMainFolder();
-        displayDivDestinationFolder();
+		hideDiv("div-seleccionar-carpeta-principal");
+		displayDiv("div-seleccionar-carpeta-destino");
         generateSubfolderCheckboxList(statistics, folders);
     })
     .catch(error => {
@@ -73,10 +71,11 @@ function selectDestinationFolder() {
 	.then(jsonResponse => {
 		let folders = jsonResponse.folders;
 		let destinationFolder = jsonResponse.destination_folder;
-		hideDivDestinationFolder();
+
+		hideDiv("div-seleccionar-carpeta-destino");
 		emptyDiv("div-seleccionar-subcarpetas");
 		generateSelectedFoldersList(folders, destinationFolder);
-        displayDivProcess();
+        displayDiv("div-procesar");
 	})
 	.catch(error => {
 		console.error("Error during fetch:", error.error, error.status);
@@ -113,7 +112,7 @@ function processFolders() {
 	})
 	.then(jsonResponse => {
         displayDivProgressBar();
-		hideDivProcess();
+		hideDiv("div-procesar");
         intervalId = setInterval(updateProgressBar, 500);
 	})
 	.catch(error => {
