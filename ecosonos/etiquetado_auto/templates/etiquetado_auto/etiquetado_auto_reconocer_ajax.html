@@ -84,7 +84,7 @@
             <div class="container">
                 <div class="row">
                     <section class="col-12 col-12-narrower">
-                        <div class="contenidos">
+                        <div class="contenidos" id="opciones">
                             <button type="submit" name="sonotipo" id="sonotipo">Sonotipo</button>
                             <button type="submit" name="reconocer" id="reconocer">Reconocer</button>
                             <button type="submit" name="temporal" id="temporal">Patrones temporales del
@@ -92,334 +92,137 @@
                         </div>
                     </section>
                     <div class="contenedor-iframes">
-                        <!-- Contenido sonotipo -->
-                        <div id="sonotipo_div" style="display: {{ div_sonotipo|default:'none' }};">
-                            <h1>Sonotipo</h1>
-                            <section class="col-12 col-12-narrower">
-                                <form class="filtros" method="POST" action="{% url 'etiquetado-auto' %}">
-                                    {% csrf_token %}
-                                    <section class="col-12 col-12-narrower">
-                                        <div class="contenidos">
-                                            <input type="hidden" name="div" value="div_sonotipo" />
-                                            <input type="submit" value="Seleccionar Carpeta Principal" id="cargar"
-                                                name="cargar" {{ button_disable|default:'' }}></input>
-                                        </div>
-                                    </section>
-                                </form>
 
-                                {% if div_sonotipo == 'block' %}
-                                <br>
-
-                                {% if not carpetas_procesando %}
-
-                                {% if folders_details %}
-                                <form method="POST" action="{% url 'etiquetado-auto' %}">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="div" value="div_sonotipo" />
-                                    {% for folder_detail in folders_details %}
-                                    <div class="carpetas-cargadas">
-                                        <input type="checkbox" name="carpetas" value="{{ folder_detail.folders_path }}"
-                                            checked>
-                                        <label for="carpetas">{{ folder_detail.folders_basename }}</label>
-                                    </div>
-                                    {% endfor %}
-                                    <div class="thebuttons">
-                                        <button type="button" id="swapFire" class="btn btn-primary showFire"
-                                            name="false">
-                                            <span class="glyphicon glyphicon-folder-close"></span> Deseleccionar
-                                            Carpetas
-                                        </button>
-                                    </div>
-                                    <input type="submit" value="Seleccionar Carpeta Destino" id="destino" name="destino"
-                                        {{ button_disable|default:'' }}></input>
-
-                                </form>
-                                {% endif %}
-                                {% endif %}
-
-                                {% if carpetas_procesando %}
-
-                                <form method="POST" action="{% url 'etiquetado-auto' %}">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="div" value="div_sonotipo" />
-                                    <div class="row gtr-50 campostxt">
-                                        <div class="col-6 col-12-mobilep">
-                                            <label for="frecuenciaminima">Frecuencia Mínima (Hz)</label>
-                                            <input type="text" name="frecuenciaminima" id="frecuenciaminima"
-                                                placeholder="Ingrese frecuencia mínima" />
-                                        </div>
-                                        <div class="col-6 col-12-mobilep">
-                                            <label for="frecuenciaminima">Frecuencia Máxima (Hz)</label>
-                                            <input type="text" name="frecuenciamaxima" id="frecuenciamaxima"
-                                                placeholder="Ingrese frecuencia máxima" />
-                                        </div>
-                                    </div>
-                                    <br>
-                                    <input type="submit" value="Procesar Carpetas" id="procesar_carpetas_sonotipo"
-                                        name="procesar_carpetas" {{ button_disable|default:'' }}></input>
-                                </form>
-
-
-                                {% if seleccionadas %}
-                                Carpetas seleccionadas
-                                {% else %}
-                                Procesando
-                                {% endif %}
-                                {% for procesando in carpetas_procesando %}
-
-                                <ul>
-                                    <li>
-                                        <label>{{procesando}}</label>
-                                    </li>
-                                </ul>
-
-                                {% endfor %}
-
-                                {% if mostrar_barra_proceso %}
-
-                                <br>
-                                <section class="col-12 col-12-narrower">
-                                    <div class="chart">
-                                        <div class="bar"></div>
-                                        <span id="value1">0%</span>
-                                    </div>
-                                </section>
-
-                                {% endif %}
-                                {% endif %}
-                            </section>
-
-                            <form class="carpetaprincipal" method="POST" action="{% url 'etiquetado-auto' %}">
+                        <!-- Div seleccionar CSV -->
+                        <div id="div-seleccionar-csv">
+                            <form class="filtros" method="POST" id="form_cargar_csv">
                                 {% csrf_token %}
-                                <div id="checkbox_clusters_sonotipo">
-
-                                </div>
-                                <div>
-                                    <ul id="lista_audios_sonotipo">
-
-                                    </ul>
-                                </div>
-                            </form>
-
-                            <div class="ropcionesradio">
-                                <form method="POST" id="radio_clusters_sonotipo" action="{% url 'etiquetado-auto' %}">
-                                    {% csrf_token %}
-                                </form>
-                            </div>
-
-                            <section class="col-12 col-12-narrower">
-                                <div id="cluster_sonotipo_div"
-                                    style="width: 1024px !important; height: 700px !important;">
-                            </section>
-
-                            <section class="col-12 col-12-narrower">
-                                <div id="representativo_sonotipo_div"
-                                    style="width: 1024px !important; height: 700px !important;">
-                            </section>
-                            {% endif %}
-                        </div>
-
-                        <!-- Contenido reconocer -->
-                        <div id="reconocer_div" style="display: {{ div_reconocer|default:'none' }};">
-                            <h1>Reconocer</h1>
-                            <section class="col-12 col-12-narrower">
-                                <form class="filtros" method="POST" action="{% url 'reconocer' %}">
-                                    {% csrf_token %}
-                                    <section class="col-12 col-12-narrower">
-                                        <div class="contenidos">
-                                            <input type="hidden" name="div" value="div_reconocer" />
-                                            <input type="submit" value="Seleccionar CSV Nuevas Especies" id="cargar"
-                                                name="cargar_csv" {{ button_disable|default:'' }}></input>
-                                        </div>
-                                    </section>
-                                </form>
-
-                                {% if div_reconocer == 'block' %}
-                                <br>
-
-                                <form class="filtros" method="POST" action="{% url 'reconocer' %}">
-                                    {% csrf_token %}
-                                    <section class="col-12 col-12-narrower">
-                                        <div class="contenidos">
-                                            <input type="hidden" name="div" value="div_reconocer" />
-
-                                            {% if cluster_names %}
-                                            Seleccionar especies
-                                            {% for cluster_name in cluster_names %}
-                                            <div class="carpetas-cargadas">
-                                                <input type="checkbox" name="clusters_names" value="{{ cluster_name }}"
-                                                    checked>
-                                                <label for="clusters_names">{{ cluster_name }}</label>
-                                            </div>
-                                            {% endfor %}
-                                            {% endif %}
-                                            <input type="submit" value="Seleccionar Carpeta Principal" id="cargar"
-                                                name="cargar" {{ button_disable|default:'' }}></input>
-                                        </div>
-                                    </section>
-                                </form>
-
-                                <br>
-
-                                {% if not carpetas_procesando %}
-
-                                {% if folders_details %}
-                                <form method="POST" action="{% url 'reconocer' %}">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="div" value="div_reconocer" />
-                                    {% for folder_detail in folders_details %}
-                                    <div class="carpetas-cargadas">
-                                        <input type="checkbox" name="carpetas" value="{{ folder_detail.folders_path }}"
-                                            checked>
-                                        <label for="carpetas">{{ folder_detail.folders_basename }}</label>
-                                    </div>
-                                    {% endfor %}
-                                    <div class="thebuttons">
-                                        <button type="button" id="swapFire" class="btn btn-primary showFire"
-                                            name="false">
-                                            <span class="glyphicon glyphicon-folder-close"></span> Deseleccionar
-                                            Carpetas
-                                        </button>
-                                    </div>
-                                    <input type="submit" value="Seleccionar Carpeta Destino" id="destino" name="destino"
-                                        {{ button_disable|default:'' }}></input>
-
-                                </form>
-                                {% endif %}
-                                {% endif %}
-
-                                {% if carpetas_procesando %}
-
-                                <form method="POST" action="{% url 'reconocer' %}">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="div" value="div_reconocer" />
-                                    <div class="row gtr-50 campostxt">
-                                        <div class="col-6 col-12-mobilep">
-                                            <label for="frecuenciaminima">Frecuencia Mínima (Hz)</label>
-                                            <input type="text" name="frecuenciaminima" id="frecuenciaminima"
-                                                placeholder="Ingrese frecuencia mínima" />
-                                        </div>
-                                        <div class="col-6 col-12-mobilep">
-                                            <label for="frecuenciaminima">Frecuencia Máxima (Hz)</label>
-                                            <input type="text" name="frecuenciamaxima" id="frecuenciamaxima"
-                                                placeholder="Ingrese frecuencia máxima" />
-                                        </div>
-                                    </div>
-                                    <br>
-                                    <input type="submit" value="Procesar Carpetas" id="procesar_carpetas_reconocer"
-                                        name="procesar_carpetas" {{ button_disable|default:'' }}></input>
-                                </form>
-
-
-                                {% if seleccionadas %}
-                                Carpetas seleccionadas
-                                {% else %}
-                                Procesando
-                                {% endif %}
-                                {% for procesando in carpetas_procesando %}
-
-                                <ul>
-                                    <li>
-                                        <label>{{procesando}}</label>
-                                    </li>
-                                </ul>
-
-                                {% endfor %}
-
-                                {% endif %}
-
-                                {% if selected_cluster_names %}
-                                Especies seleccionadas
-                                {% for cluster in selected_cluster_names %}
-
-                                <ul>
-                                    <li>
-                                        <label>{{cluster}}</label>
-                                    </li>
-                                </ul>
-
-                                {% endfor %}
-
-                                {% endif %}
-
-                                {% if mostrar_barra_proceso %}
-                                <br>
                                 <section class="col-12 col-12-narrower">
-                                    <div class="chart">
-                                        <div class="bar"></div>
-                                        <span id="value1">0%</span>
+                                    <div class="contenidos">
+                                        <input type="submit" value="Seleccionar CSV Nuevas Especies" id="cargar_csv"
+                                            name="cargar_csv"></input>
                                     </div>
                                 </section>
-                                {% endif %}
-                            </section>
+                            </form>
+                        </div>
 
-                            <form class="carpetaprincipal" method="POST" action="{% url 'etiquetado-auto' %}">
+                        <div id="div-clusters-seleccionados">
+                            <h1 id="h1-clusters-seleccionados" style="display: none;">Especies seleccionadas</h1>
+                            <ul id="ul-clusters-seleccionados">
+
+                            </ul>
+                        </div>
+
+                        <!-- Div seleccionar carpeta principal -->
+                        <div id="div-seleccionar-carpeta-principal" style="display: none;">
+                            <form class="filtros" method="POST" id="cargar_carpeta">
                                 {% csrf_token %}
-                                <div id="checkbox_clusters_reconocer">
-
-                                </div>
-                                <div>
-                                    <ul id="lista_audios_reconocer">
-
-                                    </ul>
-                                </div>
-                            </form>
-
-                            <div class="ropcionesradio">
-                                <form method="POST" id="radio_clusters_reconocer" action="{% url 'etiquetado-auto' %}">
-                                    {% csrf_token %}
-                                </form>
-                            </div>
-
-                            <section class="col-12 col-12-narrower">
-                                <div id="cluster_reconocer_div"
-                                    style="width: 1024px !important; height: 700px !important;">
-                            </section>
-
-                            <section class="col-12 col-12-narrower">
-                                <div id="representativo_reconocer_div"
-                                    style="width: 1024px !important; height: 700px !important;">
-                            </section>
-                            {% endif %}
-                        </div>
-                        <!-- Contenido patrones temporales -->
-                        <div id="temporal_div" style="display: {{ div_temporal|default:'none' }};">
-                            <h1>Patrones Temporales</h1>
-                            <section class="col-12 col-12-narrower">
-                                <form class="filtros" method="POST" action="{% url 'temporal' %}"
-                                    id="cargar_csv_nuevas_especies">
-                                    {% csrf_token %}
-                                    <section class="col-12 col-12-narrower">
-                                        <div class="contenidos">
-                                            <input type="hidden" name="div" value="div_temporal" />
-                                            <input type="submit" value="Seleccionar CSV Nuevas Especies"
-                                                id="nuevas_especies" name="nuevas_especies"></input>
-                                        </div>
-                                    </section>
-                                </form>
-
-                                {% if div_temporal == 'block' %}
-
-
-                                {% if mostrar_barra_proceso %}
-
-                                <br>
                                 <section class="col-12 col-12-narrower">
-                                    <div class="chart">
-                                        <div class="bar" id="barra_temporal"></div>
-                                        <span id="value1">0%</span>
+                                    <div class="contenidos">
+                                        <div id="div-seleccionar-especies">
+
+                                        </div>
+
+                                        <input type="submit" value="Seleccionar Carpeta Principal" id="cargar"
+                                            name="cargar"></input>
                                     </div>
                                 </section>
-
-                                {% endif %}
-
-                                <id id="contedorImagenes">
-
-                                </id>
-
-                                {% endif %}
-                            </section>
+                            </form>
                         </div>
+
+                        <!-- Div carpeta destino -->
+                        <div id="div-seleccionar-carpeta-destino" style="display: none;">
+                            <form method="POST" id="carpeta_destino">
+                                {% csrf_token %}
+
+                                <div id="div-seleccionar-subcarpetas">
+
+                                </div>
+
+                                <div class="thebuttons">
+                                    <button type="button" id="swapFire" class="btn btn-primary showFire" name="false">
+                                        <span class="glyphicon glyphicon-folder-close"></span> Deseleccionar
+                                        Carpetas
+                                    </button>
+                                </div>
+                                <input type="submit" value="Seleccionar Carpeta Destino" id="destino"
+                                    name="destino"></input>
+
+                            </form>
+                        </div>
+
+                        <div>
+                            <div>
+                                <h1 id="titulo-carpetas-procesar" style="display: none;">Carpetas
+                                    a procesar</h1>
+                                <ul id="lista-nombre-carpetas-procesar">
+
+                                </ul>
+                            </div>
+                            <h1 id="nombre-carpeta-destino-seleccionada"></h1>
+                        </div>
+
+                        <!-- Form procesar carpetas -->
+                        <div id="div-procesar" style="display: none;">
+                            <form method="POST" id="form_procesar">
+                                {% csrf_token %}
+                                <div class="row gtr-50 campostxt">
+                                    <div class="col-6 col-12-mobilep">
+                                        <label for="frecuenciaminima">Frecuencia Mínima (Hz)</label>
+                                        <input type="text" name="frecuenciaminima" id="frecuenciaminima"
+                                            placeholder="Ingrese frecuencia mínima" />
+                                    </div>
+                                    <div class="col-6 col-12-mobilep">
+                                        <label for="frecuenciaminima">Frecuencia Máxima (Hz)</label>
+                                        <input type="text" name="frecuenciamaxima" id="frecuenciamaxima"
+                                            placeholder="Ingrese frecuencia máxima" />
+                                    </div>
+                                </div>
+                                <br>
+                                <input type="submit" value="Procesar Carpetas" id="procesar_carpetas_reconocer"
+                                    name="procesar_carpetas"></input>
+                            </form>
+                        </div>
+
+                        <br>
+
+                        <section class="col-12 col-12-narrower">
+                            <div class="chart" id="div-barra-progreso" style="display: none;">
+                                <div class="bar"></div>
+                                <span id="value1">0%</span>
+                            </div>
+                        </section>
+
+                        <br>
+                        <br>
+
+                        <form class="carpetaprincipal" method="POST">
+                            {% csrf_token %}
+                            <div id="checkbox_clusters_reconocer">
+
+                            </div>
+                            <div>
+                                <ul id="lista_audios_reconocer">
+
+                                </ul>
+                            </div>
+                        </form>
+
+                        <div id="div-opciones-radio" class="ropcionesradio" style="display: none;">
+                            <form method="POST" id="radio_clusters_reconocer">
+                                {% csrf_token %}
+                            </form>
+                        </div>
+
+                        <section id="section-cluster-reconocer" class="col-12 col-12-narrower" style="display: none;">
+                            <div id="cluster_reconocer_div" style="width: 1024px !important; height: 500px !important;">
+                        </section>
+
+                        <section id="section-representativo-reconocer" class="col-12 col-12-narrower"
+                            style="display: none;">
+                            <div id="representativo_reconocer_div"
+                                style="width: 1024px !important; height: 500px !important;">
+                        </section>
                     </div>
                 </div>
             </div>
@@ -477,6 +280,8 @@
     <script src="{% static 'etiquetado_auto/showOptions.js' %}"></script>
     <script src="{% static 'etiquetado_auto/getPlots.js' %}"></script>
     <script src="{% static 'etiquetado_auto/navigator.js' %}"></script>
+    <script src="{% static 'etiquetado_auto/reconocer/formHandler.js' %}"></script>
+    <script src="{% static 'etiquetado_auto/reconocer/tagManipulation.js' %}"></script>
 </body>
 
 </html>

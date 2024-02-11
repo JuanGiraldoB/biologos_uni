@@ -255,9 +255,7 @@ async def process_folders_sonotipo(request):
     visualize = 0
     banda = [minimum_frequency, maximum_frequency]
 
-    # Determine if this is for "sonotipo" or "reconocer" and prepare the CSV path accordingly
     csv_name = 'Tabla_Nuevas_especies.csv'
-
     csv_path = os.path.join(destination_folder, csv_name)
 
     # Create a MetodologiaResult object for storing results

@@ -122,9 +122,9 @@ function setupDivCheckbox(clustersDiv, clusters) {
 
 	for (let i = 0; i < clusters.length; i++) {
 		const cluster = clusters[i];
-		let checkbox = createCheckBox(cluster);
+		let checkbox = createCheckBoxSowFiles(cluster);
 		let label = createLabelFiles(cluster, false);
-		let div = createCheckboxDiv();
+		let div = createCheckboxSowFilesDiv();
 
 		div.appendChild(checkbox);
 		div.appendChild(label);
@@ -157,7 +157,7 @@ function createHeaderFiles(content) {
 	return clusterHeader;
 }
 
-function createCheckBox(value) {
+function createCheckBoxSowFiles(value) {
 	let checkbox = document.createElement("input");
 	checkbox.type = "checkbox";
 	checkbox.name = value;
@@ -196,7 +196,7 @@ function createI() {
 	return document.createElement("i");
 }
 
-function createCheckboxDiv() {
+function createCheckboxSowFilesDiv() {
 	let divCarpetasCargadas = document.createElement("div");
 	divCarpetasCargadas.className = "carpetas-clusters";
 

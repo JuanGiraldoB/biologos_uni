@@ -9,13 +9,11 @@ from django.conf import settings
 from ..models import MetodologiaResult, GuardadoClusterResult
 
 from .Bioacustica_Completo import (
-    run_metodologia,
     guardado_cluster,
     run_metodologia_prueba,
 )
 
 from .utils import (
-    prepare_csv_path,
     get_cluster_names_session,
     save_cluster_names_session,
     serialize_and_save_to_db,
@@ -30,7 +28,6 @@ from ecosonos.utils.session_utils import (
     save_destination_folder_session,
     get_destination_folder_session,
     save_subfolders_details_session,
-    get_subfolders_details_session,
     save_files_session,
     get_files_session,
     get_selected_subfolders_session,
@@ -54,7 +51,7 @@ import asyncio
 from asgiref.sync import sync_to_async
 
 
-async def load_main_folder(request):
+async def load_main_folder_reconocer(request):
     # Create an empty dictionary to store data that will be sent to the template
     data = {}
 
@@ -66,19 +63,16 @@ async def load_main_folder(request):
         root_folder = await sync_to_async(get_root_folder)()
     except Exception as e:
         print(e)
-        return render(request, "etiquetado_auto/etiquetado_auto.html", data)
+        return render(request, "etiquetado_auto/etiquetado_auto_reconocer_ajax.html", data)
 
     # If no root folder is selected, render an error page or return an error response
     if not root_folder:
-        return render(request, "etiquetado_auto/etiquetado_auto.html", data)
+        return render(request, "etiquetado_auto/etiquetado_auto_reconocer_ajax.html", data)
 
-    # Delete MetodologiaResult records if the request came from sonotipo, otherwise save cluster names to the session
-    if data['div_sonotipo'] == 'block':
-        await sync_to_async(MetodologiaResult.objects.all().delete)()
-    else:
-        selected_cluster_names = request.POST.getlist('clusters_names')
-        await sync_to_async(save_cluster_names_session)(request, selected_cluster_names)
-        data['selected_cluster_names'] = selected_cluster_names
+    # Save cluster names to the session
+    selected_cluster_names = request.POST.getlist('clusters_names')
+    await sync_to_async(save_cluster_names_session)(request, selected_cluster_names)
+    data['selected_cluster_names'] = selected_cluster_names
 
     # Get lists of folder paths and their basenames that contain WAV files
     folders_wav_path, folders_wav_basename = get_folders_with_wav(
@@ -87,8 +81,8 @@ async def load_main_folder(request):
     folders_details = []
     for path, basename in zip(folders_wav_path, folders_wav_basename):
         folder_detail = {
-            'folders_path': path,
-            'folders_basename': basename,
+            'folder_path': path,
+            'folder_name': basename,
         }
         folders_details.append(folder_detail)
 
@@ -98,11 +92,12 @@ async def load_main_folder(request):
 
     data['folders_details'] = folders_details
 
+    return JsonResponse(data)
     # Save the statistics state and subfolder details to the session
-    return render(request, "etiquetado_auto/etiquetado_auto.html", data)
+    # return render(request, "etiquetado_auto/etiquetado_auto_reconocer_ajax.html", data)
 
 
-async def load_csv(request):
+async def load_csv_reconocer(request):
     # Create an empty dictionary to store data that will be sent to the template
     data = {}
 
@@ -111,11 +106,11 @@ async def load_csv(request):
         csv_path = await sync_to_async(get_file)()
     except Exception as e:
         print(e)
-        return render(request, "etiquetado_auto/etiquetado_auto.html", data)
+        return render(request, "etiquetado_auto/etiquetado_auto_reconocer_ajax.html", data)
 
     # Check if there was a selected file and contains a ".csv" extension
     if not csv_path or ".csv" not in csv_path:
-        return render(request, "etiquetado_auto/etiquetado_auto.html", data)
+        return render(request, "etiquetado_auto/etiquetado_auto_reconocer_ajax.html", data)
 
     # Save the CSV file path to the session
     await sync_to_async(save_csv_path_session)(
@@ -134,8 +129,9 @@ async def load_csv(request):
         infoZC = np.array(metodologia.infoZC)
         representativo = np.array(metodologia.representativo)
         frecuencia = np.array(metodologia.frecuencia)
-    except:
-        return render(request, "etiquetado_auto/etiquetado_auto.html", data)
+    except Exception as e:
+        print(e)
+        return render(request, "etiquetado_auto/etiquetado_auto_reconocer_ajax.html", data)
 
     # Generate new table with the values obtained from running sonotipo
     new_specs = await sync_to_async(guardado_cluster)(cluster_names, table, mean_class,
@@ -150,11 +146,12 @@ async def load_csv(request):
 
     data['cluster_names'] = species_str
 
+    return JsonResponse(data)
     # Return the prepared data with the template for rendering
-    return render(request, "etiquetado_auto/etiquetado_auto.html", data)
+    # return render(request, "etiquetado_auto/etiquetado_auto_reconocer_ajax.html", data)
 
 
-async def prepare_destination_folder(request):
+async def prepare_destination_folder_reconocer(request):
     # Create an empty dictionary to store data that will be sent to the template
     data = {}
 
@@ -167,40 +164,35 @@ async def prepare_destination_folder(request):
 
     # If no subfolders are selected, return to the template
     if not selected_subdfolders:
-        return render(request, "etiquetado_auto/etiquetado_auto.html")
+        return render(request, "etiquetado_auto/etiquetado_auto_reconocer_ajax.html")
 
     try:
         # Get the destination folder where the processed output csv file will be saved
         destination_folder = await sync_to_async(get_root_folder)()
     except Exception as e:
         print("Error en destino carpeta", e)
-        return render(request, "etiquetado_auto/etiquetado_auto.html")
+        return render(request, "etiquetado_auto/etiquetado_auto_reconocer_ajax.html")
 
     # If no destination folder is selected, return to the template
     if not destination_folder:
-        return render(request, "etiquetado_auto/etiquetado_auto.html")
+        return render(request, "etiquetado_auto/etiquetado_auto_reconocer_ajax.html")
 
     # Save the destination folder and selected subfolders paths to the session
     await sync_to_async(save_destination_folder_session)(request, destination_folder, app="etiquetado_auto")
     await sync_to_async(save_selected_subfolders_session)(request, selected_subdfolders,  app='etiquetado_auto')
 
-    # Get folder details from the session
-    folders_details = await sync_to_async(get_subfolders_details_session)(request, app='etiquetado_auto')
+    selected_cluster_names = await sync_to_async(get_cluster_names_session)(request)
 
-    data['carpetas_procesando'] = selected_subdfolders_base_name
-    data['folders_details'] = folders_details
-    data['seleccionadas'] = 'seleccionadas'
+    data['folders'] = selected_subdfolders_base_name
+    data['selected_cluster_names'] = selected_cluster_names
+    data['destination_folder'] = destination_folder.split('/')[-1]
 
-    # Delete only if the request was sent from sonotipo (check the div visibility)
-    if data['div_reconocer'] == 'block':
-        selected_cluster_names = await sync_to_async(get_cluster_names_session)(request)
-        data['selected_cluster_names'] = selected_cluster_names
-
+    return JsonResponse(data)
     # Return the prepared data with the template for rendering
-    return render(request, "etiquetado_auto/etiquetado_auto.html", data)
+    # return render(request, "etiquetado_auto/etiquetado_auto_reconocer_ajax.html", data)
 
 
-async def process_folders(request):
+async def process_folders_reconocer(request):
     # Create an empty dictionary to store data that will be sent to the template
     data = {}
 
@@ -209,7 +201,7 @@ async def process_folders(request):
 
     # If no subfolders are selected, return to the template
     if not selected_subdfolders:
-        return render(request, "etiquetado_auto/etiquetado_auto.html", data)
+        return render(request, "etiquetado_auto/etiquetado_auto_reconocer_ajax.html", data)
 
     # Get frequency range from POST request
     minimum_frequency = request.POST.get('frecuenciaminima')
@@ -258,58 +250,27 @@ async def process_folders(request):
 
     # Set parameters for processing
     canal = 1
-    autosel = 0
-    visualize = 0
     banda = [minimum_frequency, maximum_frequency]
 
-    # Determine if this is for "sonotipo" or "reconocer" and prepare the CSV path accordingly
-    csv_name = 'Tabla_Nuevas_especies.csv' if data['div_sonotipo'] == 'block' else 'Tabla_reconocimiento.csv'
-    # csv_path = prepare_csv_path(
-    #     selected_folders_basenames, destination_folder, table_type)
-
+    csv_name = 'Tabla_reconocimiento.csv'
     csv_path = os.path.join(destination_folder, csv_name)
-
-    # Create a MetodologiaResult object for storing results
-    metodologia_output = await sync_to_async(MetodologiaResult.objects.create)()
 
     data['carpetas_procesando'] = selected_folders_basenames
 
-    if data['div_sonotipo'] == 'block':
-        try:
-            asyncio.create_task(run_metodologia(
-                files_paths, files_basenames, banda, canal, autosel, visualize, progreso, csv_path, metodologia_output))
-        except Exception as e:
-            print('error: ***********', e)
+    # Load the CSV table and run the metodologia prueba
+    csv_path_sonotipo_table = await sync_to_async(get_csv_path_session)(request, app='etiquetado_auto')
+    table = pd.read_csv(csv_path_sonotipo_table)
+    del table['Membership']
+    table = table.to_numpy()
 
-    else:
-        # For "reconocer" mode, load the CSV table and run the metodologia prueba
-        csv_path_sonotipo_table = await sync_to_async(get_csv_path_session)(request, app='etiquetado_auto')
-        table = pd.read_csv(csv_path_sonotipo_table)
-        del table['Membership']
-        table = table.to_numpy()
-        cluster_names = 'Sp'
+    new_specs = await sync_to_async(deserialize_from_db)()
 
-        try:
-            # Get the MetodologiaResult object for the parameters
-            metodologia = await sync_to_async(MetodologiaResult.objects.first)()
-            mean_class = np.array(metodologia.mean_class)
-            infoZC = np.array(metodologia.infoZC)
-            representativo = np.array(metodologia.representativo)
-            frecuencia = np.array(metodologia.frecuencia)
-        except:
-            return render(request, "etiquetado_auto/etiquetado_auto.html", data)
+    # Get selected cluster names from the session
+    selected_cluster_names = await sync_to_async(get_cluster_names_session)(request)
+    data['selected_cluster_names'] = selected_cluster_names
 
-        # Generate new spectrogram features using cluster information
-        # new_specs = await sync_to_async(guardado_cluster)(cluster_names, table, mean_class,
-        #                                                   infoZC, representativo, frecuencia)
-        new_specs = await sync_to_async(deserialize_from_db)()
-
-        # Get selected cluster names from the session
-        selected_cluster_names = await sync_to_async(get_cluster_names_session)(request)
-        data['selected_cluster_names'] = selected_cluster_names
-
-        asyncio.create_task(run_metodologia_prueba(
-            files_paths, files_basenames, banda, canal, new_specs, selected_cluster_names, progreso, csv_path))
+    asyncio.create_task(run_metodologia_prueba(
+        files_paths, files_basenames, banda, canal, new_specs, selected_cluster_names, progreso, csv_path))
 
     # Save the CSV path to the session
     await sync_to_async(save_csv_path_session)(
@@ -319,7 +280,8 @@ async def process_folders(request):
     data['button_disable'] = "disabled"
 
     # Return the prepared data with the template for rendering
-    return render(request, "etiquetado_auto/etiquetado_auto.html", data)
+    return JsonResponse(data)
+    # return render(request, "etiquetado_auto/etiquetado_auto_reconocer_ajax.html", data)
 
 
 def spectrogram_plot(request):
@@ -401,11 +363,11 @@ async def process_hourly_sonotype(request):
         csv_path = await sync_to_async(get_file)()
     except Exception as e:
         print(e)
-        return render(request, "etiquetado_auto/etiquetado_auto.html", data)
+        return render(request, "etiquetado_auto/etiquetado_auto_reconocer_ajax.html", data)
 
     # Check if there was a selected file and contains a ".csv" extension
     if not csv_path or ".csv" not in csv_path:
-        return render(request, "etiquetado_auto/etiquetado_auto.html", data)
+        return render(request, "etiquetado_auto/etiquetado_auto_reconocer_ajax.html", data)
 
     dft = pd.read_csv(csv_path)
     unique_clusters = list(dft['Cluster'].unique())
@@ -415,7 +377,7 @@ async def process_hourly_sonotype(request):
 
     data['mostrar_barra_proceso'] = True
 
-    return render(request, "etiquetado_auto/etiquetado_auto.html", data)
+    return render(request, "etiquetado_auto/etiquetado_auto_reconocer_ajax.html", data)
 
 
 def get_hourly_sonotype_plots_urls():

@@ -23,6 +23,13 @@ from .utils.helper_functions_sonotipo import (
     process_folders_sonotipo
 )
 
+from .utils.helper_functions_reconocer import (
+    load_main_folder_reconocer,
+    prepare_destination_folder_reconocer,
+    process_folders_reconocer,
+    load_csv_reconocer
+)
+
 
 def etiquetado_auto_view(request):
     return render(request, "etiquetado_auto/etiquetado_auto.html")
@@ -44,19 +51,20 @@ async def sonotipo_view(request):
 
 async def reconocer_view(request):
     if request.method == 'POST':
+        print(request.POST)
         if 'cargar_csv' in request.POST:
-            return await load_csv(request)
+            return await load_csv_reconocer(request)
 
         elif 'cargar' in request.POST:
-            return await load_main_folder(request)
+            return await load_main_folder_reconocer(request)
 
         elif 'destino' in request.POST:
-            return await prepare_destination_folder(request)
+            return await prepare_destination_folder_reconocer(request)
 
         elif 'procesar_carpetas' in request.POST:
-            return await process_folders(request)
+            return await process_folders_reconocer(request)
 
-    return render(request, "etiquetado_auto/etiquetado_auto.html")
+    return render(request, "etiquetado_auto/etiquetado_auto_reconocer_ajax.html")
 
 
 async def temporal_view(request):
@@ -69,6 +77,7 @@ async def temporal_view(request):
 
 @csrf_exempt
 def plots_view(request):
+    print(request.POST)
     if request.method == 'POST':
         if 'informacion' in request.POST:
             return get_spectrogram_data(request)
