@@ -14,9 +14,9 @@ selectAllBtn.addEventListener("click", function () {
     }
 
     if (value){
-        selectAllBtn.value = "Deseeleccionar todos los filtros";
+        selectAllBtn.value = "Deseeleccionar todos los índices";
     }else{
-        selectAllBtn.value = "Seleccionar todos los filtros";
+        selectAllBtn.value = "Seleccionar todos los índices";
     }
 
     for (const checkbox of checkboxes) {
