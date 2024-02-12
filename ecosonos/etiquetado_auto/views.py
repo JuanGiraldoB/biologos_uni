@@ -6,14 +6,9 @@ from ecosonos.utils.helper_functions import (
 )
 
 from .utils.helper_functions import (
-    load_main_folder,
-    process_folders,
     spectrogram_plot,
-    prepare_destination_folder,
     get_spectrogram_data,
     representative_element_plot,
-    load_csv,
-    process_hourly_sonotype,
     get_hourly_sonotype_plots_urls
 )
 
@@ -29,6 +24,8 @@ from .utils.helper_functions_reconocer import (
     process_folders_reconocer,
     load_csv_reconocer
 )
+
+from .utils.helper_functions_temporal import process_hourly_sonotype
 
 
 def etiquetado_auto_view(request):
@@ -51,7 +48,6 @@ async def sonotipo_view(request):
 
 async def reconocer_view(request):
     if request.method == 'POST':
-        print(request.POST)
         if 'cargar_csv' in request.POST:
             return await load_csv_reconocer(request)
 
@@ -69,15 +65,14 @@ async def reconocer_view(request):
 
 async def temporal_view(request):
     if request.method == 'POST':
-        if 'nuevas_especies' in request.POST:
+        if 'cargar_csv' in request.POST:
             return await process_hourly_sonotype(request)
 
-    return render(request, "etiquetado_auto/etiquetado_auto.html")
+    return render(request, "etiquetado_auto/etiquetado_auto_temporal_ajax.html")
 
 
 @csrf_exempt
 def plots_view(request):
-    print(request.POST)
     if request.method == 'POST':
         if 'informacion' in request.POST:
             return get_spectrogram_data(request)
