@@ -3,7 +3,6 @@ from django.http import JsonResponse
 import pandas as pd
 import numpy as np
 import os
-from django.conf import settings
 
 
 from ..models import MetodologiaResult, GuardadoClusterResult
@@ -29,7 +28,6 @@ from ecosonos.utils.session_utils import (
     get_destination_folder_session,
     save_subfolders_details_session,
     save_files_session,
-    get_files_session,
     get_selected_subfolders_session,
 )
 
@@ -39,11 +37,7 @@ from ecosonos.utils.carpeta_utils import (
     get_all_files_in_all_folders
 )
 
-from .plot_helper import (
-    generate_spectrogram_with_clusters_plot,
-    generate_spectrogram_representative_element_plot,
-    run_generate_hourly_pattern_graph_of_the_sonotype
-)
+
 from procesamiento.models import Progreso
 import pandas as pd
 from ecosonos.utils.tkinter_utils import get_root_folder, get_file
@@ -282,114 +276,3 @@ async def process_folders_reconocer(request):
     # Return the prepared data with the template for rendering
     return JsonResponse(data)
     # return render(request, "etiquetado_auto/etiquetado_auto_reconocer_ajax.html", data)
-
-
-def spectrogram_plot(request):
-    # Get the path to the CSV file from the session
-    csv_path = get_csv_path_session(request, app='etiquetado_auto')
-
-    # Get the selected clusters from the POST request and convert them to integers
-    selected_clusters = request.POST.getlist('selected_clusters')
-    selected_clusters = [int(cluster) for cluster in selected_clusters]
-
-    # Get the file path from the POST request
-    file_path = request.POST.get('path')
-
-    # Read the CSV file into a DataFrame
-    df = pd.read_csv(csv_path)
-
-    # Generate the spectrogram plot with selected clusters
-    plot_url = generate_spectrogram_with_clusters_plot(
-        file_path, selected_clusters, df)
-
-    # Return the plot URL as a JSON response
-    return JsonResponse({'plot_url': plot_url})
-
-
-def representative_element_plot(request):
-    # Get the list of representative element indices from the POST request
-    representativo_index = request.POST.getlist('representativo')
-
-    # Get the path to the CSV file from the session
-    csv_path = get_csv_path_session(request, app='etiquetado_auto')
-
-    # Read the CSV file into a DataFrame
-    df = pd.read_csv(csv_path)
-
-    # Get the first representative index as an integer
-    representative_index = int(representativo_index[0])
-
-    # Get the MetodologiaResult object obtained from runing sonotipo
-    metodologia_output = MetodologiaResult.objects.first()
-
-    # Generate the representative element plot
-    plot_url = generate_spectrogram_representative_element_plot(
-        metodologia_output, df, representative_index)
-
-    # Return the plot URL as a JSON response
-    return JsonResponse({'plot_url': plot_url})
-
-
-def get_spectrogram_data(request):
-    # Create an empty dictionary to store the data to be sent as a JSON response
-    data = {}
-
-    # Get the files details from the session
-    files_details = get_files_session(request, app='etiquetado_auto')
-
-    # Get the path to the CSV file from the session
-    csv_path = get_csv_path_session(request, app='etiquetado_auto')
-
-    # Read the CSV file into a DataFrame
-    df = pd.read_csv(csv_path)
-
-    # Get unique cluster labels from the last column of the DataFrame
-    clusters = df.iloc[:, -2].unique().tolist()
-
-    # Sort the cluster labels numerically
-    data['clusters'] = sorted(clusters)
-    data['files_details'] = files_details
-
-    # Return the data as a JSON response
-    return JsonResponse(data)
-
-
-async def process_hourly_sonotype(request):
-    # Create an empty dictionary to store data that will be sent to the template
-    data = {}
-
-    try:
-        # Get the CSV file path
-        csv_path = await sync_to_async(get_file)()
-    except Exception as e:
-        print(e)
-        return render(request, "etiquetado_auto/etiquetado_auto_reconocer_ajax.html", data)
-
-    # Check if there was a selected file and contains a ".csv" extension
-    if not csv_path or ".csv" not in csv_path:
-        return render(request, "etiquetado_auto/etiquetado_auto_reconocer_ajax.html", data)
-
-    dft = pd.read_csv(csv_path)
-    unique_clusters = list(dft['Cluster'].unique())
-    progreso = await sync_to_async(Progreso.objects.create)(cantidad_archivos=len(unique_clusters))
-    asyncio.create_task(
-        run_generate_hourly_pattern_graph_of_the_sonotype(dft, progreso))
-
-    data['mostrar_barra_proceso'] = True
-
-    return render(request, "etiquetado_auto/etiquetado_auto_reconocer_ajax.html", data)
-
-
-def get_hourly_sonotype_plots_urls():
-    img_dir = os.path.join(settings.BASE_DIR, 'etiquetado_auto', 'static',
-                           'etiquetado_auto', 'img')
-
-    # Get a list of image file names in the directory
-    img_file_names = [f for f in os.listdir(
-        img_dir) if f.lower().endswith(('.png'))]
-
-    # Construct the URLs for each image
-    img_urls = [os.path.join(
-        settings.STATIC_URL, 'etiquetado_auto', 'img', fname) for fname in img_file_names]
-
-    return JsonResponse({"img_urls": img_urls})

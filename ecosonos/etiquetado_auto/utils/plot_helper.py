@@ -306,11 +306,6 @@ def generate_hourly_pattern_graph_of_the_sonotype(dft, progreso):
 
     plt.close()
 
-    # data['fig_urls'] = fig_urls
-    # data['mostrar_barra_proceso'] = True
-
-    # return render(request, "etiquetado_auto/etiquetado-auto.html", data)
-
 
 def extract_prefix_from_filename(filename):
     if '__' in filename:
