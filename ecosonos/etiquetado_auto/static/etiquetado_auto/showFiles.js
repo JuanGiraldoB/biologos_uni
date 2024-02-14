@@ -29,7 +29,10 @@ function show_files(type) {
 				);
 				radioClusterForm = document.getElementById("radio_clusters_reconocer");
 				ulElement = document.getElementById("lista_audios_reconocer");
+				console.log(checkboxClusterDiv)
 			}
+
+			console.log(checkboxClusterDiv)
 
 			setupDivCheckbox(checkboxClusterDiv, clusters);
 

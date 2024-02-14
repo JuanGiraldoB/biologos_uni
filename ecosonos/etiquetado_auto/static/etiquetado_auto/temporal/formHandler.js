@@ -23,7 +23,7 @@ function selectCSV() {
     .then(jsonResponse => {
 		displayDivProgressBar();
 		emptyDiv("contedorImagenes")
-		intervalId = setInterval(() => updateProgressBar("temporal"), 500);
+		const intervalId = setInterval(() => updateProgressBar("temporal", intervalId), 500);
     })
     .catch(error => {
         console.error("Error during fetch:", error.error, error.status);
