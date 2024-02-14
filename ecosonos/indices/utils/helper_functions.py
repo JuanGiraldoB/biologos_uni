@@ -27,13 +27,15 @@ from ecosonos.utils.session_utils import (
 from ecosonos.utils.tkinter_utils import get_root_folder, get_file
 from procesamiento.models import Progreso
 from .funciones_indices_progress import generate_polar_plot
-from .funciones_indices import run_calcular_indice
+from .funciones_indices import run_calcular_indice, stop_process_indices
 
 from ecosonos.utils.carpeta_utils import (
     get_folders_with_wav,
     get_subfolders_basename,
     get_all_files_in_all_folders
 )
+
+global background_task
 
 
 async def load_folder(request):
@@ -131,6 +133,7 @@ async def prepare_destination_folder(request):
 
 async def process_folders(request):
     # Create an empty dictionary to store data that will be sent to the template
+    global background_task, cancel_flag
     data = {}
 
     # Get the list of selected subfolders from the session
@@ -154,8 +157,10 @@ async def process_folders(request):
     progress = await sync_to_async(Progreso.objects.create)(cantidad_archivos=len(all_files))
 
     # Start the processing task in the background
-    asyncio.create_task(run_calcular_indice(
+    background_task = asyncio.create_task(run_calcular_indice(
         selected_indices, root_folder, all_files, csv_path, progress))
+
+    print(background_task)
 
     # Get base names of selected subfolders
     selected_subdfolders_base_name = get_subfolders_basename(
@@ -173,6 +178,13 @@ async def process_folders(request):
     # Return the prepared data with the template for rendering
     return JsonResponse(data)
     # return render(request, 'indices/indices.html', data)
+
+
+async def stop_process(request):
+    data = {}
+    stop_process_indices()
+
+    return JsonResponse(data)
 
 
 async def show_plot(request):

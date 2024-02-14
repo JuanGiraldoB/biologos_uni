@@ -5,7 +5,8 @@ import os
 from django.conf import settings
 
 from .plot_helper import (
-    run_generate_hourly_pattern_graph_of_the_sonotype
+    run_generate_hourly_pattern_graph_of_the_sonotype,
+    stop_process
 )
 from procesamiento.models import Progreso
 import pandas as pd
@@ -17,6 +18,8 @@ from asgiref.sync import sync_to_async
 async def process_hourly_sonotype(request):
     # Create an empty dictionary to store data that will be sent to the template
     data = {}
+
+    await sync_to_async(Progreso.objects.all().delete)()
     try:
         # Get the CSV file path
         csv_path = await sync_to_async(get_file)()
@@ -52,3 +55,10 @@ def get_hourly_sonotype_plots_urls():
         settings.STATIC_URL, 'etiquetado_auto', 'img', fname) for fname in img_file_names]
 
     return JsonResponse({"img_urls": img_urls})
+
+
+async def stop_process_temporal(request):
+    data = {}
+    stop_process()
+
+    return JsonResponse(data)

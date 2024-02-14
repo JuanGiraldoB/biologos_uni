@@ -13,6 +13,8 @@ import statistics as stat
 from scipy.stats import zscore
 from ecosonos.utils.archivos_utils import save_filename_in_txt
 
+global stop_thread_metodologia, stop_thread_metodologia_prueba
+
 
 def fcc5(canto, nfiltros, nc, nframes):
     """ Calculo de FCCs con escalamiento lineal
@@ -361,6 +363,14 @@ def segmentacion(archivos_full_dir, archivos_nombre_base, banda, canal, progreso
     # Aqui se debe llamar la funcion del espectrograma.
 
     for archivo in audios:
+
+        if stop_thread_metodologia or stop_thread_metodologia_prueba:
+            print("Se ha detenido el proceso")
+            return
+
+        # if stop_thread_metodologia_prueba:
+        #     return
+
         contador_archivos = contador_archivos + 1
         # leemos el audio
         try:
@@ -799,6 +809,9 @@ def seleccion_features(it_num, dat_norma):
 
 
 async def run_metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, visualize, progreso, csv_name, metodologia_output):
+    global stop_thread_metodologia, stop_thread_metodologia_prueba
+    stop_thread_metodologia = False
+    stop_thread_metodologia_prueba = False
     await asyncio.to_thread(Metodologia, archivos_full_dir, archivos_nombre_base, banda, canal, autosel, visualize, progreso, csv_name, metodologia_output)
 
 
@@ -1020,6 +1033,16 @@ def Metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, 
     # return table, datos_clasifi, mean_class, infoZC, gadso, representativo, dispersion, frecuencia
 
 
+def stop_process_metodologia():
+    global stop_thread_metodologia
+    stop_thread_metodologia = True
+
+
+def stop_process_metodologia_prueba():
+    global stop_thread_metodologia_prueba
+    stop_thread_metodologia_prueba = True
+
+
 def mlamda_fuzzy_3pi_apract(it_num, dat_norma, mean_class, flag):
     clusters, xx = np.shape(mean_class)
     num_clases, xx = np.shape(mean_class)
@@ -1083,6 +1106,9 @@ def mlamda_fuzzy_3pi_apract(it_num, dat_norma, mean_class, flag):
 
 
 async def run_metodologia_prueba(files_paths, files_basenames, banda, canal, specs, speciesStr, progreso, csv_path):
+    global stop_thread_metodologia, stop_thread_metodologia_prueba
+    stop_thread_metodologia = False
+    stop_thread_metodologia_prueba = False
     await asyncio.to_thread(Metodologia_Prueba, files_paths, files_basenames, banda, canal, specs, speciesStr, progreso, csv_path)
 
 

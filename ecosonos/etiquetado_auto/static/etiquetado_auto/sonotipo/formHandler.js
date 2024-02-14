@@ -1,3 +1,5 @@
+let intervalId;
+
 // Main Folder
 let formMainFolder = document.getElementById("cargar_carpeta");
 formMainFolder.addEventListener("submit", handleSubmiSelectMainFolder);
@@ -109,9 +111,49 @@ function processFolders() {
         displayDivProgressBar();
 		hideDiv("div-procesar");
 		displayDiv("div-opciones-radio");
+		displayDiv("div-parar");
 		displaySection("section-cluster-sonotipo");
 		displaySection("section-representativo-sonotipo");
-        const intervalId = setInterval(() => updateProgressBar("sonotipo", intervalId), 500);
+        intervalId = setInterval(() => updateProgressBar("sonotipo", intervalId), 500);
+	})
+	.catch(error => {
+		console.error("Error during fetch:", error.error, error.status);
+	});
+}
+
+// Stop process
+let formStopProcess = document.getElementById("form_parar");
+formStopProcess.addEventListener("submit", handleSubmiStopProcess);
+
+function handleSubmiStopProcess(event) {
+    event.preventDefault();
+    stopProcess();
+}
+
+function stopProcess() {
+    let form = document.getElementById("form_parar");
+    let submitButton = document.getElementById("parar_proceso");
+
+	let formData = new FormData(form);
+	formData.append("parar_proceso", submitButton.name);
+
+	fetch("", {
+		method: "POST",
+		body: formData,
+	})
+	.then(async response => {
+		if (response.ok) {
+			return response.json();
+		} else {
+			const data = await response.json();
+			return await Promise.reject(data);
+		}
+	})
+	.then(jsonResponse => {
+		clearInterval(intervalId);
+		const spanValue = document.getElementById("value1");
+		spanValue.innerHTML = "Cancelado";
+		hideDiv("div-parar");
 	})
 	.catch(error => {
 		console.error("Error during fetch:", error.error, error.status);

@@ -14,6 +14,8 @@ import asyncio
 warnings.filterwarnings('ignore')
 warnings.simplefilter("ignore", category=RuntimeWarning)
 
+global stop_thread
+
 
 def meanspec(audio, Fs=1, wn="hann", ovlp=0, wl=512, nfft=None, norm=True):
     '''
@@ -366,6 +368,9 @@ def algoritmo_lluvia_imp_intensidad(df_ind, arraymeanspect_ind):
 
 
 async def run_algoritmo_lluvia_edison(carpetas, raiz, progreso, path_csv):
+    global stop_thread
+    stop_thread = False
+
     await asyncio.to_thread(algoritmo_lluvia_edison, carpetas, raiz, progreso, path_csv)
 
 
@@ -444,6 +449,10 @@ def algoritmo_lluvia_edison(carpetas, raiz, progreso, path_csv):
             for i, res in enumerate(tqdm.tqdm(pool.imap(_apply_df, [(d, calculo_PSD_and_Espectro_promedio, i) for i, d in enumerate(df_split)]), total=len(df_split))):
                 result.append(res)
                 x = pd.concat([r[0] for r in result])
+
+                if stop_thread:
+                    return
+
                 progreso.archivos_completados = len(x)
                 progreso.save()
 
@@ -498,3 +507,8 @@ def algoritmo_lluvia_edison(carpetas, raiz, progreso, path_csv):
         # print(f"Results saved in {path_file}")
         print(
             f"Execution Time {str(timedelta(seconds=time.time() - start_time))}")
+
+
+def stop_process_preproceso():
+    global stop_thread
+    stop_thread = True

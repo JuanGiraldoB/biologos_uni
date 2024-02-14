@@ -6,7 +6,7 @@ import os
 
 from procesamiento.models import Progreso
 
-from .lluvia_edison import run_algoritmo_lluvia_edison
+from .lluvia_edison import run_algoritmo_lluvia_edison, stop_process_preproceso
 from .plot import generate_and_get_plot_url_from_csv
 
 from ecosonos.utils.tkinter_utils import (
@@ -191,6 +191,13 @@ async def process_folders(request):
     # Return the prepared data with the template for rendering
     return JsonResponse(data)
     # return render(request, 'procesamiento/preproceso.html', data)
+
+
+async def stop_process(request):
+    data = {}
+    stop_process_preproceso()
+
+    return JsonResponse(data)
 
 
 async def move_files(request):

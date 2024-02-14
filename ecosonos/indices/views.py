@@ -7,6 +7,7 @@ from .utils.helper_functions import (
     process_folders,
     show_plot,
     load_csv,
+    stop_process
 )
 
 from ecosonos.utils.helper_functions import (
@@ -93,11 +94,14 @@ async def indices_vista(request):
         if 'cargar' in request.POST:
             return await load_folder(request)
 
-        elif 'destino' in request.POST:
+        if 'destino' in request.POST:
             return await prepare_destination_folder(request)
 
-        elif 'procesar_carpetas' in request.POST:
+        if 'procesar_carpetas' in request.POST:
             return await process_folders(request)
+
+        if 'parar_proceso' in request.POST:
+            return await stop_process(request)
 
         if 'mostrar-grafica' in request.POST:
             return await show_plot(request)

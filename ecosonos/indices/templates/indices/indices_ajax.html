@@ -272,6 +272,15 @@
 							</form>
 						</div>
 
+						<!-- Form parar proceso -->
+						<div id="div-parar" style="display: none;">
+							<form method="POST" id="form_parar">
+								{% csrf_token %}
+								<input type="submit" value="Parar Proceso" id="parar_proceso"
+									name="parar_proceso"></input>
+							</form>
+						</div>
+
 						<br>
 
 						<section>

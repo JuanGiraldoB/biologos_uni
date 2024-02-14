@@ -10,6 +10,8 @@ from ecosonos.utils.archivos_utils import get_date_from_filename, save_filename_
 import pathlib
 import os
 
+global stop_thread
+
 # import matplotlib.pyplot as plt
 
 
@@ -117,10 +119,17 @@ def csvIndices(indicesCalculados, ruta, csv_path, indices_select):
 
 
 async def run_calcular_indice(indices_select, carpeta, archivos, csv_path, progreso):
+    global stop_thread
+    stop_thread = False
+
     await asyncio.to_thread(calcular_indice, indices_select, carpeta, archivos, csv_path, progreso)
 
 
 def calcular_indice(indices_select, carpeta, archivos, csv_path, progreso):
+    global stop_thread
+    import time
+    # Start time
+    start_time = time.time()
     """Calcula el valor de los indices seleccionados por el usuario.
 
     :param indices_select: Cadena de texto que agrupa las abreviaturas
@@ -146,6 +155,10 @@ def calcular_indice(indices_select, carpeta, archivos, csv_path, progreso):
         Valores.append(list())
 
     for grabacion in tqdm(grabaciones):
+
+        if stop_thread:
+            return
+
         # TODO: OS SEP
         g = str(grabacion).split("/")[-1]
         Valores[0].append(g)
@@ -248,9 +261,20 @@ def calcular_indice(indices_select, carpeta, archivos, csv_path, progreso):
         Indices_grabaciones.append({"Grabacion": g, "Indices": list(aux)})
 
     csvIndices(Valores, carpeta, csv_path, indices_select)
+    # End time
+    end_time = time.time()
+
+    # Calculate the execution time
+    execution_time = end_time - start_time
+    print(f"Time taken: {execution_time} seconds")
     # graficaErrorBar(carpeta, grabaciones)
     return carpeta, grabaciones
     # return JsonResponse({"Indices calculados": Indices_grabaciones})
+
+
+def stop_process_indices():
+    global stop_thread
+    stop_thread = True
 
 
 def graficaErrorBar(ruta, grabaciones):

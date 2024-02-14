@@ -8,6 +8,7 @@ from ..models import MetodologiaResult
 
 from .Bioacustica_Completo import (
     run_metodologia,
+    stop_process_metodologia
 )
 
 from ecosonos.utils.session_utils import (
@@ -202,3 +203,10 @@ async def process_folders_sonotipo(request):
     # Return the prepared data with the template for rendering
     return JsonResponse(data)
     # return render(request, "etiquetado_auto/etiquetado-auto.html", data)
+
+
+async def stop_process_sonotipo(request):
+    data = {}
+    stop_process_metodologia()
+
+    return JsonResponse(data)

@@ -15,6 +15,8 @@ import matplotlib
 # Use the Agg backend to avoid threading problems
 matplotlib.use('Agg')
 
+global stop_thread
+
 
 def generate_distinct_colors(num_colors):
     colors = []
@@ -222,6 +224,8 @@ def generate_spectrogram_representative_element_plot(metodologia_output, df, rep
 
 
 async def run_generate_hourly_pattern_graph_of_the_sonotype(dft, progreso):
+    global stop_thread
+    stop_thread = False
     await asyncio.to_thread(generate_hourly_pattern_graph_of_the_sonotype, dft, progreso)
 
 
@@ -304,6 +308,9 @@ def generate_hourly_pattern_graph_of_the_sonotype(dft, progreso):
         progreso.archivos_completados += 1
         progreso.save()
 
+        if stop_thread:
+            return
+
     plt.close()
 
 
@@ -314,3 +321,8 @@ def extract_prefix_from_filename(filename):
         prefix = filename.split('_')[0]
 
     return prefix
+
+
+def stop_process():
+    global stop_thread
+    stop_thread = True

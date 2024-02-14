@@ -11,6 +11,7 @@ from ..models import MetodologiaResult, GuardadoClusterResult
 from .Bioacustica_Completo import (
     guardado_cluster,
     run_metodologia_prueba,
+    stop_process_metodologia_prueba
 )
 
 from .utils import (
@@ -279,3 +280,10 @@ async def process_folders_reconocer(request):
     # Return the prepared data with the template for rendering
     return JsonResponse(data)
     # return render(request, "etiquetado_auto/etiquetado_auto_reconocer_ajax.html", data)
+
+
+async def stop_process_reconocer(request):
+    data = {}
+    stop_process_metodologia_prueba()
+
+    return JsonResponse(data)

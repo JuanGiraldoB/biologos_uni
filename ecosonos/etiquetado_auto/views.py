@@ -15,17 +15,22 @@ from .utils.helper_functions import (
 from .utils.helper_functions_sonotipo import (
     load_main_folder_sonotipo,
     prepare_destination_folder_sonotipo,
-    process_folders_sonotipo
+    process_folders_sonotipo,
+    stop_process_sonotipo
 )
 
 from .utils.helper_functions_reconocer import (
     load_main_folder_reconocer,
     prepare_destination_folder_reconocer,
     process_folders_reconocer,
-    load_csv_reconocer
+    load_csv_reconocer,
+    stop_process_reconocer
 )
 
-from .utils.helper_functions_temporal import process_hourly_sonotype
+from .utils.helper_functions_temporal import (
+    process_hourly_sonotype,
+    stop_process_temporal
+)
 
 
 def etiquetado_auto_view(request):
@@ -37,11 +42,14 @@ async def sonotipo_view(request):
         if 'cargar' in request.POST:
             return await load_main_folder_sonotipo(request)
 
-        elif 'destino' in request.POST:
+        if 'destino' in request.POST:
             return await prepare_destination_folder_sonotipo(request)
 
-        elif 'procesar_carpetas' in request.POST:
+        if 'procesar_carpetas' in request.POST:
             return await process_folders_sonotipo(request)
+
+        if 'parar_proceso' in request.POST:
+            return await stop_process_sonotipo(request)
 
     return render(request, "etiquetado_auto/etiquetado_auto_sonotipo_ajax.html")
 
@@ -51,14 +59,17 @@ async def reconocer_view(request):
         if 'cargar_csv' in request.POST:
             return await load_csv_reconocer(request)
 
-        elif 'cargar' in request.POST:
+        if 'cargar' in request.POST:
             return await load_main_folder_reconocer(request)
 
-        elif 'destino' in request.POST:
+        if 'destino' in request.POST:
             return await prepare_destination_folder_reconocer(request)
 
-        elif 'procesar_carpetas' in request.POST:
+        if 'procesar_carpetas' in request.POST:
             return await process_folders_reconocer(request)
+
+        if 'parar_proceso' in request.POST:
+            return await stop_process_reconocer(request)
 
     return render(request, "etiquetado_auto/etiquetado_auto_reconocer_ajax.html")
 
@@ -68,6 +79,9 @@ async def temporal_view(request):
         if 'cargar_csv' in request.POST:
             return await process_hourly_sonotype(request)
 
+        if 'parar_proceso' in request.POST:
+            return await stop_process_temporal(request)
+
     return render(request, "etiquetado_auto/etiquetado_auto_temporal_ajax.html")
 
 
@@ -76,11 +90,11 @@ def plots_view(request):
     if request.method == 'POST':
         if 'informacion' in request.POST:
             return get_spectrogram_data(request)
-        elif 'path' in request.POST:
+        if 'path' in request.POST:
             return spectrogram_plot(request)
-        elif 'representativo' in request.POST:
+        if 'representativo' in request.POST:
             return representative_element_plot(request)
-        elif 'graficas' in request.POST:
+        if 'graficas' in request.POST:
             return get_hourly_sonotype_plots_urls()
 
     return redirect('etiquetado-auto')
