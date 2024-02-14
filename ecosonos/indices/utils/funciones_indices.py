@@ -67,7 +67,7 @@ def calcular_espectrograma(ruta):
     return f, t, s, senal_audio, fs
 
 
-def csvIndices(indicesCalculados, ruta, destino, indices_select):
+def csvIndices(indicesCalculados, ruta, csv_path, indices_select):
     Valores = indicesCalculados
 
     fechas = []
@@ -112,20 +112,15 @@ def csvIndices(indicesCalculados, ruta, destino, indices_select):
     date_column = indicesDF.pop('Date')
     indicesDF['Date'] = date_column
 
-    csv_path = os.path.join(destino, 'indices_acusticos.csv')
-
-    print("**************", csv_path)
-    print("**************", indicesDF.head())
-
     indicesDF.to_csv(csv_path,
                      encoding='utf_8_sig', index=False, sep=',')
 
 
-async def run_calcular_indice(indices_select, carpeta, archivos, destino, progreso):
-    await asyncio.to_thread(calcular_indice, indices_select, carpeta, archivos, destino, progreso)
+async def run_calcular_indice(indices_select, carpeta, archivos, csv_path, progreso):
+    await asyncio.to_thread(calcular_indice, indices_select, carpeta, archivos, csv_path, progreso)
 
 
-def calcular_indice(indices_select, carpeta, archivos, destino, progreso):
+def calcular_indice(indices_select, carpeta, archivos, csv_path, progreso):
     """Calcula el valor de los indices seleccionados por el usuario.
 
     :param indices_select: Cadena de texto que agrupa las abreviaturas
@@ -252,7 +247,7 @@ def calcular_indice(indices_select, carpeta, archivos, destino, progreso):
 
         Indices_grabaciones.append({"Grabacion": g, "Indices": list(aux)})
 
-    csvIndices(Valores, carpeta, destino, indices_select)
+    csvIndices(Valores, carpeta, csv_path, indices_select)
     # graficaErrorBar(carpeta, grabaciones)
     return carpeta, grabaciones
     # return JsonResponse({"Indices calculados": Indices_grabaciones})

@@ -3,21 +3,13 @@
 # # Press Mayús+F10 to execute it or replace it with your code.
 # # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 import os
-import csv
-import cv2
-import os
 # import soundfile as sf
 # from flask import Flask, jsonify
 from scipy import signal
-from PIL import Image
 import numpy as np
-import matplotlib.pyplot as plt
-import sounddevice as sd
+# import sounddevice as sd
 import soundfile as sf
 from csv import writer
-import time
-import asyncio
-import plotly.express as px
 
 
 def calcular_espectrograma(ruta):

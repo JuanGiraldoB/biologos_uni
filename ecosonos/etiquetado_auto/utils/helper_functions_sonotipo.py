@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 import os
 
+from ecosonos.utils.helper_functions import get_current_datetime_with_minutes
 
 from ..models import MetodologiaResult
 
@@ -181,8 +182,11 @@ async def process_folders_sonotipo(request):
     visualize = 0
     banda = [minimum_frequency, maximum_frequency]
 
-    csv_name = 'Tabla_Nuevas_especies.csv'
+    # Name of csv file where the output will be saved
+    date_time = get_current_datetime_with_minutes()
+    csv_name = f'tabla-nuevas-especies-{date_time}.csv'
     csv_path = os.path.join(destination_folder, csv_name)
+    await sync_to_async(save_csv_path_session)(request, csv_path, app="etiquetado_auto")
 
     # Create a MetodologiaResult object for storing results
     metodologia_output = await sync_to_async(MetodologiaResult.objects.create)()
@@ -194,10 +198,6 @@ async def process_folders_sonotipo(request):
             files_paths, files_basenames, banda, canal, autosel, visualize, progreso, csv_path, metodologia_output))
     except Exception as e:
         print('error: ***********', e)
-
-    # Save the CSV path to the session
-    await sync_to_async(save_csv_path_session)(
-        request, csv_path, app='etiquetado_auto')
 
     # Return the prepared data with the template for rendering
     return JsonResponse(data)

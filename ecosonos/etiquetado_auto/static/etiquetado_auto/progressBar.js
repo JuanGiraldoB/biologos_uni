@@ -1,10 +1,7 @@
-let intervalId = null;
-
-function updateProgressBar(type) {
+function updateProgressBar(type, intervalId) {
 	let xhr = new XMLHttpRequest();
 	xhr.open("POST", "/etiquetado-auto/barra_progreso", true);
 	xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-	xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
 
 	xhr.onreadystatechange = function () {
 		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
@@ -19,14 +16,17 @@ function updateProgressBar(type) {
 			console.log(porcentaje_completado);
 
 			if (porcentaje_completado == 100) {
-				spanValue.innerHTML = "Completado";
 				clearInterval(intervalId);
-				if (type == "temporal") {
-					getPlots();
-				} else {
-					show_files(type);
-				}
+				setTimeout(() => {
+					spanValue.innerHTML = "Completado";
+					if (type == "temporal") {
+						getPlots();
+					} else {
+						show_files(type);
+					}
+				}, 5000); // Wait for 1000 milliseconds (1 second)
 			}
+			
 		}
 	};
 	xhr.send();

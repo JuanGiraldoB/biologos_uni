@@ -4,14 +4,11 @@ import pandas as pd
 from scipy import signal, stats
 import os
 import tqdm
-from multiprocessing import Manager, Pool
+from multiprocessing import Pool
 import time
 from datetime import timedelta
-import argparse
-from pathlib import Path
 import warnings
 from pydub import AudioSegment
-import sys
 import asyncio
 
 warnings.filterwarnings('ignore')
@@ -368,11 +365,11 @@ def algoritmo_lluvia_imp_intensidad(df_ind, arraymeanspect_ind):
     return df_indices_lluvia
 
 
-async def run_algoritmo_lluvia_edison(carpetas, raiz, destino, progreso):
-    await asyncio.to_thread(algoritmo_lluvia_edison, carpetas, raiz, destino, progreso)
+async def run_algoritmo_lluvia_edison(carpetas, raiz, progreso, path_csv):
+    await asyncio.to_thread(algoritmo_lluvia_edison, carpetas, raiz, progreso, path_csv)
 
 
-def algoritmo_lluvia_edison(carpetas, raiz, destino, progreso):
+def algoritmo_lluvia_edison(carpetas, raiz, progreso, path_csv):
     Edison_Duque = True
 
     # Ruta donde se encuentran los archivos
@@ -380,9 +377,6 @@ def algoritmo_lluvia_edison(carpetas, raiz, destino, progreso):
 
     # Ruta donde se guardan los resultados
     folder_rain = raiz
-
-    # Nombre csv
-    name_file = 'resultado_preproceso.csv'
 
     formatos = ['wav', 'WAV']
     n_cores = 14
@@ -499,10 +493,8 @@ def algoritmo_lluvia_edison(carpetas, raiz, destino, progreso):
         cols2 = cols[:-2] + cols[-1:] + ['Duracion(seg)']
         df_y = df_y[cols2]
 
-        path_file = os.path.join(destino, name_file)
-
         # print(f"Saving in {path_file} ...")
-        df_y.to_csv(path_file, index=False)
+        df_y.to_csv(path_csv, index=False)
         # print(f"Results saved in {path_file}")
         print(
             f"Execution Time {str(timedelta(seconds=time.time() - start_time))}")

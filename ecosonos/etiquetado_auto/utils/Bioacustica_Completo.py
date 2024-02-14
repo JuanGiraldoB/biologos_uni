@@ -983,10 +983,20 @@ def Metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, 
         14: 'Membership'
     }
 
+    import time
+    # start time
+    start_time = time.time()
+
     Tabla_NewSpecies = pd.DataFrame(table)
     Tabla_NewSpecies.rename(columns=column_mapping, inplace=True)
     Tabla_NewSpecies.to_csv(
         csv_name, index=False)
+
+    # end time
+    end_time = time.time()
+    # Calculate the execution time
+    execution_time = end_time - start_time
+    print(f"Time taken to save DataFrame to CSV: {execution_time} seconds")
 
     progreso.archivos_completados += progreso.uno_porciento
     progreso.save()

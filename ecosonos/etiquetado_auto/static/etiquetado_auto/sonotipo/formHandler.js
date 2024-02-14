@@ -111,7 +111,7 @@ function processFolders() {
 		displayDiv("div-opciones-radio");
 		displaySection("section-cluster-sonotipo");
 		displaySection("section-representativo-sonotipo");
-        intervalId = setInterval(() => updateProgressBar("sonotipo"), 500);
+        const intervalId = setInterval(() => updateProgressBar("sonotipo", intervalId), 500);
 	})
 	.catch(error => {
 		console.error("Error during fetch:", error.error, error.status);

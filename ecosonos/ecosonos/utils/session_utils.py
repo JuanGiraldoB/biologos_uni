@@ -39,14 +39,22 @@ def get_selected_subfolders_session(request, app='preproceso'):
 
 
 def save_csv_path_session(request, csv_path, app='etiquetado'):
-    if app == 'etiquetado':
+    if app == 'preproceso':
+        request.session['csv_preproceso'] = csv_path
+    elif app == 'indices':
+        request.session['csv_indices'] = csv_path
+    elif app == 'etiquetado':
         request.session['csv_etiquetado'] = csv_path
     elif app == 'etiquetado_auto':
         request.session['csv_etiquetado_auto'] = csv_path
 
 
 def get_csv_path_session(request, app='etiquetado'):
-    if app == 'etiquetado':
+    if app == 'preproceso':
+        return request.session['csv_preproceso']
+    elif app == 'indices':
+        return request.session['csv_indices']
+    elif app == 'etiquetado':
         return request.session['csv_etiquetado']
     elif app == 'etiquetado_auto':
         return request.session['csv_etiquetado_auto']

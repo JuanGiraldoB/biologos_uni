@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.http import JsonResponse
 from procesamiento.models import Progreso
 
@@ -7,7 +8,6 @@ def get_advance_percentage():
     progreso = Progreso.objects.first()
 
     if not progreso:
-        data['procentaje_completado'] = 0
         return JsonResponse(data)
 
     archivos_completados = progreso.archivos_completados
@@ -25,3 +25,10 @@ def get_advance_percentage():
         Progreso.objects.all().delete()
 
     return JsonResponse(data)
+
+
+def get_current_datetime_with_minutes():
+    current_datetime = datetime.now()
+    formatted_datetime = current_datetime.strftime("%d-%m-%y-%H-%M")
+
+    return formatted_datetime

@@ -6,9 +6,8 @@ from django.templatetags.static import static
 from django.conf import settings
 
 
-def generate_and_get_plot_url_from_csv(csv_folder):
-    # Step 1: Read the xlsx file and extract the necessary information
-    csv_path = os.path.join(csv_folder, 'resultado_preproceso.csv')
+def generate_and_get_plot_url_from_csv(csv_path):
+    # Step 1: Read the csv file and extract the necessary information
     df = pd.read_csv(csv_path)
 
     # Step 2: Extract the date from the filename using the function `get_date_from_filename`

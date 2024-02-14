@@ -21,8 +21,7 @@ def save_filename_in_txt(file_name, from_app="etiquetado", broken=False):
         print(f"An error occurred: {str(e)}")
 
 
-def move_files_depending_type(root_folder, destination_folder, type):
-    csv_path = os.path.join(root_folder, 'resultado_preproceso.csv')
+def move_files_depending_of_type(csv_path, destination_folder, type):
     csv_file = pd.read_csv(csv_path)
 
     for _, row in csv_file.iterrows():

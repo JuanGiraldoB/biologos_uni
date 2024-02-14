@@ -2,6 +2,7 @@ from django.shortcuts import render
 from asgiref.sync import sync_to_async
 from django.http import JsonResponse
 import asyncio
+import os
 
 from procesamiento.models import Progreso
 
@@ -11,6 +12,8 @@ from .plot import generate_and_get_plot_url_from_csv
 from ecosonos.utils.tkinter_utils import (
     get_root_folder
 )
+
+from ecosonos.utils.helper_functions import get_current_datetime_with_minutes
 
 from ecosonos.utils.session_utils import (
     save_root_folder_session,
@@ -22,7 +25,9 @@ from ecosonos.utils.session_utils import (
     save_statistics_state_session,
     get_statistics_state_session,
     save_selected_subfolders_session,
-    get_selected_subfolders_session
+    get_selected_subfolders_session,
+    save_csv_path_session,
+    get_csv_path_session
 )
 
 from ecosonos.utils.carpeta_utils import (
@@ -32,7 +37,7 @@ from ecosonos.utils.carpeta_utils import (
 )
 
 from ecosonos.utils.archivos_utils import (
-    move_files_depending_type,
+    move_files_depending_of_type,
 )
 
 
@@ -100,7 +105,6 @@ async def prepare_destination_folder(request):
 
     # Get the list of selected subfolders from the POST request
     selected_subdfolders = request.POST.getlist('carpetas')
-    print(selected_subdfolders)
 
     # Get the base names of the selected subfolders
     selected_subdfolders_base_name = get_subfolders_basename(
@@ -157,9 +161,15 @@ async def process_folders(request):
     root_folder = await sync_to_async(get_root_folder_session)(request)
     destination_folder = await sync_to_async(get_destination_folder_session)(request)
 
+    # Name of csv file where the output will be saved
+    date_time = get_current_datetime_with_minutes()
+    csv_name = f'resultado-preproceso-{date_time}.csv'
+    csv_path = os.path.join(destination_folder, csv_name)
+    await sync_to_async(save_csv_path_session)(request, csv_path, app="preproceso")
+
     # Start the processing task in the background
     asyncio.create_task(run_algoritmo_lluvia_edison(
-        selected_subdfolders, root_folder, destination_folder, progress))
+        selected_subdfolders, root_folder, progress, csv_path))
 
     # Get the base names of the selected subfolders
     selected_subdfolders_base_name = get_subfolders_basename(
@@ -208,11 +218,12 @@ async def move_files(request):
 
     try:
         # Attempt to retrieve the CSV folder path from the session
-        csv_folder = await sync_to_async(get_destination_folder_session)(request)
+        csv_path = await sync_to_async(get_csv_path_session)(request, app="preproceso")
+        # csv_folder = await sync_to_async(get_destination_folder_session)(request)
 
         # Move files depending on their type
-        move_files_depending_type(
-            csv_folder, destination_folder, type_of_files_to_move)
+        move_files_depending_of_type(
+            csv_path, destination_folder, type_of_files_to_move)
 
         data['folder'] = destination_folder.split('/')[-1]
 
@@ -231,10 +242,11 @@ async def show_plot(request):
 
     try:
         # Attempt to retrieve the CSV folder path from the session
-        csv_folder = await sync_to_async(get_destination_folder_session)(request)
+        csv_path = await sync_to_async(get_csv_path_session)(request, app="preproceso")
+        # csv_folder = await sync_to_async(get_destination_folder_session)(request)
 
         # Generate a URL for the plot based on the CSV data
-        fig_url = generate_and_get_plot_url_from_csv(csv_folder)
+        fig_url = generate_and_get_plot_url_from_csv(csv_path)
 
         # Store the generated plot URL in the data dictionary
         data['fig_url'] = fig_url

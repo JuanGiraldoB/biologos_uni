@@ -2,7 +2,10 @@ from django.shortcuts import render
 import pandas as pd
 from asgiref.sync import sync_to_async
 import asyncio
+import os
 from django.http import JsonResponse
+
+from ecosonos.utils.helper_functions import get_current_datetime_with_minutes
 
 from .utils import (
     save_indices_session,
@@ -16,8 +19,9 @@ from ecosonos.utils.session_utils import (
     save_destination_folder_session,
     get_destination_folder_session,
     save_subfolders_details_session,
-    get_subfolders_details_session,
     get_selected_subfolders_session,
+    save_csv_path_session,
+    get_csv_path_session
 )
 
 from ecosonos.utils.tkinter_utils import get_root_folder, get_file
@@ -140,12 +144,18 @@ async def process_folders(request):
     # Get all files in selected subfolders
     all_files, _ = get_all_files_in_all_folders(selected_subdfolders)
 
+    # Name of csv file where the output will be saved
+    date_time = get_current_datetime_with_minutes()
+    csv_name = f'indices-acusticos-{date_time}.csv'
+    csv_path = os.path.join(destination_folder, csv_name)
+    await sync_to_async(save_csv_path_session)(request, csv_path, app="indices")
+
     # Create a progress object in the database with the amount of files that are inside the folders
     progress = await sync_to_async(Progreso.objects.create)(cantidad_archivos=len(all_files))
 
     # Start the processing task in the background
     asyncio.create_task(run_calcular_indice(
-        selected_indices, root_folder, all_files, destination_folder, progress))
+        selected_indices, root_folder, all_files, csv_path, progress))
 
     # Get base names of selected subfolders
     selected_subdfolders_base_name = get_subfolders_basename(
@@ -170,8 +180,9 @@ async def show_plot(request):
 
     try:
         # Get the destination folder and selected indices from session
-        destination_folder = await sync_to_async(get_destination_folder_session)(request, app='indices')
+        # destination_folder = await sync_to_async(get_destination_folder_session)(request, app='indices')
         selected_indices = await sync_to_async(get_indices_session)(request)
+        csv_path = await sync_to_async(get_csv_path_session)(request, app="indices")
 
     except Exception as e:
         print(e)
@@ -185,7 +196,7 @@ async def show_plot(request):
             if "ADIm" == indice:
                 continue
 
-            graficas.append(await sync_to_async(generate_polar_plot)(destination_folder, indice))
+            graficas.append(await sync_to_async(generate_polar_plot)(csv_path, indice))
 
         # If ADIM in selected indices, generate polar plots for "ADIm_i" indices
         if "ADIm" in selected_indices:
@@ -194,7 +205,7 @@ async def show_plot(request):
             for i in range(1_000_000):
                 adim_i = f'ADIm_{i}'
                 adim.append(adim_i)
-                graficas.append(await sync_to_async(generate_polar_plot)(destination_folder, indice, adim_i))
+                graficas.append(await sync_to_async(generate_polar_plot)(csv_path, indice, adim_i))
 
     # Exception occurs when there are less ADIm_{i} than in the for range
     except Exception as e:

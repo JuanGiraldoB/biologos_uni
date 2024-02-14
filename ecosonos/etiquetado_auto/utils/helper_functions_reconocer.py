@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import os
 
+from ecosonos.utils.helper_functions import get_current_datetime_with_minutes
 
 from ..models import MetodologiaResult, GuardadoClusterResult
 
@@ -246,7 +247,9 @@ async def process_folders_reconocer(request):
     canal = 1
     banda = [minimum_frequency, maximum_frequency]
 
-    csv_name = 'Tabla_reconocimiento.csv'
+    # Name of csv file where the output will be saved
+    date_time = get_current_datetime_with_minutes()
+    csv_name = f'tabla-reconocimiento-{date_time}.csv'
     csv_path = os.path.join(destination_folder, csv_name)
 
     data['carpetas_procesando'] = selected_folders_basenames
