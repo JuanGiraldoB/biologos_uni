@@ -80,32 +80,13 @@ function createAElement(file){
 					dragmode: "select",
 				};
 
-				// let lockIcon = {
-				// 	width: 1000,
-				// 	height: 1000,
-				// 	path: "M320 768h512v192q0 106 -75 181t-181 75t-181 -75t-75 -181v-192zM1152 672v-576q0 -40 -28 -68t-68 -28h-960q-40 0 -68 28t-28 68v576q0 40 28 68t68 28h32v192q0 184 132 316t316 132t316 -132t132 -316v-192h32q40 0 68 -28t28 -68z",
-				// 	transform: "matrix(0.75 0 0 -0.75 0 1000)",
-				// };
-
-				// let modeBarButtons = [
-				// 	[
-				// 		{
-				// 			name: "Borrar ultima etiqueta",
-				// 			icon: lockIcon,
-				// 			click: () => {
-				// 				quitarEtiqueta();
-				// 			},
-				// 		},
-				// 	],
-				// ];
-
 				// Define the layout for the plot
 				let layout = {
 					xaxis: { title: "Tiempo (s)" },
 					yaxis: { title: "Frecuencia (Hz)" },
 					margin: { t: 60 },
-					width: 800,
-					height: 400,
+					width: 1100,
+					height: 800,
 					font: { size: 16 },
 					dragmode: "select",
 					updatemenus: [
@@ -417,28 +398,12 @@ function createHeader(type, text) {
 }
 
 // Hide Show Tags
-function hideDivMainFolder() {
-	document.getElementById("div-seleccionar-carpeta-principal").style.display = "none";
+function hideDiv(id) {
+	document.getElementById(id).style.display = "none";
 }
 
-function hideDivCsv() {
-	document.getElementById("div-mostrar-csv").style.display = "none";
-}
-
-function displayDivCsv() {
-	document.getElementById("div-mostrar-csv").style.display = "block";
-}
-
-function displayDivDestinationFolder() {
-	document.getElementById("div-seleccionar-carpeta-destino").style.display = "block";
-}
-
-function displayDivProcess() {
-	document.getElementById("div-procesar").style.display = "block";
-}
-
-function hideDivProcess() {
-	document.getElementById("div-procesar").style.display = "none";
+function displayDiv(id) {
+	document.getElementById(id).style.display = "block";
 }
 
 function displayDivProgressBar() {
@@ -447,10 +412,6 @@ function displayDivProgressBar() {
 	spanValue.innerHTML = 0 + "%";
 	const barElement = document.querySelector(".bar");
 	barElement.style.setProperty("--percentage", spanValue.textContent);
-}
-
-function hideDivDestinationFolder() {
-	document.getElementById("div-seleccionar-carpeta-destino").style.display = "none";
 }
 
 function emptyDiv(id){

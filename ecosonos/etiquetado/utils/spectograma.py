@@ -3,13 +3,11 @@
 # # Press Mayús+F10 to execute it or replace it with your code.
 # # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 import os
-# import soundfile as sf
-# from flask import Flask, jsonify
+import soundfile as sf
 from scipy import signal
 import numpy as np
-# import sounddevice as sd
+import sounddevice as sd
 import soundfile as sf
-from csv import writer
 
 
 def calcular_espectrograma(ruta):

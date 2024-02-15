@@ -26,8 +26,8 @@ function selectMainFolder() {
     })
     .then(jsonResponse => {
 		let mainFolder = jsonResponse.selected_folder;
-        hideDivMainFolder();
-        displayDivDestinationFolder();
+        hideDiv("div-seleccionar-carpeta-principal");
+        displayDiv("div-seleccionar-carpeta-destino")
 		generateFolderHeader("Carpeta principal seleccionada: " + mainFolder);
 		
     })
@@ -72,7 +72,7 @@ function selectDestinationFolder() {
 	.then(jsonResponse => {
         let destinationFolder = jsonResponse.selected_destination_folder;
 		let files = jsonResponse.files_details;
-		hideDivDestinationFolder();
+		hideDiv("div-seleccionar-carpeta-destino");
 		generateFolderHeader("Carpeta destino seleccionada: " + destinationFolder);
 		generateFileList(files);
 	})
