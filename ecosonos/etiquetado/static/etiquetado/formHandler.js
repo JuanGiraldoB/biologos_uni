@@ -74,7 +74,7 @@ function selectDestinationFolder() {
 		let files = jsonResponse.files_details;
 		hideDiv("div-seleccionar-carpeta-destino");
 		generateFolderHeader("Carpeta destino seleccionada: " + destinationFolder);
-		generateFileList(files);
+		generateFileList(files, 10, 1);
 	})
 	.catch(error => {
 		console.error("Error during fetch:", error.error, error.status);

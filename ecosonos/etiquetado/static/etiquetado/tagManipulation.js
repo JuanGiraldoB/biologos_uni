@@ -1,15 +1,54 @@
 // Create tags
 
-function generateFileList(files){
-	let ul = document.getElementById("ul-lista-archivos");
+// function generateFileList(files){
+// 	let ul = document.getElementById("ul-lista-archivos");
 
-	files.forEach(file => {
-		const a = createAElement(file);
-		const li = createLi();
+// 	files.forEach(file => {
+// 		const a = createAElement(file);
+// 		const li = createLi();
 		
-		li.appendChild(a);
-		ul.appendChild(li);
-	});
+// 		li.appendChild(a);
+// 		ul.appendChild(li);
+// 	});
+// }
+
+function generateFileList(files, itemsPerPage, currentPage) {
+    let ul = document.getElementById("ul-lista-archivos");
+    ul.innerHTML = ""; // Clear the existing list
+
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+
+    const filesToShow = files.slice(startIndex, endIndex);
+
+    filesToShow.forEach(file => {
+        const a = createAElement(file);
+        const li = createLi();
+        li.appendChild(a);
+        ul.appendChild(li);
+    });
+
+    // Optionally, you can also add pagination controls
+    const totalPages = Math.ceil(files.length / itemsPerPage);
+    addPaginationControls(files, itemsPerPage, currentPage, totalPages);
+}
+
+function addPaginationControls(files, itemsPerPage, currentPage, totalPages) {
+    // Assuming you have some element to append pagination controls, such as a div with id "pagination-controls"
+    const paginationControls = document.getElementById("pagination-controls");
+    paginationControls.innerHTML = "";
+
+    for (let i = 1; i <= totalPages; i++) {
+        const button = document.createElement("button");
+        button.textContent = i;
+        button.onclick = function() {
+            generateFileList(files, itemsPerPage, i);
+        };
+        if (i === currentPage) {
+            button.classList.add("active");
+        }
+        paginationControls.appendChild(button);
+    }
 }
 
 function createAElement(file){
