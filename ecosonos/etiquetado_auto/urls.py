@@ -6,6 +6,7 @@ from .views import (
     temporal_view,
     barra_progreso,
     plots_view,
+    csv_cargado
 )
 
 urlpatterns = [
@@ -15,4 +16,5 @@ urlpatterns = [
     path('temporal', temporal_view, name='temporal'),
     path('plots', plots_view, name='plots'),
     path('barra_progreso', barra_progreso, name='barra_progreso'),
+    path('csv_cargado', csv_cargado, name='csv_cargado'),
 ]

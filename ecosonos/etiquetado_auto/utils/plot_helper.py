@@ -151,8 +151,16 @@ def generate_spectrogram_with_clusters_plot(file_path, selected_clusters, df):
 def generate_spectrogram_representative_element_plot(metodologia_output, df, representativo_index):
     table = df
     representativo = metodologia_output.representativo
+
     # selección de un cluster numero minimo y maximo dado por la tabla puede cambiar este numero según los clusters que haya
     representativo_row = representativo[representativo_index]
+    print("representativo index:", representativo_index)
+    print("representativo metodologia:", representativo)
+    print("representativo row:", representativo_row)
+    print()
+
+    import pprint
+    pprint.pprint(table)
 
     # audio = table[representativo[sel]][0]
     audio = table.iloc[representativo_row, 0]

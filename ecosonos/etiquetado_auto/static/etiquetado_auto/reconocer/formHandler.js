@@ -1,4 +1,5 @@
-let intervalId;
+let intervalIdProgressBar;
+let waitTime = 1000;
 
 // CSV
 let formCSV = document.getElementById("form_cargar_csv");
@@ -155,7 +156,7 @@ function processFolders() {
         displayDiv("div-parar");
 		displaySection("section-cluster-reconocer");
 		displaySection("section-representativo-reconocer");
-        intervalId = setInterval(() => updateProgressBar("reconocer", intervalId), 500);
+        intervalIdProgressBar = setInterval(() => updateProgressBar("reconocer", intervalIdProgressBar, waitTime), waitTime);
 	})
 	.catch(error => {
 		console.error("Error during fetch:", error.error, error.status);
@@ -191,10 +192,12 @@ function stopProcess() {
 		}
 	})
 	.then(jsonResponse => {
-		clearInterval(intervalId);
-		const spanValue = document.getElementById("value1");
-		spanValue.innerHTML = "Cancelado";
+		clearInterval(intervalIdProgressBar);
 		hideDiv("div-parar");
+		setTimeout(() => {
+			const spanValue = document.getElementById("value1");
+			spanValue.innerHTML = "Cancelado";
+		}, waitTime*2.5);
 	})
 	.catch(error => {
 		console.error("Error during fetch:", error.error, error.status);

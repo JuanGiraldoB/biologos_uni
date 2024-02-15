@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 
 from ecosonos.utils.helper_functions import (
-    get_advance_percentage
+    get_advance_percentage,
+    check_csv_state
 )
 
 from .utils.helper_functions import (
@@ -93,6 +94,7 @@ def plots_view(request):
         if 'path' in request.POST:
             return spectrogram_plot(request)
         if 'representativo' in request.POST:
+            print(request.POST)
             return representative_element_plot(request)
         if 'graficas' in request.POST:
             return get_hourly_sonotype_plots_urls()
@@ -103,3 +105,8 @@ def plots_view(request):
 @csrf_exempt
 def barra_progreso(request):
     return get_advance_percentage()
+
+
+@csrf_exempt
+def csv_cargado(request):
+    return check_csv_state()

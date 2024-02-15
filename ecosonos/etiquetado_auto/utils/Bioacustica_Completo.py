@@ -1005,15 +1005,6 @@ def Metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, 
     Tabla_NewSpecies.to_csv(
         csv_name, index=False)
 
-    # end time
-    end_time = time.time()
-    # Calculate the execution time
-    execution_time = end_time - start_time
-    print(f"Time taken to save DataFrame to CSV: {execution_time} seconds")
-
-    progreso.archivos_completados += progreso.uno_porciento
-    progreso.save()
-
     try:
         metodologia_output.datos_clasifi = datos_clasifi.tolist()
         metodologia_output.mean_class = mean_class.tolist()
@@ -1028,6 +1019,14 @@ def Metodologia(archivos_full_dir, archivos_nombre_base, banda, canal, autosel, 
     except Exception as e:
         print(e)
 
+    # end time
+    end_time = time.time()
+    # Calculate the execution time
+    execution_time = end_time - start_time
+    print(f"Time taken to save DataFrame to CSV: {execution_time} seconds")
+    progreso.csv_cargado = True
+    print(progreso.csv_cargado, "bioacustica")
+    progreso.save()
     # request.session['table'] = table
     # print(request.session['table'])
     # return table, datos_clasifi, mean_class, infoZC, gadso, representativo, dispersion, frecuencia
@@ -1346,7 +1345,8 @@ def Metodologia_Prueba(files_paths, files_basenames, banda, canal, specs, specie
     Tabla_NewSpecies.rename(columns=column_mapping, inplace=True)
     Tabla_NewSpecies.to_csv(
         csv_path, index=False)
-    progreso.archivos_completados += progreso.uno_porciento
+
+    progreso.csv_cargado = True
     progreso.save()
 
     return table, datos_clasifi, mean_clas2, infoZC, gadso, repre, Dispersion, frecuencia

@@ -53,6 +53,8 @@ async def load_main_folder_reconocer(request):
 
     # Delete all records in the Progreso model
     await sync_to_async(Progreso.objects.all().delete)()
+    await sync_to_async(GuardadoClusterResult.objects.all().delete)()
+    await sync_to_async(MetodologiaResult.objects.all().delete)()
 
     try:
         # Get the root folder where the wav files are located
@@ -94,8 +96,13 @@ async def load_main_folder_reconocer(request):
 
 
 async def load_csv_reconocer(request):
+    await sync_to_async(Progreso.objects.all().delete)()
+    await sync_to_async(GuardadoClusterResult.objects.all().delete)()
+    await sync_to_async(MetodologiaResult.objects.all().delete)()
     # Create an empty dictionary to store data that will be sent to the template
     data = {}
+
+    print("deleted")
 
     try:
         # Get the CSV file path
@@ -234,11 +241,8 @@ async def process_folders_reconocer(request):
     # Save file details to the session
     save_files_session(request, files_details, app='etiquetado_auto')
 
-    # Calculate the 1% of total files
-    one_percent = int(0.01 * len(files_paths))
-
     # Create a progress object to track the processing progress with the amount of files from the selected folders
-    progreso = await sync_to_async(Progreso.objects.create)(cantidad_archivos=len(files_paths) + one_percent, uno_porciento=one_percent)
+    progreso = await sync_to_async(Progreso.objects.create)(cantidad_archivos=len(files_paths))
 
     # Get selected subfolders basenames
     selected_folders_basenames = get_subfolders_basename(

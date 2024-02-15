@@ -1,4 +1,4 @@
-function updateProgressBar(type, intervalId) {
+function updateProgressBar(type, intervalIdProgressBar, waitTime) {
 	let xhr = new XMLHttpRequest();
 	xhr.open("POST", "/etiquetado-auto/barra_progreso", true);
 	xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
@@ -16,15 +16,39 @@ function updateProgressBar(type, intervalId) {
 			console.log(porcentaje_completado);
 
 			if (porcentaje_completado == 100) {
-				clearInterval(intervalId);
+				clearInterval(intervalIdProgressBar);
 				setTimeout(() => {
 					spanValue.innerHTML = "Completado";
 					if (type == "temporal") {
 						getPlots();
 					} else {
-						show_files(type);
+						intervalIdCsvState = setInterval(() => getCsvState(type, intervalIdCsvState), waitTime);
 					}
-				}, 5000); // Wait for 1000 milliseconds (1 second)
+				}, waitTime*2.5);
+			}
+			
+		}
+	};
+	xhr.send();
+}
+
+function getCsvState(type, intervalIdCsvState, waitTime) {
+	let xhr = new XMLHttpRequest();
+	xhr.open("POST", "/etiquetado-auto/csv_cargado", true);
+	xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+
+	xhr.onreadystatechange = function () {
+		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+			const data = JSON.parse(xhr.responseText);
+			const csvCargado = data["csv_cargado"];
+
+			console.log(csvCargado);
+
+			if (csvCargado) {
+				clearInterval(intervalIdCsvState);
+				setTimeout(() => {
+					show_files(type);
+				}, waitTime*2.5); // Wait for 1000 milliseconds (1 second)
 			}
 			
 		}

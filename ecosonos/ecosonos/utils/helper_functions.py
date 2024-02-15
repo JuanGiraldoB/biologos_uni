@@ -7,9 +7,6 @@ def get_advance_percentage():
     data = {}
     progreso = Progreso.objects.first()
 
-    if not progreso:
-        return JsonResponse(data)
-
     archivos_completados = progreso.archivos_completados
     cantidad_archivos = progreso.cantidad_archivos
 
@@ -21,9 +18,14 @@ def get_advance_percentage():
 
     data['procentaje_completado'] = porcentaje_completado
 
-    if archivos_completados == cantidad_archivos:
-        Progreso.objects.all().delete()
+    return JsonResponse(data)
 
+
+def check_csv_state():
+    data = {}
+    progreso = Progreso.objects.first()
+    data['csv_cargado'] = progreso.csv_cargado
+    print(progreso.csv_cargado)
     return JsonResponse(data)
 
 

@@ -1,4 +1,5 @@
-let intervalId;
+let intervalIdProgressBar;
+let waitTime = 1000;
 
 // Main Folder
 let formMainFolder = document.getElementById("cargar_carpeta");
@@ -114,7 +115,7 @@ function processFolders() {
 		displayDiv("div-parar");
 		displaySection("section-cluster-sonotipo");
 		displaySection("section-representativo-sonotipo");
-        intervalId = setInterval(() => updateProgressBar("sonotipo", intervalId), 500);
+        intervalIdProgressBar = setInterval(() => updateProgressBar("sonotipo", intervalIdProgressBar, waitTime), waitTime);
 	})
 	.catch(error => {
 		console.error("Error during fetch:", error.error, error.status);
@@ -150,10 +151,12 @@ function stopProcess() {
 		}
 	})
 	.then(jsonResponse => {
-		clearInterval(intervalId);
-		const spanValue = document.getElementById("value1");
-		spanValue.innerHTML = "Cancelado";
+		clearInterval(intervalIdProgressBar);
 		hideDiv("div-parar");
+		setTimeout(() => {
+			const spanValue = document.getElementById("value1");
+			spanValue.innerHTML = "Cancelado";
+		}, waitTime*2.5);
 	})
 	.catch(error => {
 		console.error("Error during fetch:", error.error, error.status);

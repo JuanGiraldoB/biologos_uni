@@ -48,11 +48,11 @@ async def load_main_folder_sonotipo(request):
         root_folder = await sync_to_async(get_root_folder)()
     except Exception as e:
         print(e)
-        return render(request, "etiquetado_auto/etiquetado-auto.html", data)
+        return render(request, "etiquetado_auto/etiquetado_auto_sonotipo_ajax.html", data)
 
     # If no root folder is selected, render an error page or return an error response
     if not root_folder:
-        return render(request, "etiquetado_auto/etiquetado-auto.html", data)
+        return render(request, "etiquetado_auto/etiquetado_auto_sonotipo_ajax.html", data)
 
     # Get lists of folder paths and their basenames that contain WAV files
     folders_wav_path, folders_wav_basename = get_folders_with_wav(
@@ -75,7 +75,7 @@ async def load_main_folder_sonotipo(request):
 
     # Save the statistics state and subfolder details to the session
     return JsonResponse(data)
-    # return render(request, "etiquetado_auto/etiquetado-auto.html", data)
+    # return render(request, "etiquetado_auto/etiquetado_auto_sonotipo_ajax.html", data)
 
 
 async def prepare_destination_folder_sonotipo(request):
@@ -91,18 +91,18 @@ async def prepare_destination_folder_sonotipo(request):
 
     # If no subfolders are selected, return to the template
     if not selected_subdfolders:
-        return render(request, "etiquetado_auto/etiquetado-auto.html")
+        return render(request, "etiquetado_auto/etiquetado_auto_sonotipo_ajax.html")
 
     try:
         # Get the destination folder where the processed output csv file will be saved
         destination_folder = await sync_to_async(get_root_folder)()
     except Exception as e:
         print("Error en destino carpeta", e)
-        return render(request, "etiquetado_auto/etiquetado-auto.html")
+        return render(request, "etiquetado_auto/etiquetado_auto_sonotipo_ajax.html")
 
     # If no destination folder is selected, return to the template
     if not destination_folder:
-        return render(request, "etiquetado_auto/etiquetado-auto.html")
+        return render(request, "etiquetado_auto/etiquetado_auto_sonotipo_ajax.html")
 
     # Save the destination folder and selected subfolders paths to the session
     await sync_to_async(save_destination_folder_session)(request, destination_folder, app="etiquetado_auto")
@@ -118,7 +118,7 @@ async def prepare_destination_folder_sonotipo(request):
 
     # Return the prepared data with the template for rendering
     return JsonResponse(data)
-    # return render(request, "etiquetado_auto/etiquetado-auto.html", data)
+    # return render(request, "etiquetado_auto/etiquetado_auto_sonotipo_ajax.html", data)
 
 
 async def process_folders_sonotipo(request):
@@ -130,7 +130,7 @@ async def process_folders_sonotipo(request):
 
     # If no subfolders are selected, return to the template
     if not selected_subdfolders:
-        return render(request, "etiquetado_auto/etiquetado-auto.html", data)
+        return render(request, "etiquetado_auto/etiquetado_auto_sonotipo_ajax.html", data)
 
     # Get frequency range from POST request
     minimum_frequency = request.POST.get('frecuenciaminima')
@@ -167,11 +167,8 @@ async def process_folders_sonotipo(request):
     # Save file details to the session
     save_files_session(request, files_details, app='etiquetado_auto')
 
-    # Calculate the 1% of total files
-    one_percent = int(0.01 * len(files_paths))
-
     # Create a progress object to track the processing progress with the amount of files from the selected folders
-    progreso = await sync_to_async(Progreso.objects.create)(cantidad_archivos=len(files_paths) + one_percent, uno_porciento=one_percent)
+    progreso = await sync_to_async(Progreso.objects.create)(cantidad_archivos=len(files_paths))
 
     # Get selected subfolders basenames
     selected_folders_basenames = get_subfolders_basename(
@@ -202,7 +199,7 @@ async def process_folders_sonotipo(request):
 
     # Return the prepared data with the template for rendering
     return JsonResponse(data)
-    # return render(request, "etiquetado_auto/etiquetado-auto.html", data)
+    # return render(request, "etiquetado_auto/etiquetado_auto_sonotipo_ajax.html", data)
 
 
 async def stop_process_sonotipo(request):
