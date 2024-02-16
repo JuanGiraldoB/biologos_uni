@@ -267,6 +267,11 @@
 						<div id="div-procesar" style="display: none;">
 							<form method="POST" id="form_procesar">
 								{% csrf_token %}
+								<div class="col-6 col-12-mobilep">
+									<label for="workers">Workers</label>
+									<input type="text" name="workers" id="workers"
+										placeholder="Ingrese cantidad de workers" />
+								</div>
 								<input type="submit" value="Procesar Carpetas" id="procesar_carpetas"
 									name="procesar_carpetas"></input>
 							</form>

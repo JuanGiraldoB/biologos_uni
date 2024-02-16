@@ -173,8 +173,12 @@ async def process_folders(request):
     # Start the processing task in the background
     # background_task = asyncio.create_task(run_calcular_indice(
     #     selected_indices, all_files, csv_path, progress))
+
+    workers = request.POST.get("workers")
+    print("workers:", workers)
+
     background_task = asyncio.create_task(run_calcular_indice(
-        selected_indices, all_files, csv_path))
+        selected_indices, all_files, csv_path, workers))
 
     # Get base names of selected subfolders
     selected_subdfolders_base_name = get_subfolders_basename(

@@ -169,14 +169,14 @@ def csvIndicesPool(valores, csv_path, indices_select):
                      encoding='utf_8_sig', index=False, sep=',')
 
 
-async def run_calcular_indice(indices_select, archivos, csv_path):
+async def run_calcular_indice(indices_select, archivos, csv_path, workers):
     global stop_thread
     stop_thread = False
 
-    await asyncio.to_thread(calcular_indices_pool, indices_select, archivos, csv_path)
+    await asyncio.to_thread(calcular_indices_pool, indices_select, archivos, csv_path, workers)
 
 
-def calcular_indices_pool(indices_select, archivos, csv_path):
+def calcular_indices_pool(indices_select, archivos, csv_path, workers):
     from multiprocessing import Pool
     from procesamiento.models import Progreso
     from indices.models import Indices
@@ -194,7 +194,7 @@ def calcular_indices_pool(indices_select, archivos, csv_path):
     total_tasks = len(args_list)
     completed_tasks = 0
 
-    with Pool(processes=10) as pool:
+    with Pool(processes=int(workers)) as pool:
         for result in pool.imap(process_grabacion_wrapper, args_list):
             valores.append(result)
             completed_tasks += 1
