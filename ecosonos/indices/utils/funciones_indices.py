@@ -1,3 +1,7 @@
+# from multiprocessing import Pool
+# from procesamiento.models import Progreso
+# from indices.models import Indices
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import soundfile as sf
 from scipy import signal
 from .calculo_indices import *
@@ -9,8 +13,11 @@ import asyncio
 from ecosonos.utils.archivos_utils import get_date_from_filename, save_filename_in_txt
 import pathlib
 import os
+import django
+django.setup()
 
 global stop_thread
+stop_thread = False
 
 # import matplotlib.pyplot as plt
 
@@ -69,12 +76,12 @@ def calcular_espectrograma(ruta):
     return f, t, s, senal_audio, fs
 
 
-def csvIndices(indicesCalculados, ruta, csv_path, indices_select):
-    Valores = indicesCalculados
+def csvIndices(indicesCalculados, csv_path, indices_select):
+    valores = indicesCalculados
 
     fechas = []
 
-    for nombre in Valores[0]:
+    for nombre in valores[0]:
         archivo_sin_extension = pathlib.Path(nombre).stem
 
         if '__' in archivo_sin_extension:
@@ -82,25 +89,19 @@ def csvIndices(indicesCalculados, ruta, csv_path, indices_select):
                 '__', '_')
 
         fechas.append(get_date_from_filename(archivo_sin_extension))
-        # fecha, tiempo = nombre.split('_')[1:3]
-        # tiempo = tiempo.split('.')[0]
 
-        # dt_obj = datetime.datetime.strptime(
-        #    fecha + tiempo, '%Y%m%d%H%M%S')
-
-        # fechas.append(dt_obj)
-
-    Valores.append(fechas)
+    valores.append(fechas)
 
     data = None
     indices_select.insert(0, 'File')
     indices_select.append('Date')
     indicesDF = pd.DataFrame(data, columns=indices_select)
+    # pprint.pprint(indicesDF)
 
     try:
 
         for j in range(len(indices_select)):
-            indicesDF[indices_select[j]] = Valores[j]
+            indicesDF[indices_select[j]] = valores[j]
 
         if 'ADIm' in indicesDF:
             for i in range(len(indicesDF['ADIm'][0])):
@@ -118,18 +119,221 @@ def csvIndices(indicesCalculados, ruta, csv_path, indices_select):
                      encoding='utf_8_sig', index=False, sep=',')
 
 
-async def run_calcular_indice(indices_select, carpeta, archivos, csv_path, progreso):
+def csvIndicesPool(valores, csv_path, indices_select):
+    import pprint
+
+    # for valor in valores:
+    #     for v in valor:
+    #         pprint.pprint(v)
+    #     print()
+    #     print()
+    #     print()
+
+    fechas = []
+    for nombre in valores:
+        archivo_sin_extension = pathlib.Path(nombre[0][0]).stem
+        if '__' in archivo_sin_extension:
+            archivo_sin_extension = archivo_sin_extension.replace(
+                '__', '_')
+
+        fechas.append(get_date_from_filename(archivo_sin_extension))
+
+    # valores.append(fechas)
+
+    data = None
+    indices_select.insert(0, 'File')
+    indices_select.append('Date')
+    indicesDF = pd.DataFrame(data, columns=indices_select)
+
+    try:
+
+        for valor, date in zip(valores, fechas):
+            # Create a new dictionary to store the row values
+            row_values = {}
+
+            # Iterate over each index and value in `valor`
+            for j, value in enumerate(valor):
+                column_name = indices_select[j]  # Get the column name
+                # Assign the value to the corresponding column
+                row_values[column_name] = value[0]
+
+            row_values['Date'] = date
+
+            # Append the row to the DataFrame
+            indicesDF = indicesDF.append(row_values, ignore_index=True)
+
+        if 'ADIm' in indicesDF:
+            for i in range(len(indicesDF['ADIm'][0])):
+                indicesDF[f'ADIm_{i}'] = indicesDF['ADIm'].apply(
+                    lambda x: x[i])
+
+            indicesDF = indicesDF.drop(columns=['ADIm'])
+    except Exception as e:
+        print(e)
+
+    date_column = indicesDF.pop('Date')
+    indicesDF['Date'] = date_column
+
+    indicesDF.to_csv(csv_path,
+                     encoding='utf_8_sig', index=False, sep=',')
+
+
+async def run_calcular_indice(indices_select, archivos, csv_path):
     global stop_thread
     stop_thread = False
 
-    await asyncio.to_thread(calcular_indice, indices_select, carpeta, archivos, csv_path, progreso)
+    await asyncio.to_thread(calcular_indices_pool, indices_select, archivos, csv_path)
 
 
-def calcular_indice(indices_select, carpeta, archivos, csv_path, progreso):
-    global stop_thread
+def calcular_indices_pool(indices_select, archivos, csv_path):
+    from multiprocessing import Pool
+    from procesamiento.models import Progreso
+    from indices.models import Indices
     import time
-    # Start time
     start_time = time.time()
+    indices = Indices.objects.first()
+    indices_select = indices.indices_seleccionados
+    progreso = Progreso.objects.first()
+    csv_path = indices.csv_path
+    valores = []
+
+    args_list = [(grabacion, indices_select, indices.valores)
+                 for grabacion in archivos]
+
+    total_tasks = len(args_list)
+    completed_tasks = 0
+
+    with Pool(processes=10) as pool:
+        for result in pool.imap(process_grabacion_wrapper, args_list):
+            valores.append(result)
+            completed_tasks += 1
+
+            global stop_thread
+            if stop_thread:
+                return
+
+            # Update progress
+            progreso.archivos_completados = completed_tasks
+            progreso.save()
+
+            # You might also want to print progress for your reference
+            print(f"Completed {completed_tasks}/{total_tasks} tasks")
+
+    # with Pool(processes=10) as pool:
+    #     valores = pool.starmap(process_grabacion, args_list)
+
+    csvIndicesPool(valores, csv_path, indices_select)
+    end_time = time.time()
+    print(f"total time: {end_time-start_time}")
+
+
+def process_grabacion_wrapper(args):
+    return process_grabacion(*args)
+
+
+def process_grabacion(grabacion, indices_select, valores):
+    global stop_thread
+    if stop_thread:
+        return
+
+    g = str(grabacion).split("/")[-1]
+    valores[0].append(g)
+
+    indices_calculados = {}
+    f, t, s, audio, Fs = calcular_espectrograma(grabacion)
+    parametros = {
+        "ACIft": {"s": s},
+        "ADI": {"s": s, "Fmax": 10000, "wband": 1000, "bn": -50},
+        "ACItf": {"audio": audio, "Fs": Fs, "j": 5, "s": s},
+        "BETA": {"s": s, "f": f, "bio_band": (2000, 8000)},
+        "TE": {"audio": audio, "Fs": Fs},
+        "ESM": {"s": s, "f": f, "fmin": 482, "fmax": 8820},
+        "NDSI": {
+            "s": s,
+            "f": f,
+            "bio_band": (2000, 8000),
+            "tech_band": (200, 1500),
+        },
+        "P": {"s": s, "f": f, "bio_band": (2000, 8000), "tech_band": (200, 1500)},
+        "M": {"audio": audio, "Fs": Fs, "depth": 16},
+        "NP": {"s": s, "f": f, "nedges": 10},
+        "MID": {"s": s, "f": f, "fmin": 450, "fmax": 3500},
+        "BNF": {"s": s},
+        "BNT": {"audio": audio, "fwin": 5},
+        "MD": {
+            "audio": audio,
+            "Fs": Fs,
+            "win": 256,
+            "nfft": None,
+            "type_win": "hann",
+            "overlap": None,
+        },
+        "FM": {"s": s},
+        "SF": {
+            "audio": audio,
+            "win": 256,
+            "nfft": None,
+            "type_win": "hann",
+            "overlap": None,
+        },
+        "RMS": {"audio": audio},
+        "CF": {"audio": audio},
+        "SC": {"audio": audio, "Fs": Fs},
+        "SB": {"audio": audio, "Fs": Fs},
+        "Tonnets": {"audio": audio, "Fs": Fs},
+        "SVE": {"s": s, "f": f, "fmin": 482, "fmax": 8820},
+        "SNR": {"audio": audio, "axis": 0, "ddof": 0},
+        "ADIm": {"s": s, "Fs": Fs, "wband": 1000},
+    }
+
+    calcular_indices = {
+        "ACIft": ACIft,
+        "ADI": ADI,
+        "ACItf": ACItf,
+        "BETA": beta,
+        "TE": temporal_entropy,
+        "ESM": spectral_maxima_entropy,
+        "NDSI": NDSI,
+        "P": rho,
+        "M": median_envelope,
+        "NP": number_of_peaks,
+        "MID": mid_band_activity,
+        "BNF": background_noise_freq,
+        "BNT": background_noise_time,
+        "MD": musicality_degree,
+        "FM": frequency_modulation,
+        "SF": wiener_entropy,
+        "RMS": rms,
+        "CF": crest_factor,
+        "SC": spectral_centroid,
+        "SB": spectral_bandwidth,
+        "Tonnets": tonnetz,
+        "SVE": spectral_variance_entropy,
+        "SNR": signaltonoise,
+        "ADIm": ADIm,
+    }
+
+    for indice in indices_select:
+        indices_calculados[indice] = calcular_indices[indice]
+
+    aux = []
+    j = 0
+    for indice in indices_select:
+        j += 1
+        valor_indice = indices_calculados[indice](parametros[indice])
+        valores[j].append(valor_indice)
+        aux.append({"Name_indice": indice, "valor": valor_indice})
+
+    # progreso.archivos_completados += 1
+    # progreso.save()
+
+    save_filename_in_txt(grabacion)
+
+    return valores
+
+
+def calcular_indice(indices_select, archivos, csv_path, progreso):
+    import time
     """Calcula el valor de los indices seleccionados por el usuario.
 
     :param indices_select: Cadena de texto que agrupa las abreviaturas
@@ -138,30 +342,24 @@ def calcular_indice(indices_select, carpeta, archivos, csv_path, progreso):
     :return: Nombre y valor de los indices calculados
     :rtype: json
     """
-    Indices_grabaciones = []
+    start_time = time.time()
+
+    global stop_thread
+    indices_grabaciones = []
 
     grabaciones = archivos
-    # carpeta = askdirectory(title='Seleccionar carpeta con audios')
-    # archivos = os.listdir(carpeta)
 
-    # for archivo in archivos:
-    # archivo = archivo.lower()
-    # incluir todos los formatos que queremos que soporte
-    # if archivo[-4:] == ".wav" or archivo[-4:] == ".WAV":
-    #     grabaciones.append(archivo)
-
-    Valores = list()
+    valores = list()
     for i in range(len(indices_select)+1):
-        Valores.append(list())
+        valores.append(list())
 
     for grabacion in tqdm(grabaciones):
 
         if stop_thread:
             return
 
-        # TODO: OS SEP
         g = str(grabacion).split("/")[-1]
-        Valores[0].append(g)
+        valores[0].append(g)
 
         Indices_calculados = {}
 
@@ -250,7 +448,7 @@ def calcular_indice(indices_select, carpeta, archivos, csv_path, progreso):
         for indice in indices_select:
             j = j+1
             valor_indice = Indices_calculados[indice](parametros[indice])
-            Valores[j].append(valor_indice)
+            valores[j].append(valor_indice)
             aux.append({"Name_indice": indice, "valor": valor_indice})
 
         progreso.archivos_completados += 1
@@ -258,17 +456,14 @@ def calcular_indice(indices_select, carpeta, archivos, csv_path, progreso):
 
         save_filename_in_txt(grabacion)
 
-        Indices_grabaciones.append({"Grabacion": g, "Indices": list(aux)})
+        indices_grabaciones.append({"Grabacion": g, "Indices": list(aux)})
 
-    csvIndices(Valores, carpeta, csv_path, indices_select)
-    # End time
     end_time = time.time()
+    print(f"total time: {end_time-start_time}")
 
-    # Calculate the execution time
-    execution_time = end_time - start_time
-    print(f"Time taken: {execution_time} seconds")
-    # graficaErrorBar(carpeta, grabaciones)
-    return carpeta, grabaciones
+    csvIndices(valores, csv_path, indices_select)
+    # graficaErrorBa, grabaciones)
+    return grabaciones
     # return JsonResponse({"Indices calculados": Indices_grabaciones})
 
 

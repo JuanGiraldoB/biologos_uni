@@ -453,6 +453,8 @@ def algoritmo_lluvia_edison(carpetas, raiz, progreso, path_csv):
                 if stop_thread:
                     return
 
+                print(f"Completed tasks")
+
                 progreso.archivos_completados = len(x)
                 progreso.save()
 

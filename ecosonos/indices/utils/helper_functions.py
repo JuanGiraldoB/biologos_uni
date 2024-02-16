@@ -24,8 +24,9 @@ from ecosonos.utils.session_utils import (
     get_csv_path_session
 )
 
-from ecosonos.utils.tkinter_utils import get_root_folder, get_file
 from procesamiento.models import Progreso
+from indices.models import Indices
+from ecosonos.utils.tkinter_utils import get_root_folder, get_file
 from .funciones_indices_progress import generate_polar_plot
 from .funciones_indices import run_calcular_indice, stop_process_indices
 
@@ -44,6 +45,7 @@ async def load_folder(request):
 
     # Delete all records in the Progreso model
     await sync_to_async(Progreso.objects.all().delete)()
+    await sync_to_async(Indices.objects.all().delete)()
 
     try:
         # Get the root folder where the wav files are located
@@ -156,11 +158,23 @@ async def process_folders(request):
     # Create a progress object in the database with the amount of files that are inside the folders
     progress = await sync_to_async(Progreso.objects.create)(cantidad_archivos=len(all_files))
 
-    # Start the processing task in the background
-    background_task = asyncio.create_task(run_calcular_indice(
-        selected_indices, root_folder, all_files, csv_path, progress))
+    # Create indices object
+    valores = list()
+    for i in range(len(selected_indices)+1):
+        valores.append(list())
 
-    print(background_task)
+    await sync_to_async(Indices.objects.create)(
+        indices_seleccionados=selected_indices,
+        csv_path=csv_path,
+        valores=valores,
+        grabaciones=all_files
+    )
+
+    # Start the processing task in the background
+    # background_task = asyncio.create_task(run_calcular_indice(
+    #     selected_indices, all_files, csv_path, progress))
+    background_task = asyncio.create_task(run_calcular_indice(
+        selected_indices, all_files, csv_path))
 
     # Get base names of selected subfolders
     selected_subdfolders_base_name = get_subfolders_basename(

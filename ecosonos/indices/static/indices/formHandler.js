@@ -113,7 +113,7 @@ function processFolders() {
         displayDivProgressBar();
 		displayDiv("div-parar");
         hideDiv("div-procesar");
-        intervalId = setInterval(updateProgressBar, 500);
+        intervalId = setInterval(updateProgressBar, 2000);
 	})
 	.catch(error => {
 		console.error("Error during fetch:", error.error, error.status);
