@@ -120,15 +120,6 @@ def csvIndices(indicesCalculados, csv_path, indices_select):
 
 
 def csvIndicesPool(valores, csv_path, indices_select):
-    import pprint
-
-    # for valor in valores:
-    #     for v in valor:
-    #         pprint.pprint(v)
-    #     print()
-    #     print()
-    #     print()
-
     fechas = []
     for nombre in valores:
         archivo_sin_extension = pathlib.Path(nombre[0][0]).stem
@@ -216,7 +207,6 @@ def calcular_indices_pool(indices_select, archivos, csv_path):
             progreso.archivos_completados = completed_tasks
             progreso.save()
 
-            # You might also want to print progress for your reference
             print(f"Completed {completed_tasks}/{total_tasks} tasks")
 
     # with Pool(processes=10) as pool:
