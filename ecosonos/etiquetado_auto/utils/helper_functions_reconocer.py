@@ -53,8 +53,6 @@ async def load_main_folder_reconocer(request):
 
     # Delete all records in the Progreso model
     await sync_to_async(Progreso.objects.all().delete)()
-    await sync_to_async(GuardadoClusterResult.objects.all().delete)()
-    await sync_to_async(MetodologiaResult.objects.all().delete)()
 
     try:
         # Get the root folder where the wav files are located
@@ -96,13 +94,8 @@ async def load_main_folder_reconocer(request):
 
 
 async def load_csv_reconocer(request):
-    await sync_to_async(Progreso.objects.all().delete)()
-    await sync_to_async(GuardadoClusterResult.objects.all().delete)()
-    await sync_to_async(MetodologiaResult.objects.all().delete)()
     # Create an empty dictionary to store data that will be sent to the template
     data = {}
-
-    print("deleted")
 
     try:
         # Get the CSV file path
