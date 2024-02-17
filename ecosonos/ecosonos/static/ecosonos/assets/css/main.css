@@ -3727,7 +3727,7 @@ input, select, textarea {
 		background: rgba(25, 161, 115, 0.2);
 		justify-content: flex-start;
 		border-radius: 100px;
-		align-items: center;
+		align-items: center !important;
 		position: relative;
 		padding: 0 5px;
 		display: flex;
@@ -3752,7 +3752,7 @@ input, select, textarea {
 	
 		border-radius: 100px;
 		background: #19a173;
-		height: 15px;
+		height: 20px;
 		width: 0;
 	} 
 	
@@ -4605,7 +4605,7 @@ input, select, textarea {
 	  .titulo-graficas{
 		text-align: left;
 		margin: 0% !important;
-		padding-bottom: 10px !important;
+		padding-bottom: 25px !important;
 		line-height: 0% !important;
 	  }
 
