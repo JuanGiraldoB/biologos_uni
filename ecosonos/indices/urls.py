@@ -1,8 +1,13 @@
 from django.urls import path
-from . import views
+from .views import (
+    indices_vista,
+    barra_progreso_vista,
+    csv_cargado
+)
 
 
 urlpatterns = [
-    path('', views.indices_vista, name='indices'),
-    path('barra_progreso', views.barra_progreso_vista, name='barra_progreso'),
+    path('', indices_vista, name='indices'),
+    path('barra_progreso', barra_progreso_vista, name='barra_progreso'),
+    path('csv_cargado', csv_cargado, name='csv_cargado'),
 ]

@@ -2,7 +2,8 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
 from ecosonos.utils.helper_functions import (
-    get_advance_percentage
+    get_advance_percentage,
+    check_csv_state
 )
 
 from .utils.helper_functions import (
@@ -42,3 +43,8 @@ async def lluvia(request):
 @csrf_exempt
 def progress_bar(request):
     return get_advance_percentage()
+
+
+@csrf_exempt
+def csv_cargado(request):
+    return check_csv_state()

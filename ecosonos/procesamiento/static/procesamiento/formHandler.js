@@ -1,3 +1,6 @@
+let intervalIdProgressBar = null;
+let waitTime = 1000;
+
 // Main Folder
 let formMainFolder = document.getElementById("cargar_carpeta");
 formMainFolder.addEventListener("submit", handleSubmiSelectMainFolder);
@@ -114,7 +117,7 @@ function processFolders() {
         displayDivProgressBar();
 		hideDiv("div-procesar");
 		displayDiv("div-parar");
-        intervalId = setInterval(updateProgressBar, 500);
+        intervalIdProgressBar = setInterval(() => updateProgressBar(intervalIdProgressBar, waitTime), waitTime);
 	})
 	.catch(error => {
 		console.error("Error during fetch:", error.error, error.status);
@@ -150,7 +153,7 @@ function stopProcess() {
 		}
 	})
 	.then(jsonResponse => {
-		clearInterval(intervalId);
+		clearInterval(intervalIdProgressBar);
 		const spanValue = document.getElementById("value1");
 		spanValue.innerHTML = "Cancelado";
 		hideDiv("div-parar");

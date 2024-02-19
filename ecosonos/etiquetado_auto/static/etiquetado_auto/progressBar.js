@@ -18,7 +18,7 @@ function updateProgressBar(type, intervalIdProgressBar, waitTime) {
 			if (porcentaje_completado == 100) {
 				clearInterval(intervalIdProgressBar);
 				setTimeout(() => {
-					spanValue.innerHTML = "Completado";
+					spanValue.innerHTML = "Completado - Guardando datos en CSV";
 					if (type == "temporal") {
 						getPlots();
 					} else {

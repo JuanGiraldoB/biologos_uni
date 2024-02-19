@@ -504,9 +504,11 @@ def algoritmo_lluvia_edison(carpetas, raiz, progreso, path_csv):
         cols2 = cols[:-2] + cols[-1:] + ['Duracion(seg)']
         df_y = df_y[cols2]
 
-        # print(f"Saving in {path_file} ...")
         df_y.to_csv(path_csv, index=False)
-        # print(f"Results saved in {path_file}")
+
+        progreso.csv_cargado = True
+        progreso.save()
+
         print(
             f"Execution Time {str(timedelta(seconds=time.time() - start_time))}")
 
