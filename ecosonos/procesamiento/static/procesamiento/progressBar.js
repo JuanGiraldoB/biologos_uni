@@ -18,6 +18,7 @@ function updateProgressBar(intervalIdProgressBar, waitTime) {
 				clearInterval(intervalIdProgressBar);
 				setTimeout(() => {
 					spanValue.innerHTML = "Completado - Guardando datos en CSV";
+					hideDiv("div-parar")
 					intervalIdCsvState = setInterval(() => getCsvState(intervalIdCsvState), waitTime);
 				}, waitTime*2.5);
 			}
