@@ -161,9 +161,12 @@ async def process_folders(request):
     root_folder = await sync_to_async(get_root_folder_session)(request)
     destination_folder = await sync_to_async(get_destination_folder_session)(request)
 
+    # Base name of root folder
+    base_name_root_folder = os.path.basename(root_folder)
+
     # Name of csv file where the output will be saved
     date_time = get_current_datetime_with_minutes()
-    csv_name = f'resultado-preproceso-{date_time}.csv'
+    csv_name = f'preproceso-{base_name_root_folder}-{date_time}.csv'
     csv_path = os.path.join(destination_folder, csv_name)
     await sync_to_async(save_csv_path_session)(request, csv_path, app="preproceso")
 

@@ -119,7 +119,7 @@ def csvIndices(indicesCalculados, csv_path, indices_select):
                      encoding='utf_8_sig', index=False, sep=',')
 
 
-def csvIndicesPool(valores, csv_path, indices_select):
+def csvIndicesPool(valores, csv_path, indices_select, progreso):
     fechas = []
     for nombre in valores:
         archivo_sin_extension = pathlib.Path(nombre[0][0]).stem
@@ -168,6 +168,9 @@ def csvIndicesPool(valores, csv_path, indices_select):
     indicesDF.to_csv(csv_path,
                      encoding='utf_8_sig', index=False, sep=',')
 
+    progreso.csv_cargado = True
+    progreso.save()
+
 
 async def run_calcular_indice(indices_select, archivos, csv_path, workers):
     global stop_thread
@@ -212,7 +215,7 @@ def calcular_indices_pool(indices_select, archivos, csv_path, workers):
     # with Pool(processes=10) as pool:
     #     valores = pool.starmap(process_grabacion, args_list)
 
-    csvIndicesPool(valores, csv_path, indices_select)
+    csvIndicesPool(valores, csv_path, indices_select, progreso)
     end_time = time.time()
     print(f"total time: {end_time-start_time}")
 
