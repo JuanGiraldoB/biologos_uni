@@ -173,12 +173,11 @@ async def process_folders(request):
         grabaciones=all_files
     )
 
-    # Start the processing task in the background
-    # background_task = asyncio.create_task(run_calcular_indice(
-    #     selected_indices, all_files, csv_path, progress))
-
     workers = request.POST.get("workers")
-    print("workers:", workers)
+
+    # if workers is not defined, assign a default value
+    if not workers:
+        workers = 5
 
     background_task = asyncio.create_task(run_calcular_indice(
         selected_indices, all_files, csv_path, workers))
