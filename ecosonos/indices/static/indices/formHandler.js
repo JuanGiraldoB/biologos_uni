@@ -71,7 +71,6 @@ function selectDestinationFolder() {
 		}
 	})
 	.then(jsonResponse => {
-        console.log(jsonResponse)
         let folders = jsonResponse.folders;
 		let destinationFolder = jsonResponse.destination_folder;
 		hideDiv("div-seleccionar-carpeta-destino");
